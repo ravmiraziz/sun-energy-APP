@@ -25,13 +25,13 @@ import {
 } from "recharts";
 
 const data = [
-  { name: "Mon", usage: 4000, solar: 2400 },
-  { name: "Tue", usage: 3000, solar: 1398 },
-  { name: "Wed", usage: 2000, solar: 9800 },
-  { name: "Thu", usage: 2780, solar: 3908 },
-  { name: "Fri", usage: 1890, solar: 4800 },
-  { name: "Sat", usage: 2390, solar: 3800 },
-  { name: "Sun", usage: 3490, solar: 4300 },
+  { name: "Du", usage: 4000, solar: 2400 },
+  { name: "Se", usage: 3000, solar: 1398 },
+  { name: "Cho", usage: 2000, solar: 9800 },
+  { name: "Pa", usage: 2780, solar: 3908 },
+  { name: "Ju", usage: 1890, solar: 4800 },
+  { name: "Sha", usage: 2390, solar: 3800 },
+  { name: "Ya", usage: 3490, solar: 4300 },
 ];
 
 const DashboardView: React.FC = () => {
@@ -41,7 +41,7 @@ const DashboardView: React.FC = () => {
       value: "$45,231.89",
       trend: "+12.5%",
       isPositive: true,
-      icon: <MdPayments className="text-[26px]"/>,
+      icon: <MdPayments className="text-[26px]" />,
       colorClass: "revenue-card-gradient border-2 border-yellow-500",
     },
     {
@@ -49,21 +49,21 @@ const DashboardView: React.FC = () => {
       value: "12,840 kWh",
       trend: "+5.2%",
       isPositive: true,
-      icon: <MdBolt className="text-[26px]"/>,
+      icon: <MdBolt className="text-[26px]" />,
     },
     {
       label: "Total Orders",
       value: "1,254",
       trend: "-2.4%",
       isPositive: false,
-      icon: <MdShoppingCart className="text-[26px]"/>,
+      icon: <MdShoppingCart className="text-[26px]" />,
     },
     {
       label: "Active Nodes",
       value: "842 Nodes",
       trend: "System Online",
       isPositive: true,
-      icon: <MdHub className="text-[26px]"/>,
+      icon: <MdHub className="text-[26px]" />,
     },
   ];
 
@@ -73,21 +73,21 @@ const DashboardView: React.FC = () => {
       name: "Node Cluster-09",
       location: "Sector 4, New York",
       status: "Active",
-      icon: <MdRouter className="text-[26px]"/>,
+      icon: <MdRouter className="text-[26px]" />,
     },
     {
       id: "2",
       name: "Main Transformer B",
       location: "Sector 2, New Jersey",
       status: "Syncing",
-      icon: <MdPower className="text-[26px]"/>,
+      icon: <MdPower className="text-[26px]" />,
     },
     {
       id: "3",
       name: "Node Solar-22",
       location: "Sector 9, Arizona",
       status: "Alert",
-      icon: <MdWarning className="text-[26px]"/>,
+      icon: <MdWarning className="text-[26px]" />,
     },
   ];
 
@@ -280,7 +280,7 @@ const DashboardView: React.FC = () => {
                 </div>
               </div>
               <button className="text-slate-400 hover:text-primary transition-colors">
-                <MdRefresh className="text-[26px]"/>
+                <MdRefresh className="text-[26px]" />
               </button>
             </div>
             <button className="w-full py-3 text-xs font-bold bg-primary rounded-xl transition-all active:scale-[0.98]">

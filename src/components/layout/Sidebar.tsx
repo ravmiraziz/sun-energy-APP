@@ -1,6 +1,14 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { MdBolt, MdDashboard, MdInventory2, MdReceiptLong, MdGroup, MdSettings, MdAddCircle } from "react-icons/md";
+import {
+  MdBolt,
+  MdDashboard,
+  MdInventory2,
+  MdReceiptLong,
+  MdGroup,
+  MdSettings,
+  MdAddCircle,
+} from "react-icons/md";
 
 const Sidebar: React.FC = () => {
   return (
@@ -22,66 +30,66 @@ const Sidebar: React.FC = () => {
             end
             className={({ isActive }) =>
               `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "text-gray-500"
+                isActive ? "text-[#fbbf24]" : "card_text"
               }`
             }
           >
-            <MdDashboard className="text-[24px]"/>
+            <MdDashboard className="text-[24px]" />
             <span className="text-sm font-semibold">Boshqaruv</span>
           </NavLink>
           <NavLink
             to="/admin/products"
             className={({ isActive }) =>
               `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "text-gray-500"
+                isActive ? "text-[#fbbf24]" : "card_text"
               }`
             }
           >
-            <MdInventory2 className="text-[24px]"/>
+            <MdInventory2 className="text-[24px]" />
             <span className="text-sm font-semibold">Mahsulotlar</span>
           </NavLink>
           <NavLink
             to="/admin/orders"
             className={({ isActive }) =>
               `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "text-gray-500"
+                isActive ? "text-[#fbbf24]" : "card_text"
               }`
             }
           >
-            <MdReceiptLong className="text-[24px]"/>
+            <MdReceiptLong className="text-[24px]" />
             <span className="text-sm font-semibold">Buyurtmalar</span>
           </NavLink>
           <NavLink
             to="/admin/users"
             className={({ isActive }) =>
               `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "text-gray-500"
+                isActive ? "text-[#fbbf24]" : "card_text"
               }`
             }
           >
-            <MdGroup className="text-[24px]"/>
+            <MdGroup className="text-[24px]" />
             <span className="text-sm font-semibold">Foydalanuvchilar</span>
           </NavLink>
           <NavLink
             to="/admin/services"
             className={({ isActive }) =>
               `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "text-gray-500"
+                isActive ? "text-[#fbbf24]" : "card_text"
               }`
             }
           >
-            <MdGroup className="text-[24px]"/>
+            <MdGroup className="text-[24px]" />
             <span className="text-sm font-semibold">Serveslar</span>
           </NavLink>
           <NavLink
             to="/admin/settings"
             className={({ isActive }) =>
               `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "text-gray-500"
+                isActive ? "text-[#fbbf24]" : "card_text"
               }`
             }
           >
-            <MdSettings className="text-[24px]"/>
+            <MdSettings className="text-[24px]" />
             <span className="text-sm font-semibold">Sozlamalar</span>
           </NavLink>
         </nav>
@@ -110,7 +118,7 @@ const Sidebar: React.FC = () => {
           end
           className={({ isActive }) =>
             `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "text-gray-500"
+              isActive ? "text-[#fbbf24]" : "card_text"
             }`
           }
         >
@@ -121,7 +129,7 @@ const Sidebar: React.FC = () => {
           to="/admin/products"
           className={({ isActive }) =>
             `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "text-gray-500"
+              isActive ? "text-[#fbbf24]" : "card_text"
             }`
           }
         >
@@ -132,7 +140,7 @@ const Sidebar: React.FC = () => {
           to="/admin/orders"
           className={({ isActive }) =>
             `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "text-gray-500"
+              isActive ? "text-[#fbbf24]" : "card_text"
             }`
           }
         >
@@ -143,7 +151,7 @@ const Sidebar: React.FC = () => {
           to="/admin/users"
           className={({ isActive }) =>
             `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "text-gray-500"
+              isActive ? "text-[#fbbf24]" : "card_text"
             }`
           }
         >
@@ -154,7 +162,7 @@ const Sidebar: React.FC = () => {
           to="/admin/services"
           className={({ isActive }) =>
             `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "text-gray-500"
+              isActive ? "text-[#fbbf24]" : "card_text"
             }`
           }
         >
@@ -165,7 +173,7 @@ const Sidebar: React.FC = () => {
           to="/admin/settings"
           className={({ isActive }) =>
             `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "text-gray-500"
+              isActive ? "text-[#fbbf24]" : "card_text"
             }`
           }
         >

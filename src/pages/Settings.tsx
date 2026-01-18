@@ -9,7 +9,7 @@ import {
 
 const Settings: React.FC = () => {
   return (
-    <div className="p-8 max-w-5xl mx-auto w-full space-y-12">
+    <div className="p-8 max-w-400 mx-auto w-full space-y-12">
       <div className="flex flex-wrap justify-between items-end gap-6">
         <div>
           <h2 className="text-4xl font-black leading-tight tracking-tight">

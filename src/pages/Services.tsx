@@ -45,7 +45,7 @@ const SERVICES = [
 
 const Services: React.FC = () => {
   return (
-    <div className="flex-1 p-10">
+    <div className="flex-1 p-8  ">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-4xl font-black text-white tracking-tight">

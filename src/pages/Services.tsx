@@ -21,18 +21,18 @@ const Services: React.FC = () => {
           </p>
         </div>
         <button className="p-2 rounded-full bg-[#064e3b] border border-emerald-800">
-          <MdNotifications />
+          <MdNotifications  className="text-[24px]"/>
         </button>
       </header>
 
       <div className="px-6 mb-6">
         <div className="relative">
-          <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400" />
+          <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 text-[24px]" />
           <input
             className="w-full bg-[#064e3b] rounded-2xl pl-11 pr-4 py-4 text-sm focus:ring-[#FFB800]"
             placeholder="Xizmatni toping..."
           />
-          <MdTune className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400" />
+          <MdTune className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400 text-[24px]" />
         </div>
       </div>
 

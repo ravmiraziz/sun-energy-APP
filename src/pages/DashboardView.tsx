@@ -22,7 +22,7 @@ const DashboardView: React.FC = () => {
       value: "$45,231.89",
       trend: "+12.5%",
       isPositive: true,
-      icon: <MdPayments />,
+      icon: <MdPayments className="text-[26px]"/>,
       colorClass: "revenue-card-gradient border-2 border-yellow-500",
     },
     {
@@ -30,21 +30,21 @@ const DashboardView: React.FC = () => {
       value: "12,840 kWh",
       trend: "+5.2%",
       isPositive: true,
-      icon: <MdBolt />,
+      icon: <MdBolt className="text-[26px]"/>,
     },
     {
       label: "Total Orders",
       value: "1,254",
       trend: "-2.4%",
       isPositive: false,
-      icon: <MdShoppingCart />,
+      icon: <MdShoppingCart className="text-[26px]"/>,
     },
     {
       label: "Active Nodes",
       value: "842 Nodes",
       trend: "System Online",
       isPositive: true,
-      icon: <MdHub />,
+      icon: <MdHub className="text-[26px]"/>,
     },
   ];
 
@@ -54,21 +54,21 @@ const DashboardView: React.FC = () => {
       name: "Node Cluster-09",
       location: "Sector 4, New York",
       status: "Active",
-      icon: <MdRouter />,
+      icon: <MdRouter className="text-[26px]"/>,
     },
     {
       id: "2",
       name: "Main Transformer B",
       location: "Sector 2, New Jersey",
       status: "Syncing",
-      icon: <MdPower />,
+      icon: <MdPower className="text-[26px]"/>,
     },
     {
       id: "3",
       name: "Node Solar-22",
       location: "Sector 9, Arizona",
       status: "Alert",
-      icon: <MdWarning />,
+      icon: <MdWarning className="text-[26px]"/>,
     },
   ];
 
@@ -254,7 +254,7 @@ const DashboardView: React.FC = () => {
             <div className="card_btn p-3 rounded-xl flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-slate-200 dark:bg-card-dark rounded-lg text-slate-500">
-                  <MdUpdate className="text-sm" />
+                  <MdUpdate />
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase">
@@ -264,7 +264,7 @@ const DashboardView: React.FC = () => {
                 </div>
               </div>
               <button className="text-slate-400 hover:text-primary transition-colors">
-                <MdRefresh />
+                <MdRefresh className="text-[26px]"/>
               </button>
             </div>
             <button className="w-full py-3 text-xs font-bold text-slate-500 dark:text-slate-400 border border_color dark:border-border-teal rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-[0.98]">

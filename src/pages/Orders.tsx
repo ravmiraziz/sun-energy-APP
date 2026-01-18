@@ -172,7 +172,7 @@ const Orders: React.FC = () => {
         <div className="p-6 border-b border_color dark:border-border-teal flex items-center justify-between">
           <h3 className="text-xl font-black">Order Details</h3>
           <button className="text-slate-400 hover:text-primary transition-colors">
-            <MdClose />
+            <MdClose className="text-[24px]" />
           </button>
         </div>
 
@@ -232,7 +232,7 @@ const Orders: React.FC = () => {
               </div>
             </div>
             <div className="mt-6 p-4 card_btn rounded-xl flex items-center gap-4 border border_color/50 dark:border-border-teal/50">
-              <MdAccountBalanceWallet className="text-primary" />
+              <MdAccountBalanceWallet className="text-primary text-[24px]" />
               <div>
                 <p className="text-[10px] text-slate-400 font-bold uppercase">
                   Payment Method

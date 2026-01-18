@@ -88,7 +88,7 @@ const Products: React.FC = () => {
           </p>
           <div className="flex items-center gap-2">
             <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400">
-              <MdFilterList />
+              <MdFilterList className="text-[24px]"/>
             </button>
           </div>
         </div>

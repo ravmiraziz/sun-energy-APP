@@ -8,7 +8,7 @@ const Sidebar: React.FC = () => {
       <aside className="w-64 bg_mode border-r border_color not-sm:hidden flex flex-col z-20 transition-all duration-300">
         <div className="p-6 flex items-center gap-3">
           <div className="bg-primary size-10 rounded-lg flex items-center justify-center  shadow-lg shadow-primary/20">
-            <MdBolt className="font-bold" />
+            <MdBolt className="font-bold text-[24px]" />
           </div>
           <div>
             <h1 className="text-base font-bold leading-tight">Smart Energy</h1>
@@ -26,7 +26,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <MdDashboard />
+            <MdDashboard className="text-[24px]"/>
             <span className="text-sm font-semibold">Boshqaruv</span>
           </NavLink>
           <NavLink
@@ -37,7 +37,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <MdInventory2 />
+            <MdInventory2 className="text-[24px]"/>
             <span className="text-sm font-semibold">Mahsulotlar</span>
           </NavLink>
           <NavLink
@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <MdReceiptLong />
+            <MdReceiptLong className="text-[24px]"/>
             <span className="text-sm font-semibold">Buyurtmalar</span>
           </NavLink>
           <NavLink
@@ -59,7 +59,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <MdGroup />
+            <MdGroup className="text-[24px]"/>
             <span className="text-sm font-semibold">Foydalanuvchilar</span>
           </NavLink>
           <NavLink
@@ -70,7 +70,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <MdGroup />
+            <MdGroup className="text-[24px]"/>
             <span className="text-sm font-semibold">Serveslar</span>
           </NavLink>
           <NavLink
@@ -81,7 +81,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <MdSettings />
+            <MdSettings className="text-[24px]"/>
             <span className="text-sm font-semibold">Sozlamalar</span>
           </NavLink>
         </nav>

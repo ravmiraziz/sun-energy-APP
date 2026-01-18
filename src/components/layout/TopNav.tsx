@@ -39,11 +39,11 @@ const TopNav: React.FC = () => {
 
         <div className="flex gap-2">
           <button className="size-10 flex items-center justify-center rounded-xl card_btn text-slate-600 dark:text-slate-400 relative hover:text-primary transition-colors">
-            <MdNotifications />
+            <MdNotifications className="text-[24px]"/>
             <span className="absolute top-2 right-2 size-2 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></span>
           </button>
           <button className="size-10 flex items-center justify-center rounded-xl card_btn text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-            <MdChatBubble />
+            <MdChatBubble className="text-[24px]"/>
           </button>
         </div>
 

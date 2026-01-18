@@ -5,7 +5,7 @@ import TopNav from "../components/layout/TopNav";
 
 const DashboardLayout: React.FC = () => {
   return (
-    <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark">
+    <div className="flex h-screen overflow-hidden bg_mode">
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0">

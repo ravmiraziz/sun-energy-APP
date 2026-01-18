@@ -49,7 +49,7 @@ const Login: React.FC = () => {
             className={`w-full md:w-1/2 p-12 flex flex-col justify-center transition-all duration-500 ${step === 2 ? "opacity-40 grayscale pointer-events-none scale-95" : "opacity-100"}`}
           >
             <div className="flex flex-col items-center mb-10">
-              <span className="material-symbols-outlined text-primary text-5xl mb-4 filled-icon">
+              <span className="material-symbols-outlined text_primary text-5xl mb-4 filled-icon">
                 admin_panel_settings
               </span>
               <h2 className="text-3xl font-black text-white text-center">
@@ -80,7 +80,7 @@ const Login: React.FC = () => {
                   </label>
                   <button
                     type="button"
-                    className="text-primary text-[10px] font-bold uppercase hover:underline"
+                    className="text_primary text-[10px] font-bold uppercase hover:underline"
                   >
                     Forgot?
                   </button>
@@ -119,7 +119,7 @@ const Login: React.FC = () => {
           >
             <div className="flex flex-col items-center mb-10">
               <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 shadow-inner">
-                <span className="material-symbols-outlined text-primary text-4xl">
+                <span className="material-symbols-outlined text_primary text-4xl">
                   verified_user
                 </span>
               </div>
@@ -128,7 +128,7 @@ const Login: React.FC = () => {
               </h2>
               <p className="text-slate-400 text-sm mt-3 text-center px-6">
                 Verification code sent to <br />
-                <span className="text-primary font-bold">
+                <span className="text_primary font-bold">
                   adm***@energy-commerce.com
                 </span>
               </p>
@@ -150,7 +150,7 @@ const Login: React.FC = () => {
             <button
               onClick={handleVerify}
               disabled={step === 1 || loading}
-              className="w-full border-2 border-primary/30 text-primary font-black py-4 rounded-2xl hover:bg-primary/10 transition-all flex items-center justify-center gap-2 mb-6 disabled:opacity-20"
+              className="w-full border-2 border-primary/30 text_primary font-black py-4 rounded-2xl hover:bg-primary/10 transition-all flex items-center justify-center gap-2 mb-6 disabled:opacity-20"
             >
               {loading ? "Verifying..." : "Verify & Access"}
               {!loading && (
@@ -161,7 +161,7 @@ const Login: React.FC = () => {
             <div className="text-center">
               <p className="text-slate-500 text-xs">
                 Didn't receive code?{" "}
-                <button className="text-primary hover:underline font-bold ml-1">
+                <button className="text_primary hover:underline font-bold ml-1">
                   Resend in 0:59
                 </button>
               </p>

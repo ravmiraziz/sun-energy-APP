@@ -67,13 +67,11 @@ const Orders: React.FC = () => {
           </div>
           <div className="flex gap-3">
             <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-border-teal bg_card text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-              <MdFilterList className="text-[22px]"/>
+              <MdFilterList className="text-[22px]" />
               Filter
             </button>
             <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-background-dark text-sm font-bold shadow-lg shadow-primary/20 hover:brightness-110 transition-all transform hover:scale-[1.02]">
-              <span className="material-symbols-outlined ">
-                download
-              </span>
+              <span className="material-symbols-outlined ">download</span>
               Export CSV
             </button>
           </div>
@@ -141,7 +139,7 @@ const Orders: React.FC = () => {
                     <span
                       className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
                         order.status === "Success"
-                          ? "bg-primary/10 text-primary border-primary/20"
+                          ? "bg-primary/10 text_primary border-primary/20"
                           : order.status === "Pending"
                             ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
                             : "bg-red-500/10 text-red-500 border-red-500/20"
@@ -158,15 +156,26 @@ const Orders: React.FC = () => {
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               Showing 1 to 10 of 124 orders
             </p>
-            <div className="flex gap-2">
-              <button className="px-4 py-2 rounded-xl bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
-                Prev
+            <div className="flex items-center gap-2">
+              <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
+                <span className="material-symbols-outlined text-[20px]">
+                  chevron_left
+                </span>
               </button>
-              <button className="px-4 py-2 rounded-xl bg-primary text-background-dark text-[10px] font-bold">
+              <button className="size-8 flex items-center justify-center rounded-lg bg-primary text-background-dark text-xs font-bold">
                 1
               </button>
-              <button className="px-4 py-2 rounded-xl bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
-                Next
+              <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
+                2
+              </button>
+              <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
+                3
+              </button>
+              <span className="px-2 text-slate-400 text-xs">...</span>
+              <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
+                <span className="material-symbols-outlined text-[20px]">
+                  chevron_right
+                </span>
               </button>
             </div>
           </div>
@@ -185,7 +194,7 @@ const Orders: React.FC = () => {
           <div className="bg-primary/5 rounded-2xl border border-primary/20 p-6 shadow-inner">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">
+                <p className="text-[10px] font-black text_primary uppercase tracking-[0.2em] mb-1">
                   Order #8821
                 </p>
                 <p className="text-xl font-black leading-tight">
@@ -197,7 +206,7 @@ const Orders: React.FC = () => {
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <div className="size-12 rounded-full bg-primary/20 flex items-center justify-center text-primary shadow-sm">
+              <div className="size-12 rounded-full bg-primary/20 flex items-center justify-center text_primary shadow-sm">
                 <span className="material-symbols-outlined text-2xl">
                   solar_power
                 </span>
@@ -233,13 +242,13 @@ const Orders: React.FC = () => {
               ))}
               <div className="pt-4 border-t border_color dark:border-border-teal flex justify-between items-baseline">
                 <span className="font-bold text-sm">Total Charged</span>
-                <span className="font-black text-primary text-2xl">
+                <span className="font-black text_primary text-2xl">
                   $128.50
                 </span>
               </div>
             </div>
             <div className="mt-6 p-4 card_btn rounded-xl flex items-center gap-4 border border_color/50 dark:border-border-teal/50">
-              <span className="material-symbols-outlined text-primary">
+              <span className="material-symbols-outlined text_primary">
                 account_balance_wallet
               </span>
               <div>

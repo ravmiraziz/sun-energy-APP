@@ -85,7 +85,7 @@ const DashboardView: React.FC = () => {
   ];
 
   return (
-    <div className="p-8 space-y-8 max-w-[1400px] mx-auto w-full">
+    <div className="p-8 space-y-8 max-w-400 mx-auto w-full">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((kpi, idx) => (
@@ -95,24 +95,24 @@ const DashboardView: React.FC = () => {
           >
             <div className="flex justify-between items-start">
               <p
-                className={`${kpi.colorClass ? "text-white/80" : "text-slate-500 dark:text-slate-400"} text-sm font-semibold`}
+                className={`${kpi.colorClass ? "text-white/80" : "text-slate-400"} text-sm font-semibold`}
               >
                 {kpi.label}
               </p>
               <span
-                className={`material-symbols-outlined ${kpi.colorClass ? "text-white/40" : "text-primary"}`}
+                className={`material-symbols-outlined ${kpi.colorClass ? "text-white/40" : "text_primary"}`}
               >
                 {kpi.icon}
               </span>
             </div>
             <div>
               <p
-                className={`${kpi.colorClass ? "text-white" : "text-slate-900 dark:text-white"} text-3xl font-bold tracking-tight`}
+                className={`${kpi.colorClass ? "text-white" : "text-white"} text-3xl font-bold tracking-tight`}
               >
                 {kpi.value}
               </p>
               <p
-                className={`${kpi.colorClass ? "text-white" : kpi.isPositive ? "text-primary" : "text-red-500"} text-xs font-medium mt-2 flex items-center gap-1`}
+                className={`${kpi.colorClass ? "text-white" : kpi.isPositive ? "text_primary" : "text-red-500"} text-xs font-medium mt-2 flex items-center gap-1`}
               >
                 <span className="material-symbols-outlined text-sm">
                   {kpi.isPositive ? "trending_up" : "trending_down"}
@@ -137,7 +137,7 @@ const DashboardView: React.FC = () => {
               </p>
             </div>
             <div className="flex gap-2">
-              <button className="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+              <button className="px-3 py-1.5 text-xs font-bold rounded-lg card_btn transition-colors">
                 Week
               </button>
               <button className="px-3 py-1.5 text-xs font-bold rounded-lg bg-primary text-background-dark shadow-lg shadow-primary/20">
@@ -192,10 +192,10 @@ const DashboardView: React.FC = () => {
         </div>
 
         {/* Node Status Widget */}
-        <div className="bg_card border border_color dark:border-border-teal rounded-2xl p-6 flex flex-col shadow-sm">
+        <div className="bg_card border border_color rounded-2xl p-6 flex flex-col shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-bold">Node Status</h2>
-            <span className="flex items-center gap-1 text-[10px] font-bold text-primary uppercase">
+            <span className="flex items-center gap-1 text-[10px] font-bold text_primary uppercase">
               <span className="size-2 bg-primary rounded-full animate-pulse"></span>
               Live Grid
             </span>
@@ -206,7 +206,7 @@ const DashboardView: React.FC = () => {
                 <div
                   className={`size-10 rounded-full flex items-center justify-center transition-colors ${
                     node.status === "Active"
-                      ? "bg-primary/10 text-primary"
+                      ? "bg-primary/10 text_primary"
                       : node.status === "Syncing"
                         ? "bg-blue-500/10 text-blue-500"
                         : "bg-red-500/10 text-red-500"
@@ -225,7 +225,7 @@ const DashboardView: React.FC = () => {
                 <span
                   className={`text-[10px] font-bold px-2 py-1 rounded transition-all ${
                     node.status === "Active"
-                      ? "bg-primary/20 text-primary"
+                      ? "bg-primary/20 text_primary"
                       : node.status === "Syncing"
                         ? "bg-blue-500/20 text-blue-500"
                         : "bg-red-500/20 text-red-500"
@@ -240,7 +240,7 @@ const DashboardView: React.FC = () => {
           <div className="mt-6 pt-6 border-t border_color">
             <div className="card_btn p-3 rounded-xl flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-slate-200 dark:bg-card-dark rounded-lg text-slate-500">
+                <div className="p-2 bg_mode rounded-lg text-slate-500">
                   <span className="material-symbols-outlined text-sm">
                     update
                   </span>
@@ -256,7 +256,7 @@ const DashboardView: React.FC = () => {
                 refresh
               </button>
             </div>
-            <button className="w-full py-3 text-xs font-bold text-slate-500 dark:text-slate-400 border border_color dark:border-border-teal rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-[0.98]">
+            <button className="w-full py-3 text-xs font-bold bg-primary rounded-xl transition-all active:scale-[0.98]">
               View All Nodes
             </button>
           </div>
@@ -264,39 +264,35 @@ const DashboardView: React.FC = () => {
       </div>
 
       {/* Recent Transactions Table */}
-      <div className="bg_card border border_color dark:border-border-teal rounded-2xl overflow-hidden shadow-sm">
-        <div className="p-6 border-b border_color dark:border-border-teal flex items-center justify-between">
+      <div className="bg_card border border_color rounded-2xl overflow-hidden shadow-sm">
+        <div className="p-6 border-b border_color flex items-center justify-between">
           <h2 className="text-lg font-bold">Recent Transactions</h2>
-          <button className="text-primary text-sm font-bold flex items-center gap-1 hover:underline transition-all">
-            Download CSV
-            <span className="material-symbols-outlined text-sm">download</span>
-          </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-slate-50 dark:bg-slate-800/50">
+            <thead className="card_btn">
               <tr>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Order ID
                 </th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Customer
                 </th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Amount
                 </th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Date
                 </th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Status
                 </th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-right">
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">
                   Action
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-border-teal">
+            <tbody className="">
               {recentTransactions.map((tx) => (
                 <tr
                   key={tx.id}
@@ -315,14 +311,14 @@ const DashboardView: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm font-bold">{tx.amount}</td>
-                  <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
+                  <td className="px-6 py-4 text-sm text-slate-400">
                     {tx.date}
                   </td>
                   <td className="px-6 py-4">
                     <span
                       className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
                         tx.status === "Completed"
-                          ? "bg-primary/20 text-primary"
+                          ? "bg-primary/20 text_primary"
                           : "bg-yellow-500/20 text-yellow-500"
                       }`}
                     >

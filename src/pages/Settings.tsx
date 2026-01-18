@@ -24,7 +24,7 @@ const Settings: React.FC = () => {
 
       <section className="space-y-6">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">
+          <span className="material-symbols-outlined text_primary">
             palette
           </span>
           <h3 className="text-xl font-bold">Appearance & Theme</h3>
@@ -64,7 +64,7 @@ const Settings: React.FC = () => {
 
       <section className="space-y-6">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">
+          <span className="material-symbols-outlined text_primary">
             account_circle
           </span>
           <h3 className="text-xl font-bold">Admin Profile</h3>
@@ -136,7 +136,7 @@ const Settings: React.FC = () => {
 
       <section className="space-y-6 pb-20">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">
+          <span className="material-symbols-outlined text_primary">
             security
           </span>
           <h3 className="text-xl font-bold">Module Access</h3>
@@ -180,20 +180,20 @@ const Settings: React.FC = () => {
                     <input
                       type="checkbox"
                       defaultChecked
-                      className="rounded border-slate-300 dark:border-border-teal text-primary focus:ring-primary bg-transparent"
+                      className="rounded border-slate-300 dark:border-border-teal text_primary focus:ring-primary bg-transparent"
                     />
                   </td>
                   <td className="px-6 py-4 text-center">
                     <input
                       type="checkbox"
                       defaultChecked={i === 0}
-                      className="rounded border-slate-300 dark:border-border-teal text-primary focus:ring-primary bg-transparent"
+                      className="rounded border-slate-300 dark:border-border-teal text_primary focus:ring-primary bg-transparent"
                     />
                   </td>
                   <td className="px-6 py-4 text-center">
                     <input
                       type="checkbox"
-                      className="rounded border-slate-300 dark:border-border-teal text-primary focus:ring-primary bg-transparent"
+                      className="rounded border-slate-300 dark:border-border-teal text_primary focus:ring-primary bg-transparent"
                     />
                   </td>
                 </tr>

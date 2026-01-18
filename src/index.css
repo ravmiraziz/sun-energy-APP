@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+:root {
+  --bg: #10221d;
+  --text: #ffff;
+  --primary: #0df2b1;
+  --card: #1c362e;
+  /* --card: #22493e; */
+  --card-text: #8fccba;
+  --card-btn: #064e3b;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+.filled-icon {
+  font-variation-settings:
+    "FILL" 1,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+.revenue-card-gradient {
+  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+}
+
+body {
+  scrollbar-width: thin;
+  scrollbar-color: #22493e transparent;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.bg_color {
+  background: var(--bg);
+}
+
+.bg_mode {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.bg-primary {
+  background: var(--primary);
+  color: var(--text);
+}
+
+.bg_card {
+  background: var(--card);
+  color: var(--text);
+}
+.card_btn {
+  background: var(--card-btn);
+  color: var(--text);
+}

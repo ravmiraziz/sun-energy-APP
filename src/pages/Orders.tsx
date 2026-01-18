@@ -1,4 +1,5 @@
 import React from "react";
+import { MdFilterList } from "react-icons/md";
 
 const Orders: React.FC = () => {
   const orders = [
@@ -66,13 +67,11 @@ const Orders: React.FC = () => {
           </div>
           <div className="flex gap-3">
             <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-border-teal bg_card text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-              <span className="material-symbols-outlined text-lg">
-                filter_list
-              </span>
+              <MdFilterList className="text-[22px]"/>
               Filter
             </button>
             <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-background-dark text-sm font-bold shadow-lg shadow-primary/20 hover:brightness-110 transition-all transform hover:scale-[1.02]">
-              <span className="material-symbols-outlined text-lg">
+              <span className="material-symbols-outlined ">
                 download
               </span>
               Export CSV

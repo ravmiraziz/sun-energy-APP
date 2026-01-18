@@ -1,5 +1,5 @@
 import React from "react";
-import { MdSearch, MdNotifications, MdChatBubble } from "react-icons/md";
+import { MdSearch } from "react-icons/md";
 
 const TopNav: React.FC = () => {
   return (

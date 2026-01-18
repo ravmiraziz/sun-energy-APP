@@ -1,5 +1,11 @@
 import React from "react";
-import { MdPalette, MdAccountCircle, MdPhotoCamera, MdExpandMore, MdSecurity } from "react-icons/md";
+import {
+  MdPalette,
+  MdAccountCircle,
+  MdPhotoCamera,
+  MdExpandMore,
+  MdSecurity,
+} from "react-icons/md";
 
 const Settings: React.FC = () => {
   return (
@@ -171,20 +177,20 @@ const Settings: React.FC = () => {
                     <input
                       type="checkbox"
                       defaultChecked
-                      className="rounded border-slate-300 dark:border-border-teal text-primary focus:ring-primary bg-transparent"
+                      className="rounded border-slate-300 dark:border-border-teal text_primary focus:ring-primary bg-transparent"
                     />
                   </td>
                   <td className="px-6 py-4 text-center">
                     <input
                       type="checkbox"
                       defaultChecked={i === 0}
-                      className="rounded border-slate-300 dark:border-border-teal text-primary focus:ring-primary bg-transparent"
+                      className="rounded border-slate-300 dark:border-border-teal text_primary focus:ring-primary bg-transparent"
                     />
                   </td>
                   <td className="px-6 py-4 text-center">
                     <input
                       type="checkbox"
-                      className="rounded border-slate-300 dark:border-border-teal text-primary focus:ring-primary bg-transparent"
+                      className="rounded border-slate-300 dark:border-border-teal text_primary focus:ring-primary bg-transparent"
                     />
                   </td>
                 </tr>

@@ -53,7 +53,9 @@ button {
 
 input,
 textarea,
-button {
+button,
+select,
+option {
   outline: none;
 }
 
@@ -67,8 +69,12 @@ button {
 }
 
 .bg-primary {
-  background: var(--primary);
+  background: orange;
   color: var(--text);
+}
+
+.bg-primary:hover {
+  background: var(--primary);
 }
 
 .bg_card {
@@ -78,6 +84,10 @@ button {
 .card_btn {
   background: var(--card-btn);
   color: var(--text);
+}
+
+.text_primary {
+  color: var(--primary);
 }
 
 .card_text {

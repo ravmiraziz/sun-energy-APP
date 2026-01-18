@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { MdBolt, MdAdminPanelSettings, MdVisibility, MdArrowForward, MdVerifiedUser, MdShield, MdLock } from "react-icons/md";
+import {
+  MdBolt,
+  MdAdminPanelSettings,
+  MdVisibility,
+  MdArrowForward,
+  MdVerifiedUser,
+  MdShield,
+  MdLock,
+} from "react-icons/md";
 
 const Login: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -79,7 +87,7 @@ const Login: React.FC = () => {
                   </label>
                   <button
                     type="button"
-                    className="text-primary text-[10px] font-bold uppercase hover:underline"
+                    className="text_primary text-[10px] font-bold uppercase hover:underline"
                   >
                     Forgot?
                   </button>
@@ -121,7 +129,7 @@ const Login: React.FC = () => {
               </h2>
               <p className="text-slate-400 text-sm mt-3 text-center px-6">
                 Verification code sent to <br />
-                <span className="text-primary font-bold">
+                <span className="text_primary font-bold">
                   adm***@energy-commerce.com
                 </span>
               </p>
@@ -143,18 +151,16 @@ const Login: React.FC = () => {
             <button
               onClick={handleVerify}
               disabled={step === 1 || loading}
-              className="w-full border-2 border-primary/30 text-primary font-black py-4 rounded-2xl hover:bg-primary/10 transition-all flex items-center justify-center gap-2 mb-6 disabled:opacity-20"
+              className="w-full border-2 border-primary/30 text_primary font-black py-4 rounded-2xl hover:bg-primary/10 transition-all flex items-center justify-center gap-2 mb-6 disabled:opacity-20"
             >
               {loading ? "Verifying..." : "Verify & Access"}
-              {!loading && (
-                <MdShield />
-              )}
+              {!loading && <MdShield />}
             </button>
 
             <div className="text-center">
               <p className="text-slate-500 text-xs">
                 Didn't receive code?{" "}
-                <button className="text-primary hover:underline font-bold ml-1">
+                <button className="text_primary hover:underline font-bold ml-1">
                   Resend in 0:59
                 </button>
               </p>

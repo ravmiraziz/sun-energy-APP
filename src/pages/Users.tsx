@@ -60,7 +60,7 @@ const Users: React.FC = () => {
             label: "Total Users",
             val: "1,284",
             trend: "+12%",
-            color: "text-primary",
+            color: "text_primary",
           },
           {
             label: "Active Admins",
@@ -157,7 +157,7 @@ const Users: React.FC = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
                       user.role === "Admin"
-                        ? "bg-primary/10 text-primary border_color"
+                        ? "bg-primary/10 text_primary border_color"
                         : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white border_color dark:border-white/20"
                     }`}
                   >

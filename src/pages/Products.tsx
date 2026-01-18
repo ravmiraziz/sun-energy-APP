@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { MdChevronRight, MdAdd, MdFilterList, MdEdit, MdDelete, MdChevronLeft, MdChevronRight as MdChevronRightIcon } from "react-icons/md";
+import {
+  MdChevronRight,
+  MdAdd,
+  MdFilterList,
+  MdEdit,
+  MdDelete,
+  MdChevronLeft,
+  MdChevronRight as MdChevronRightIcon,
+} from "react-icons/md";
 
 const Products: React.FC = () => {
   const [products] = useState([
@@ -51,15 +59,13 @@ const Products: React.FC = () => {
   ]);
 
   return (
-    <div className="p-8 max-w-[1440px] mx-auto w-full">
-      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6">
+    <div className="p-8 max-w-400 mx-auto w-full">
+      <div className="flex items-center gap-2 text-sm text_primary mb-6">
         <a className="hover:text-primary transition-colors" href="#">
           Dashboard
         </a>
         <MdChevronRight className="text-[16px]" />
-        <span className="text-slate-900 dark:text-white font-medium">
-          Products Management
-        </span>
+        <span className="text-white font-medium">Products Management</span>
       </div>
 
       <div className="flex justify-between items-center mb-6">
@@ -77,18 +83,15 @@ const Products: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg_card rounded-2xl border border_color dark:border-border-teal overflow-hidden shadow-sm flex flex-col">
-        <div className="px-6 py-4 border-b border_color dark:border-border-teal flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Showing{" "}
-            <span className="font-semibold text-slate-900 dark:text-white">
-              1-5
-            </span>{" "}
-            of 250 products
+      <div className="card_btn rounded-2xl border border_color overflow-hidden shadow-sm flex flex-col">
+        <div className="px-6 py-4 border-b border_color flex items-center justify-between">
+          <p className="text-sm text_primary">
+            Showing <span className="font-semibold text-white">1-5</span> of 250
+            products
           </p>
           <div className="flex items-center gap-2">
-            <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-400">
-              <MdFilterList className="text-[24px]"/>
+            <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400">
+              <MdFilterList />
             </button>
           </div>
         </div>
@@ -96,7 +99,7 @@ const Products: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] font-bold tracking-widest border-b border_color dark:border-border-teal">
+              <tr className="uppercase text-[11px] font-bold tracking-widest border-b border_color">
                 <th className="px-6 py-4 w-16">Image</th>
                 <th className="px-6 py-4">Product Name</th>
                 <th className="px-6 py-4">Category</th>
@@ -105,22 +108,22 @@ const Products: React.FC = () => {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-border-teal">
+            <tbody className="divide-y divide-slate-100 bg_card">
               {products.map((product) => (
                 <tr
                   key={product.id}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group"
+                  className="hover:bg-slate-800/30 transition-colors group"
                 >
                   <td className="px-6 py-4">
                     <img
-                      className="size-12 rounded-lg object-cover bg-slate-100 dark:bg-slate-800 border border_color dark:border-border-teal"
+                      className="size-12 rounded-lg object-cover bg-slate-800 border border_color"
                       src={product.image}
                       alt={product.name}
                     />
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+                      <span className="text-sm font-semibold text-white group-hover:text-primary transition-colors">
                         {product.name}
                       </span>
                       <span className="text-xs text-slate-500 font-mono uppercase tracking-tighter">
@@ -129,7 +132,7 @@ const Products: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border border_color dark:border-border-teal/50">
+                    <span className="card_btn px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border border_color/50">
                       {product.category}
                     </span>
                   </td>
@@ -140,7 +143,7 @@ const Products: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div
-                      className={`w-10 h-5 rounded-full p-1 cursor-pointer transition-colors ${product.status ? "bg-primary" : "bg-slate-300 dark:bg-slate-700"}`}
+                      className={`w-10 h-5 rounded-full p-1 cursor-pointer transition-colors ${product.status ? "bg-primary" : "bg-slate-700"}`}
                     >
                       <div
                         className={`size-3 bg-white rounded-full shadow transition-transform ${product.status ? "translate-x-5" : "translate-x-0"}`}
@@ -163,32 +166,30 @@ const Products: React.FC = () => {
           </table>
         </div>
 
-        <div className="px-6 py-4 border-t border_color dark:border-border-teal flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
+        <div className="px-6 py-4 border-t border_color flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500 dark:text-slate-400">
-              Rows per page:
-            </span>
-            <select className="bg-transparent border-none text-xs font-bold text-slate-900 dark:text-white focus:ring-0 p-0 pr-6">
+            <span className="text-xs text_primary">Rows per page:</span>
+            <select className="bg-transparent border-none text-xs font-bold bg_card focus:ring-0 p-0 pr-6">
               <option>10</option>
               <option>20</option>
               <option>50</option>
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
               <MdChevronLeft className="text-[20px]" />
             </button>
             <button className="size-8 flex items-center justify-center rounded-lg bg-primary text-background-dark text-xs font-bold">
               1
             </button>
-            <button className="size-8 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-xs font-semibold">
+            <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
               2
             </button>
-            <button className="size-8 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-xs font-semibold">
+            <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
               3
             </button>
             <span className="px-2 text-slate-400 text-xs">...</span>
-            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
               <MdChevronRightIcon className="text-[20px]" />
             </button>
           </div>

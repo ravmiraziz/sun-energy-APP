@@ -2,22 +2,29 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 export interface User {
   id: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  full_name: string;
-  image_url: string;
   phone: string;
+  password: string;
+  image_url: string;
+  language: string;
+  refresh_token: string;
   created_at: string;
-  role: "admin";
+  deleted_at: string;
 }
 
-interface AuthContextType {
+interface AuthData {
   user: User | null;
   token: string | null;
-  login: (data: { user: User; token: string }) => void;
+}
+
+interface AuthContextType extends AuthData {
+  login: (data: AuthData) => void;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -25,25 +32,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
+  /* 🔁 Refresh’da tiklash */
   useEffect(() => {
-    const saved = localStorage.getItem("auth");
-    if (saved) {
-      const parsed = JSON.parse(saved);
+    const stored = localStorage.getItem("auth");
+    if (stored) {
+      const parsed: AuthData = JSON.parse(stored);
       setUser(parsed.user);
       setToken(parsed.token);
     }
   }, []);
 
-  const login = (data: { user: User; token: string }) => {
+  const login = (data: AuthData) => {
     setUser(data.user);
     setToken(data.token);
-    localStorage.setItem("auth", JSON.stringify(data));
+    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("access_token", JSON.stringify(data.token));
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem("auth");
+    localStorage.removeItem("user");
+    localStorage.removeItem("access_token");
+    window.location.reload();
   };
 
   return (

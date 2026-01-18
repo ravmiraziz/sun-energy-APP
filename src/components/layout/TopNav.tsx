@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Search, Bell, X } from "lucide-react";
+import { Bell, X } from "lucide-react";
 import { MdNotifications, MdSearch } from "react-icons/md";
+import { useAuth } from "../../context/AuthContext";
 
 const TopNav: React.FC = () => {
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState<string[]>([]);
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
 
@@ -77,7 +79,7 @@ const TopNav: React.FC = () => {
               onClick={handleNotificationClick}
               className="size-10 flex items-center justify-center rounded-xl card_btn text-slate-600 dark:text-slate-400 relative hover:text-primary transition-colors"
             >
-              <MdNotifications />
+              <MdNotifications className="text-[22px]" />
               {notifications.length > 0 && (
                 <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white"></span>
               )}
@@ -134,18 +136,15 @@ const TopNav: React.FC = () => {
           <div className="flex items-center gap-3 cursor-pointer group">
             <div className="hidden lg:block text-right">
               <p className="text-sm font-bold leading-none group-hover:text-primary transition-colors">
-                Alex Rivera
+                {user?.first_name} {user?.last_name}
               </p>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider mt-1">
-                Super Admin
+                {user?.phone}
               </p>
             </div>
-            <div
-              className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20 group-hover:border-primary transition-all"
-              style={{
-                backgroundImage: `url('https://picsum.photos/100/100?random=1')`,
-              }}
-            />
+            <div className="bg-center bg-no-repeat aspect-square bg-cover overflow-hidden rounded-full size-10 border-2 border-primary/20 group-hover:border-primary transition-all">
+              <img src={user?.image_url} alt="avatar" />
+            </div>
           </div>
         </div>
       </header>

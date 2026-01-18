@@ -7,6 +7,8 @@ import Orders from "../pages/Orders";
 import Settings from "../pages/Settings";
 import Users from "../pages/Users";
 import Login from "../pages/auth/Login";
+import { requireAdmin } from "../utils/auth";
+import NoAccess from "../pages/NoAccess";
 
 export const router = createBrowserRouter([
   {
@@ -14,8 +16,13 @@ export const router = createBrowserRouter([
     element: <Login />,
   },
   {
+    path: "/403",
+    element: <NoAccess />,
+  },
+  {
     path: "/admin",
-    element: <DashboardLayout />, // 🔥 LAYOUT
+    element: <DashboardLayout />,
+    loader: requireAdmin,
     children: [
       { index: true, element: <DashboardView /> },
       { path: "settings", element: <Settings /> },

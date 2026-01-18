@@ -5,9 +5,12 @@ import {
   MdPhotoCamera,
   MdExpandMore,
   MdSecurity,
+  MdLogout,
 } from "react-icons/md";
+import { useAuth } from "../context/AuthContext";
 
 const Settings: React.FC = () => {
+  const { user, logout } = useAuth();
   return (
     <div className="p-8 max-w-400 mx-auto w-full space-y-12">
       <div className="flex flex-wrap justify-between items-end gap-6">
@@ -85,19 +88,14 @@ const Settings: React.FC = () => {
                 <MdPhotoCamera className="text-md" />
               </button>
             </div>
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full relative">
               {[
-                { label: "Full Name", val: "Alex Rivera", type: "text" },
+                { label: "Ism", val: user?.first_name, type: "text" },
+                { label: "Familiya", val: user?.last_name, type: "text" },
                 {
-                  label: "Email Address",
-                  val: "alex.rivera@smartenergy.admin",
+                  label: "E-pochta manzil",
+                  val: user?.email,
                   type: "email",
-                },
-                {
-                  label: "Role",
-                  val: "Super Admin",
-                  type: "select",
-                  options: ["Super Admin", "Energy Analyst", "Manager"],
                 },
                 {
                   label: "Timezone",
@@ -128,6 +126,12 @@ const Settings: React.FC = () => {
                   )}
                 </div>
               ))}
+              <button
+                className="absolute top-0 right-0 text-red-500 flex items-center gap-2 justify-center"
+                onClick={logout}
+              >
+                Chiqish <MdLogout className="text-[20px]" />
+              </button>
             </div>
           </div>
         </div>

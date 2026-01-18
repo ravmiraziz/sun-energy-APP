@@ -32,13 +32,17 @@ const Login: React.FC = () => {
     setTimeout(() => {
       login({
         user: {
-          id: "admin-1",
+          id: "1",
+          first_name: "John",
+          last_name: "Doe",
           email,
-          full_name: "John Doe",
-          role: "admin",
-          image_url: "https://picsum.photos/100/100?random=10",
           phone: "+998934905134",
-          created_at: "12.12.2000",
+          password,
+          image_url: "https://picsum.photos/100/100?random=10",
+          language: "ru",
+          refresh_token: "FAKE_REFRESH_TOKEN",
+          created_at: "01.01.2000",
+          deleted_at: "",
         },
         token: "FAKE_ADMIN_TOKEN",
       });
@@ -176,13 +180,12 @@ const Login: React.FC = () => {
             className={`w-full md:w-1/2 p-12 bg-background-dark/40 flex flex-col justify-center border-l border_color transition-all duration-500 not-md:hidden`}
           >
             <div className="flex flex-col items-center mb-10">
-              <img src="/logo.svg" alt="" />
+              <img src="/logo.svg" alt="logo" />
               <h2 className="text-2xl font-black text-white text-center">
                 Assalomu alaykum Xush kelibsiz.
               </h2>
               <p className="card_text text-sm mt-3 text-center px-6">
-                Ushbu bo'lim faqat adminlar uchun <br />
-                <span className="text_primary font-bold">{email}</span>
+                Ushbu bo'lim faqat adminlar uchun
               </p>
             </div>
 

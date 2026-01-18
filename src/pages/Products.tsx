@@ -77,7 +77,7 @@ const Products: React.FC = () => {
             Manage and track your energy asset inventory
           </p>
         </div>
-        <button className="bg-primary text-background-dark px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90 shadow-lg shadow-primary/20 transition-all transform hover:scale-[1.02]">
+        <button className="bg-primary px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90 shadow-lg shadow-primary/20 transition-all transform hover:scale-[1.02]">
           <MdAdd className="text-[20px]" />
           Add Product
         </button>
@@ -123,7 +123,7 @@ const Products: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-white group-hover:text-primary transition-colors">
+                      <span className="text-sm font-semibold text-white transition-colors">
                         {product.name}
                       </span>
                       <span className="text-xs text-slate-500 font-mono uppercase tracking-tighter">
@@ -179,7 +179,7 @@ const Products: React.FC = () => {
             <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
               <MdChevronLeft className="text-[20px]" />
             </button>
-            <button className="size-8 flex items-center justify-center rounded-lg bg-primary text-background-dark text-xs font-bold">
+            <button className="size-8 flex items-center justify-center rounded-lg bg-primary text-xs font-bold">
               1
             </button>
             <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">

@@ -11,9 +11,30 @@ import {
   MdWarning,
   MdUpdate,
   MdRefresh,
-  MdDownload,
   MdMoreHoriz,
 } from "react-icons/md";
+
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
+
+const data = [
+  { name: "Mon", usage: 4000, solar: 2400 },
+  { name: "Tue", usage: 3000, solar: 1398 },
+  { name: "Wed", usage: 2000, solar: 9800 },
+  { name: "Thu", usage: 2780, solar: 3908 },
+  { name: "Fri", usage: 1890, solar: 4800 },
+  { name: "Sat", usage: 2390, solar: 3800 },
+  { name: "Sun", usage: 3490, solar: 4300 },
+];
 
 const DashboardView: React.FC = () => {
   const kpis = [
@@ -160,49 +181,46 @@ const DashboardView: React.FC = () => {
               </button>
             </div>
           </div>
-          <div className="h-64 relative w-full mb-6">
-            <svg
-              className="w-full h-full"
-              preserveAspectRatio="none"
-              viewBox="0 0 1000 200"
-            >
-              <defs>
-                <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
-                  <stop
-                    offset="0%"
-                    stopColor="#0df2b1"
-                    stopOpacity="0.3"
-                  ></stop>
-                  <stop
-                    offset="100%"
-                    stopColor="#0df2b1"
-                    stopOpacity="0"
-                  ></stop>
-                </linearGradient>
-              </defs>
-              <path
-                d="M0,150 Q100,120 200,160 T400,100 T600,140 T800,80 T1000,120 L1000,200 L0,200 Z"
-                fill="url(#chartGradient)"
-              ></path>
-              <path
-                d="M0,150 Q100,120 200,160 T400,100 T600,140 T800,80 T1000,120"
-                fill="none"
-                stroke="#0df2b1"
-                strokeWidth="3"
-                strokeLinecap="round"
-                className="animate-draw"
-              ></path>
-            </svg>
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
-          </div>
-          <div className="flex justify-between px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
-            <span>Sun</span>
+          <div className="h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={data}>
+                <defs>
+                  <linearGradient id="colorUsage" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#09f6b3" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#09f6b3" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#1f2937"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="name"
+                  stroke="#6b7280"
+                  fontSize={12}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis hide />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#111827",
+                    border: "1px solid #374151",
+                    borderRadius: "12px",
+                  }}
+                  itemStyle={{ color: "#09f6b3" }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="usage"
+                  stroke="#09f6b3"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorUsage)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
@@ -278,10 +296,6 @@ const DashboardView: React.FC = () => {
       <div className="bg_card border border_color rounded-2xl overflow-hidden shadow-sm">
         <div className="p-6 border-b border_color flex items-center justify-between">
           <h2 className="text-lg font-bold">Recent Transactions</h2>
-          <button className="text-primary text-sm font-bold flex items-center gap-1 hover:underline transition-all">
-            Download CSV
-            <MdDownload className="text-sm" />
-          </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">

@@ -1,5 +1,13 @@
 import React from "react";
-import { MdPersonAdd, MdSearch, MdExpandMore, MdEditNote, MdDelete } from "react-icons/md";
+import {
+  MdPersonAdd,
+  MdSearch,
+  MdExpandMore,
+  MdEditNote,
+  MdDelete,
+  MdChevronLeft,
+  MdChevronRight as MdChevronRightIcon,
+} from "react-icons/md";
 
 const Users: React.FC = () => {
   const users = [
@@ -38,13 +46,13 @@ const Users: React.FC = () => {
   ];
 
   return (
-    <div className="p-8 max-w-[1200px] mx-auto w-full space-y-8">
+    <div className="p-8 max-w-400 mx-auto w-full space-y-8">
       <div className="flex flex-wrap justify-between items-center gap-4">
         <div>
           <h1 className="text-4xl font-black leading-tight tracking-tight">
             User Management
           </h1>
-          <p className="text-slate-500 dark:text-primary/60 text-sm mt-1">
+          <p className="text_primary text-sm mt-1">
             Manage administrative roles and end-user permissions.
           </p>
         </div>
@@ -77,9 +85,9 @@ const Users: React.FC = () => {
         ].map((stat, i) => (
           <div
             key={i}
-            className="bg_card rounded-2xl p-6 border border_color dark:border-border-teal shadow-sm"
+            className="bg_card rounded-2xl p-6 border border_color shadow-sm"
           >
-            <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">
+            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">
               {stat.label}
             </p>
             <div className="flex items-baseline gap-2">
@@ -92,11 +100,11 @@ const Users: React.FC = () => {
         ))}
       </div>
 
-      <div className="bg_card p-4 rounded-2xl border border_color dark:border-border-teal flex flex-col md:flex-row gap-4 items-center">
+      <div className="bg_card p-4 rounded-2xl border border_color flex flex-col md:flex-row gap-4 items-center">
         <div className="flex-1 w-full relative">
           <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[24px]" />
           <input
-            className="w-full card_btn border-none rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary text-slate-700 dark:text-white placeholder:text-slate-400"
+            className="w-full card_btn border-none rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder:text-slate-400"
             placeholder="Search by name, email or role..."
           />
         </div>
@@ -112,28 +120,28 @@ const Users: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg_card rounded-2xl border border_color dark:border-border-teal overflow-hidden shadow-sm">
+      <div className="bg_card rounded-2xl border border_color overflow-hidden shadow-sm">
         <table className="w-full text-left">
           <thead>
-            <tr className="card_btn border-b border_color dark:border-border-teal">
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <tr className="card_btn border-b border_color">
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
                 User
               </th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
                 Role
               </th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
                 Status
               </th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
                 Last Login
               </th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 text-right">
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary text-right">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-border-teal">
+          <tbody>
             {users.map((user, i) => (
               <tr key={i} className="hover:bg-primary/5 transition-all group">
                 <td className="px-6 py-4">
@@ -157,8 +165,8 @@ const Users: React.FC = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
                       user.role === "Admin"
-                        ? "bg-primary/10 text_primary border_color"
-                        : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white border_color dark:border-white/20"
+                        ? "card_btn border_color"
+                        : "card_btn border_color"
                     }`}
                   >
                     {user.role}
@@ -167,23 +175,21 @@ const Users: React.FC = () => {
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-10 h-5 rounded-full p-1 cursor-pointer transition-colors ${user.status === "Active" ? "bg-primary" : "bg-slate-300 dark:bg-slate-700"}`}
+                      className={`w-10 h-5 rounded-full p-1 cursor-pointer transition-colors ${user.status === "Active" ? "bg-primary" : "bg-slate-400"}`}
                     >
                       <div
                         className={`size-3 bg-white rounded-full transition-transform ${user.status === "Active" ? "translate-x-5" : "translate-x-0"}`}
                       ></div>
                     </div>
-                    <span className="text-xs font-medium text-slate-500">
+                    <span className="text-xs font-medium card_text">
                       {user.status}
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-xs text-slate-500">
-                  {user.login}
-                </td>
+                <td className="px-6 py-4 text-xs card_text">{user.login}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-3 text-slate-400">
-                    <button className="hover:text-primary transition-colors">
+                    <button className="hover:text-orange-400 transition-colors">
                       <MdEditNote className="text-xl" />
                     </button>
                     <button className="hover:text-red-500 transition-colors">
@@ -195,22 +201,26 @@ const Users: React.FC = () => {
             ))}
           </tbody>
         </table>
-        <div className="px-6 py-4 card_btn border-t border_color dark:border-border-teal flex justify-between items-center">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        <div className="px-6 py-4 card_btn border-t border_color flex justify-between items-center">
+          <span className="text-[10px] font-bold text_primary uppercase tracking-widest">
             Showing 1 to 4 of 1,284 users
           </span>
-          <div className="flex gap-2">
-            <button className="px-3 py-1 rounded-lg bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
-              Prev
+          <div className="flex items-center gap-2">
+            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
+              <MdChevronLeft className="text-[20px]" />
             </button>
-            <button className="px-3 py-1 rounded-lg bg-primary text-background-dark text-[10px] font-bold">
+            <button className="size-8 flex items-center justify-center rounded-lg bg-primary text-xs font-bold">
               1
             </button>
-            <button className="px-3 py-1 rounded-lg bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
+            <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
               2
             </button>
-            <button className="px-3 py-1 rounded-lg bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
-              Next
+            <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
+              3
+            </button>
+            <span className="px-2 text-slate-400 text-xs">...</span>
+            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
+              <MdChevronRightIcon className="text-[20px]" />
             </button>
           </div>
         </div>

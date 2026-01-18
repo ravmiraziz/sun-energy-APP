@@ -73,7 +73,7 @@ option {
   color: var(--text);
 }
 
-.bg-primary:hover {
+button.bg-primary:hover {
   background: var(--primary);
 }
 

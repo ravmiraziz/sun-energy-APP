@@ -16,37 +16,6 @@ const TopNav: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="hidden md:flex gap-6 mr-6 items-center">
-          <a
-            href="#"
-            className="text-sm font-semibold text-slate-900 dark:text-white"
-          >
-            Overview
-          </a>
-          <a
-            href="#"
-            className="text-sm font-medium text-slate-500 hover:text-primary transition-colors"
-          >
-            Analytics
-          </a>
-          <a
-            href="#"
-            className="text-sm font-medium text-slate-500 hover:text-primary transition-colors"
-          >
-            Reports
-          </a>
-        </div>
-
-        <div className="flex gap-2">
-          <button className="size-10 flex items-center justify-center rounded-xl card_btn text-slate-600 dark:text-slate-400 relative hover:text-primary transition-colors">
-            <MdNotifications className="text-[24px]"/>
-            <span className="absolute top-2 right-2 size-2 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></span>
-          </button>
-          <button className="size-10 flex items-center justify-center rounded-xl card_btn text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-            <MdChatBubble className="text-[24px]"/>
-          </button>
-        </div>
-
         <div className="h-8 w-px bg-slate-200 dark:bg-border-teal"></div>
 
         <div className="flex items-center gap-3 cursor-pointer group">

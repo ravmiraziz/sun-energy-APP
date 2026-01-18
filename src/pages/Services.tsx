@@ -1,143 +1,204 @@
 import React from "react";
-import {
-  MdNotifications,
-  MdSearch,
-  MdTune,
-  MdAutoAwesome,
-  MdCleaningServices,
-  MdMonitorHeart,
-  MdBatteryChargingFull,
-  MdStar
-} from "react-icons/md";
+
+const SERVICES = [
+  {
+    id: "1",
+    name: "Solar Array Maintenance",
+    description: "Bi-annual professional cleaning and inverter inspection.",
+    category: "Maintenance",
+    price: 299,
+    priceUnit: "visit",
+    status: "Active",
+    image: "https://picsum.photos/400/300?random=1",
+  },
+  {
+    id: "2",
+    name: "EV Charger Installation",
+    description: "Level 2 home charging station setup and certification.",
+    category: "Installation",
+    price: 850,
+    priceUnit: "fixed",
+    status: "Active",
+    image: "https://picsum.photos/400/300?random=2",
+  },
+  {
+    id: "3",
+    name: "Energy Efficiency Audit",
+    description: "Full thermal imaging and energy consumption report.",
+    category: "Consulting",
+    price: 149,
+    priceUnit: "hour",
+    status: "Inactive",
+    image: "https://picsum.photos/400/300?random=3",
+  },
+  {
+    id: "4",
+    name: "24/7 Emergency Support",
+    description: "Immediate response for grid failure or battery issues.",
+    category: "Support",
+    price: 45,
+    priceUnit: "month",
+    status: "Active",
+    image: "https://picsum.photos/400/300?random=4",
+  },
+];
 
 const Services: React.FC = () => {
   return (
-    <div className="flex-1 pb-32">
-      <header className="px-6 pt-12 pb-4 flex justify-between items-start">
+    <div className="flex-1 p-10">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Xizmatlar</h1>
-          <p className="text-sm text-emerald-400 font-medium">
-            Xizmat ko'rsatish va qo'llab-quvvatlash
+          <h2 className="text-4xl font-black text-white tracking-tight">
+            Services Management
+          </h2>
+          <p className="text-slate-400 mt-1">
+            Create, monitor, and manage your energy service offerings.
           </p>
         </div>
-        <button className="p-2 rounded-full bg-[#064e3b] border border-emerald-800">
-          <MdNotifications  className="text-[24px]"/>
-        </button>
-      </header>
-
-      <div className="px-6 mb-6">
-        <div className="relative">
-          <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 text-[24px]" />
-          <input
-            className="w-full bg-[#064e3b] rounded-2xl pl-11 pr-4 py-4 text-sm focus:ring-[#FFB800]"
-            placeholder="Xizmatni toping..."
-          />
-          <MdTune className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400 text-[24px]" />
-        </div>
-      </div>
-
-      <div className="px-6 mb-8 flex gap-3 overflow-x-auto no-scrollbar">
-        <button className="px-5 py-2.5 bg-[#FFB800] text-black font-bold rounded-full text-sm">
-          Barchasi
-        </button>
-        <button className="px-5 py-2.5 bg-[#064e3b] rounded-full text-sm font-medium border border-emerald-800">
-          Tozalash
-        </button>
-        <button className="px-5 py-2.5 bg-[#064e3b] rounded-full text-sm font-medium border border-emerald-800">
-          Ta'mirlash
+        <button className="bg-primary text-background-dark px-6 py-3 rounded-xl font-black flex items-center gap-2 shadow-lg shadow-primary/20">
+          <span className="material-symbols-outlined">add_circle</span>
+          Add New Service
         </button>
       </div>
 
-      <div className="px-6 mb-8">
-        <div className="bg-[#FFB800] rounded-3xl p-6 relative overflow-hidden text-black shadow-xl">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full blur-xl -mr-8 -mt-8"></div>
-          <div className="flex justify-between items-start mb-6">
-            <span className="px-3 py-1 bg-black/10 rounded-md text-[10px] font-bold uppercase flex items-center gap-1">
-              <MdAutoAwesome className="text-xs" />{" "}
-              Premium
-            </span>
-            <button className="bg-black text-[#FFB800] px-4 py-1.5 rounded-full text-xs font-bold">
-              Sotib Olish
-            </button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8">
+        <div className="bg_card p-6 rounded-2xl border border_color flex flex-col gap-2">
+          <div className="flex justify-between items-start card_text">
+            <p className="text-[10px] font-bold uppercase tracking-widest">
+              Total Services
+            </p>
+            <span className="material-symbols-outlined">inventory_2</span>
           </div>
-          <h3 className="text-2xl font-extrabold mb-1">
-            Yillik Quyosh Tekshiruvi
-          </h3>
-          <p className="text-sm mb-6 opacity-70">To'liq diagnostika paketi.</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold">129$</span>
-            <span className="text-sm opacity-40 line-through">180$</span>
+            <p className="text-3xl font-black text-white">48</p>
+            <p className="text-xs font-bold text-slate-400">Active Catalog</p>
+          </div>
+        </div>
+        <div className="bg_card p-6 rounded-2xl border border_color relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-1 h-full bg-primary"></div>
+          <div className="flex justify-between items-start card_text">
+            <p className="text-[10px] font-bold uppercase tracking-widest">
+              Active Contracts
+            </p>
+            <span className="material-symbols-outlined text-primary">bolt</span>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <p className="text-3xl font-black text-white">42</p>
+            <p className="text-xs font-bold text-primary">87.5%</p>
+          </div>
+        </div>
+        <div className="bg_card p-6 rounded-2xl border border_color relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-1 h-full bg-highlight-yellow"></div>
+          <div className="flex justify-between items-start card_text">
+            <p className="text-[10px] font-bold uppercase tracking-widest">
+              Service Revenue
+            </p>
+            <span className="material-symbols-outlined text-highlight-yellow">
+              payments
+            </span>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <p className="text-3xl font-black text-white">$124.5k</p>
+            <p className="text-xs font-bold text-highlight-yellow">+14.2%</p>
           </div>
         </div>
       </div>
 
-      <div className="px-6 space-y-4">
-        <h2 className="text-lg font-bold flex items-center gap-2">
-          Ommabop Xizmatlar{" "}
-          <span className="w-1.5 h-1.5 bg-[#FFB800] rounded-full"></span>
-        </h2>
-        <ServiceCard
-          name="Panelni Tozalash"
-          desc="Samaradorlikni oshirish"
-          price="49$"
-          rating="4.9"
-          icon={<MdCleaningServices />}
-          color="primary"
-        />
-        <ServiceCard
-          name="Tizim Diagnostikasi"
-          desc="Inverter holati"
-          price="89$"
-          rating="4.8"
-          icon={<MdMonitorHeart />}
-          color="blue"
-        />
-        <ServiceCard
-          name="Batareya Xizmati"
-          desc="Optimallashtirish"
-          price="120$"
-          rating="5.0"
-          icon={<MdBatteryChargingFull />}
-          color="emerald"
-        />
+      <div className="bg_card rounded-2xl border border_color shadow-xl overflow-hidden">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="card_btn text-[10px] font-bold uppercase tracking-widest text_primary border-b border_color">
+              <th className="px-8 py-5">Service</th>
+              <th className="px-8 py-5">Category</th>
+              <th className="px-8 py-5">Price Model</th>
+              <th className="px-8 py-5">Status</th>
+              <th className="px-8 py-5 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            {SERVICES.map((s) => (
+              <tr
+                key={s.id}
+                className="hover:bg-primary/5 transition-colors group"
+              >
+                <td className="px-8 py-6">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={s.image}
+                      className="size-14 rounded-xl object-cover grayscale group-hover:grayscale-0 transition-all border border_color"
+                      alt={s.name}
+                    />
+                    <div className="flex flex-col max-w-xs">
+                      <span className="text-sm font-bold text-white group-hover:text-primary transition-colors">
+                        {s.name}
+                      </span>
+                      <span className="text-xs card_text line-clamp-1">
+                        {s.description}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-8 py-6">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
+                    {s.category}
+                  </span>
+                </td>
+                <td className="px-8 py-6">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-highlight-yellow">
+                      ${s.price.toFixed(2)}
+                    </span>
+                    <span className="text-[10px] card_text font-bold uppercase tracking-widest">
+                      per {s.priceUnit}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-8 py-6">
+                  <div className="flex items-center">
+                    <div
+                      className={`w-9 h-5 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200
+                      ${s.status === "Active" ? "bg-primary" : "bg-slate-700"}
+                    `}
+                    >
+                      <div
+                        className={`bg-white size-3 rounded-full shadow-md transition-transform duration-200
+                        ${s.status === "Active" ? "translate-x-4" : "translate-x-0"}
+                      `}
+                      ></div>
+                    </div>
+                    <span
+                      className={`ml-3 text-[10px] font-bold uppercase ${s.status === "Active" ? "text-primary" : "card_text"}`}
+                    >
+                      {s.status}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-8 py-6 text-right">
+                  <div className="flex justify-end gap-3 card_text">
+                    <button className="p-2 hover:text-primary transition-colors">
+                      <span className="material-symbols-outlined text-xl">
+                        edit
+                      </span>
+                    </button>
+                    <button className="p-2 hover:text-red-500 transition-colors">
+                      <span className="material-symbols-outlined text-xl">
+                        delete
+                      </span>
+                    </button>
+                    <button className="p-2 hover:text-white transition-colors">
+                      <span className="material-symbols-outlined text-xl">
+                        more_horiz
+                      </span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-
-      {/* <Navigation current={AppScreen.SERVICES} onNavigate={onNavigate} /> */}
     </div>
   );
 };
-
-const ServiceCard: React.FC<{
-  name: string;
-  desc: string;
-  price: string;
-  rating: string;
-  icon: React.ReactNode;
-  color: string;
-}> = ({ name, desc, price, rating, icon, color }) => (
-  <div className="bg-[#064e3b] p-4 rounded-2xl flex items-center justify-between border border-emerald-800/50">
-    <div className="flex items-center gap-4">
-      <div className="w-12 h-12 bg-[#022c22] rounded-xl flex items-center justify-center">
-        <span className={color === "primary" ? "text-[#FFB800]" : "text-" + color + "-400"}>
-          {icon}
-        </span>
-      </div>
-      <div>
-        <h4 className="font-bold text-sm">{name}</h4>
-        <p className="text-[10px] text-emerald-400">{desc}</p>
-        <div className="flex items-center mt-1 text-[10px]">
-          <MdStar className="text-[#FFB800] text-xs" />
-          <span className="font-bold ml-1">{rating}</span>
-        </div>
-      </div>
-    </div>
-    <div className="text-right flex flex-col items-end gap-2">
-      <span className="font-bold text-[#FFB800]">{price}</span>
-      <button className="bg-[#FFB800] text-black text-[10px] font-bold px-3 py-1.5 rounded-lg">
-        Sotib Olish
-      </button>
-    </div>
-  </div>
-);
 
 export default Services;

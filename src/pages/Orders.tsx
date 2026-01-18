@@ -1,6 +1,12 @@
 import React from "react";
-import { MdFilterList } from "react-icons/md";
-
+import {
+  MdFilterList,
+  MdOutlineFileDownload,
+  MdExpandMore,
+  MdClose,
+  MdSolarPower,
+  MdAccountBalanceWallet,
+} from "react-icons/md";
 const Orders: React.FC = () => {
   const orders = [
     {
@@ -71,7 +77,7 @@ const Orders: React.FC = () => {
               Filter
             </button>
             <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-background-dark text-sm font-bold shadow-lg shadow-primary/20 hover:brightness-110 transition-all transform hover:scale-[1.02]">
-              <span className="material-symbols-outlined ">download</span>
+              <MdOutlineFileDownload className="text-[22px]" />
               Export CSV
             </button>
           </div>
@@ -86,10 +92,7 @@ const Orders: React.FC = () => {
               key={i}
               className="flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-100 dark:bg-card-dark px-5 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 border border-transparent hover:border-primary/20 transition-all"
             >
-              {filter}{" "}
-              <span className="material-symbols-outlined text-base">
-                expand_more
-              </span>
+              {filter} <MdExpandMore className="text-base" />
             </button>
           ))}
         </div>
@@ -186,7 +189,7 @@ const Orders: React.FC = () => {
         <div className="p-6 border-b border_color dark:border-border-teal flex items-center justify-between">
           <h3 className="text-xl font-black">Order Details</h3>
           <button className="text-slate-400 hover:text-primary transition-colors">
-            <span className="material-symbols-outlined">close</span>
+            <MdClose />
           </button>
         </div>
 
@@ -206,10 +209,8 @@ const Orders: React.FC = () => {
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <div className="size-12 rounded-full bg-primary/20 flex items-center justify-center text_primary shadow-sm">
-                <span className="material-symbols-outlined text-2xl">
-                  solar_power
-                </span>
+              <div className="size-12 rounded-full bg-primary/20 flex items-center justify-center text-primary shadow-sm">
+                <MdSolarPower className="text-2xl" />
               </div>
               <div>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
@@ -248,9 +249,7 @@ const Orders: React.FC = () => {
               </div>
             </div>
             <div className="mt-6 p-4 card_btn rounded-xl flex items-center gap-4 border border_color/50 dark:border-border-teal/50">
-              <span className="material-symbols-outlined text_primary">
-                account_balance_wallet
-              </span>
+              <MdAccountBalanceWallet className="text-primary" />
               <div>
                 <p className="text-[10px] text-slate-400 font-bold uppercase">
                   Payment Method

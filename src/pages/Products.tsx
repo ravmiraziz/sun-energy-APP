@@ -1,4 +1,13 @@
 import React, { useState } from "react";
+import {
+  MdChevronRight,
+  MdAdd,
+  MdFilterList,
+  MdEdit,
+  MdDelete,
+  MdChevronLeft,
+  MdChevronRight as MdChevronRightIcon,
+} from "react-icons/md";
 
 const Products: React.FC = () => {
   const [products] = useState([
@@ -55,9 +64,7 @@ const Products: React.FC = () => {
         <a className="hover:text-primary transition-colors" href="#">
           Dashboard
         </a>
-        <span className="material-symbols-outlined text-[16px]">
-          chevron_right
-        </span>
+        <MdChevronRight className="text-[16px]" />
         <span className="text-white font-medium">Products Management</span>
       </div>
 
@@ -71,7 +78,7 @@ const Products: React.FC = () => {
           </p>
         </div>
         <button className="bg-primary text-background-dark px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90 shadow-lg shadow-primary/20 transition-all transform hover:scale-[1.02]">
-          <span className="material-symbols-outlined text-[20px]">add</span>
+          <MdAdd className="text-[20px]" />
           Add Product
         </button>
       </div>
@@ -84,7 +91,7 @@ const Products: React.FC = () => {
           </p>
           <div className="flex items-center gap-2">
             <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400">
-              <span className="material-symbols-outlined">filter_list</span>
+              <MdFilterList />
             </button>
           </div>
         </div>
@@ -146,14 +153,10 @@ const Products: React.FC = () => {
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button className="p-1.5 hover:text-primary transition-colors text-slate-400">
-                        <span className="material-symbols-outlined text-[18px]">
-                          edit
-                        </span>
+                        <MdEdit className="text-[18px]" />
                       </button>
                       <button className="p-1.5 hover:text-red-500 transition-colors text-slate-400">
-                        <span className="material-symbols-outlined text-[18px]">
-                          delete
-                        </span>
+                        <MdDelete className="text-[18px]" />
                       </button>
                     </div>
                   </td>
@@ -174,9 +177,7 @@ const Products: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
-              <span className="material-symbols-outlined text-[20px]">
-                chevron_left
-              </span>
+              <MdChevronLeft className="text-[20px]" />
             </button>
             <button className="size-8 flex items-center justify-center rounded-lg bg-primary text-background-dark text-xs font-bold">
               1
@@ -189,9 +190,7 @@ const Products: React.FC = () => {
             </button>
             <span className="px-2 text-slate-400 text-xs">...</span>
             <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
-              <span className="material-symbols-outlined text-[20px]">
-                chevron_right
-              </span>
+              <MdChevronRightIcon className="text-[20px]" />
             </button>
           </div>
         </div>

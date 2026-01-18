@@ -1,4 +1,19 @@
 import React from "react";
+import {
+  MdPayments,
+  MdBolt,
+  MdShoppingCart,
+  MdHub,
+  MdTrendingUp,
+  MdTrendingDown,
+  MdRouter,
+  MdPower,
+  MdWarning,
+  MdUpdate,
+  MdRefresh,
+  MdDownload,
+  MdMoreHoriz,
+} from "react-icons/md";
 
 const DashboardView: React.FC = () => {
   const kpis = [
@@ -7,7 +22,7 @@ const DashboardView: React.FC = () => {
       value: "$45,231.89",
       trend: "+12.5%",
       isPositive: true,
-      icon: "payments",
+      icon: <MdPayments />,
       colorClass: "revenue-card-gradient border-2 border-yellow-500",
     },
     {
@@ -15,21 +30,21 @@ const DashboardView: React.FC = () => {
       value: "12,840 kWh",
       trend: "+5.2%",
       isPositive: true,
-      icon: "bolt",
+      icon: <MdBolt />,
     },
     {
       label: "Total Orders",
       value: "1,254",
       trend: "-2.4%",
       isPositive: false,
-      icon: "shopping_cart",
+      icon: <MdShoppingCart />,
     },
     {
       label: "Active Nodes",
       value: "842 Nodes",
       trend: "System Online",
       isPositive: true,
-      icon: "hub",
+      icon: <MdHub />,
     },
   ];
 
@@ -39,21 +54,21 @@ const DashboardView: React.FC = () => {
       name: "Node Cluster-09",
       location: "Sector 4, New York",
       status: "Active",
-      icon: "router",
+      icon: <MdRouter />,
     },
     {
       id: "2",
       name: "Main Transformer B",
       location: "Sector 2, New Jersey",
       status: "Syncing",
-      icon: "power",
+      icon: <MdPower />,
     },
     {
       id: "3",
       name: "Node Solar-22",
       location: "Sector 9, Arizona",
       status: "Alert",
-      icon: "warning",
+      icon: <MdWarning />,
     },
   ];
 
@@ -100,7 +115,7 @@ const DashboardView: React.FC = () => {
                 {kpi.label}
               </p>
               <span
-                className={`material-symbols-outlined ${kpi.colorClass ? "text-white/40" : "text_primary"}`}
+                className={kpi.colorClass ? "text-white/40" : "text-primary"}
               >
                 {kpi.icon}
               </span>
@@ -114,8 +129,8 @@ const DashboardView: React.FC = () => {
               <p
                 className={`${kpi.colorClass ? "text-white" : kpi.isPositive ? "text_primary" : "text-red-500"} text-xs font-medium mt-2 flex items-center gap-1`}
               >
-                <span className="material-symbols-outlined text-sm">
-                  {kpi.isPositive ? "trending_up" : "trending_down"}
+                <span className="text-sm">
+                  {kpi.isPositive ? <MdTrendingUp /> : <MdTrendingDown />}
                 </span>
                 {kpi.trend} {idx === 3 ? "" : "from last month"}
               </p>
@@ -212,9 +227,7 @@ const DashboardView: React.FC = () => {
                         : "bg-red-500/10 text-red-500"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-xl">
-                    {node.icon}
-                  </span>
+                  <span className="text-xl">{node.icon}</span>
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-bold group-hover:text-primary transition-colors">
@@ -240,10 +253,8 @@ const DashboardView: React.FC = () => {
           <div className="mt-6 pt-6 border-t border_color">
             <div className="card_btn p-3 rounded-xl flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg_mode rounded-lg text-slate-500">
-                  <span className="material-symbols-outlined text-sm">
-                    update
-                  </span>
+                <div className="p-2 bg-slate-200 dark:bg-card-dark rounded-lg text-slate-500">
+                  <MdUpdate className="text-sm" />
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase">
@@ -252,8 +263,8 @@ const DashboardView: React.FC = () => {
                   <p className="text-xs font-bold">2 mins ago</p>
                 </div>
               </div>
-              <button className="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">
-                refresh
+              <button className="text-slate-400 hover:text-primary transition-colors">
+                <MdRefresh />
               </button>
             </div>
             <button className="w-full py-3 text-xs font-bold bg-primary rounded-xl transition-all active:scale-[0.98]">
@@ -267,6 +278,10 @@ const DashboardView: React.FC = () => {
       <div className="bg_card border border_color rounded-2xl overflow-hidden shadow-sm">
         <div className="p-6 border-b border_color flex items-center justify-between">
           <h2 className="text-lg font-bold">Recent Transactions</h2>
+          <button className="text-primary text-sm font-bold flex items-center gap-1 hover:underline transition-all">
+            Download CSV
+            <MdDownload className="text-sm" />
+          </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -326,8 +341,8 @@ const DashboardView: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">
-                      more_horiz
+                    <button className="text-slate-400 hover:text-primary transition-colors">
+                      <MdMoreHoriz />
                     </button>
                   </td>
                 </tr>

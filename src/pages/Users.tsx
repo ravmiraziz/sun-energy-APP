@@ -1,4 +1,5 @@
 import React from "react";
+import { MdPersonAdd, MdSearch, MdExpandMore, MdEditNote, MdDelete } from "react-icons/md";
 
 const Users: React.FC = () => {
   const users = [
@@ -48,7 +49,7 @@ const Users: React.FC = () => {
           </p>
         </div>
         <button className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-background-dark rounded-xl font-bold text-sm tracking-tight hover:brightness-110 shadow-lg shadow-primary/20 transition-all transform hover:scale-[1.02]">
-          <span className="material-symbols-outlined">person_add</span>
+          <MdPersonAdd />
           Create New User
         </button>
       </div>
@@ -93,9 +94,7 @@ const Users: React.FC = () => {
 
       <div className="bg_card p-4 rounded-2xl border border_color dark:border-border-teal flex flex-col md:flex-row gap-4 items-center">
         <div className="flex-1 w-full relative">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-            search
-          </span>
+          <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             className="w-full card_btn border-none rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary text-slate-700 dark:text-white placeholder:text-slate-400"
             placeholder="Search by name, email or role..."
@@ -104,11 +103,11 @@ const Users: React.FC = () => {
         <div className="flex gap-3 w-full md:w-auto">
           <button className="flex h-12 items-center justify-center gap-2 rounded-xl card_btn px-5 border border-transparent hover:border-primary/30 text-slate-700 dark:text-white text-sm font-medium transition-all">
             All Roles{" "}
-            <span className="material-symbols-outlined">expand_more</span>
+            <MdExpandMore />
           </button>
           <button className="flex h-12 items-center justify-center gap-2 rounded-xl card_btn px-5 border border-transparent hover:border-primary/30 text-slate-700 dark:text-white text-sm font-medium transition-all">
             Status: Active{" "}
-            <span className="material-symbols-outlined">expand_more</span>
+            <MdExpandMore />
           </button>
         </div>
       </div>
@@ -185,14 +184,10 @@ const Users: React.FC = () => {
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-3 text-slate-400">
                     <button className="hover:text-primary transition-colors">
-                      <span className="material-symbols-outlined text-xl">
-                        edit_note
-                      </span>
+                      <MdEditNote className="text-xl" />
                     </button>
                     <button className="hover:text-red-500 transition-colors">
-                      <span className="material-symbols-outlined text-xl">
-                        delete
-                      </span>
+                      <MdDelete className="text-xl" />
                     </button>
                   </div>
                 </td>

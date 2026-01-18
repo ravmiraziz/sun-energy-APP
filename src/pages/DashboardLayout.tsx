@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/layout/Sidebar";
-import TopNav from "../components/TopNav";
+import TopNav from "../components/layout/TopNav";
 
 const DashboardLayout: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ const DashboardLayout: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <TopNav />
         <main className="flex-1 overflow-y-auto p-4">
-          <Outlet /> {/* Nested route content chiqadi */}
+          <Outlet />
         </main>
       </div>
     </div>

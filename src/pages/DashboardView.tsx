@@ -91,7 +91,7 @@ const DashboardView: React.FC = () => {
         {kpis.map((kpi, idx) => (
           <div
             key={idx}
-            className={`${kpi.colorClass || "border border-slate-200"} bg_card rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:shadow-primary/5 transition-all duration-300 h-[160px] group`}
+            className={`${kpi.colorClass || "border border_color"} bg_card rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:shadow-primary/5 transition-all duration-300 h-[160px] group`}
           >
             <div className="flex justify-between items-start">
               <p
@@ -126,7 +126,7 @@ const DashboardView: React.FC = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Energy Chart Section */}
-        <div className="xl:col-span-2 bg_card border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <div className="xl:col-span-2 bg_card border border_color rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-lg font-bold">
@@ -192,7 +192,7 @@ const DashboardView: React.FC = () => {
         </div>
 
         {/* Node Status Widget */}
-        <div className="bg_card border border-slate-200 dark:border-border-teal rounded-2xl p-6 flex flex-col shadow-sm">
+        <div className="bg_card border border_color dark:border-border-teal rounded-2xl p-6 flex flex-col shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-bold">Node Status</h2>
             <span className="flex items-center gap-1 text-[10px] font-bold text-primary uppercase">
@@ -237,8 +237,8 @@ const DashboardView: React.FC = () => {
             ))}
           </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-100 dark:border-border-teal/50">
-            <div className="bg-slate-50 dark:bg-surface-dark p-3 rounded-xl flex items-center justify-between mb-4">
+          <div className="mt-6 pt-6 border-t border_color">
+            <div className="card_btn p-3 rounded-xl flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-slate-200 dark:bg-card-dark rounded-lg text-slate-500">
                   <span className="material-symbols-outlined text-sm">
@@ -256,7 +256,7 @@ const DashboardView: React.FC = () => {
                 refresh
               </button>
             </div>
-            <button className="w-full py-3 text-xs font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-border-teal rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-[0.98]">
+            <button className="w-full py-3 text-xs font-bold text-slate-500 dark:text-slate-400 border border_color dark:border-border-teal rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-[0.98]">
               View All Nodes
             </button>
           </div>
@@ -264,8 +264,8 @@ const DashboardView: React.FC = () => {
       </div>
 
       {/* Recent Transactions Table */}
-      <div className="bg_card border border-slate-200 dark:border-border-teal rounded-2xl overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-slate-200 dark:border-border-teal flex items-center justify-between">
+      <div className="bg_card border border_color dark:border-border-teal rounded-2xl overflow-hidden shadow-sm">
+        <div className="p-6 border-b border_color dark:border-border-teal flex items-center justify-between">
           <h2 className="text-lg font-bold">Recent Transactions</h2>
           <button className="text-primary text-sm font-bold flex items-center gap-1 hover:underline transition-all">
             Download CSV

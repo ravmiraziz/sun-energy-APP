@@ -65,7 +65,7 @@ const Orders: React.FC = () => {
             </p>
           </div>
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-border-teal bg_card text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+            <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border_color dark:border-border-teal bg_card text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
               <span className="material-symbols-outlined text-lg">
                 filter_list
               </span>
@@ -97,10 +97,10 @@ const Orders: React.FC = () => {
           ))}
         </div>
 
-        <div className="bg_card border border-slate-200 dark:border-border-teal rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg_card border border_color dark:border-border-teal rounded-2xl overflow-hidden shadow-sm">
           <table className="w-full text-left">
             <thead>
-              <tr className="card_btn/50 border-b border-slate-200 dark:border-border-teal">
+              <tr className="card_btn/50 border-b border_color dark:border-border-teal">
                 <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                   Order ID
                 </th>
@@ -155,18 +155,18 @@ const Orders: React.FC = () => {
               ))}
             </tbody>
           </table>
-          <div className="p-6 border-t border-slate-200 dark:border-border-teal flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+          <div className="p-6 border-t border_color dark:border-border-teal flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               Showing 1 to 10 of 124 orders
             </p>
             <div className="flex gap-2">
-              <button className="px-4 py-2 rounded-xl bg_card text-[10px] font-bold border border-slate-200 dark:border-border-teal hover:border-primary transition-all">
+              <button className="px-4 py-2 rounded-xl bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
                 Prev
               </button>
               <button className="px-4 py-2 rounded-xl bg-primary text-background-dark text-[10px] font-bold">
                 1
               </button>
-              <button className="px-4 py-2 rounded-xl bg_card text-[10px] font-bold border border-slate-200 dark:border-border-teal hover:border-primary transition-all">
+              <button className="px-4 py-2 rounded-xl bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
                 Next
               </button>
             </div>
@@ -174,8 +174,8 @@ const Orders: React.FC = () => {
         </div>
       </div>
 
-      <aside className="w-[400px] border-l border-slate-200 dark:border-border-teal bg_card h-full flex flex-col shadow-[-10px_0_30px_-15px_rgba(0,0,0,0.1)] z-10 overflow-y-auto">
-        <div className="p-6 border-b border-slate-200 dark:border-border-teal flex items-center justify-between">
+      <aside className="w-[400px] border-l border_color dark:border-border-teal bg_card h-full flex flex-col shadow-[-10px_0_30px_-15px_rgba(0,0,0,0.1)] z-10 overflow-y-auto">
+        <div className="p-6 border-b border_color dark:border-border-teal flex items-center justify-between">
           <h3 className="text-xl font-black">Order Details</h3>
           <button className="text-slate-400 hover:text-primary transition-colors">
             <span className="material-symbols-outlined">close</span>
@@ -232,14 +232,14 @@ const Orders: React.FC = () => {
                   </span>
                 </div>
               ))}
-              <div className="pt-4 border-t border-slate-200 dark:border-border-teal flex justify-between items-baseline">
+              <div className="pt-4 border-t border_color dark:border-border-teal flex justify-between items-baseline">
                 <span className="font-bold text-sm">Total Charged</span>
                 <span className="font-black text-primary text-2xl">
                   $128.50
                 </span>
               </div>
             </div>
-            <div className="mt-6 p-4 card_btn rounded-xl flex items-center gap-4 border border-slate-200/50 dark:border-border-teal/50">
+            <div className="mt-6 p-4 card_btn rounded-xl flex items-center gap-4 border border_color/50 dark:border-border-teal/50">
               <span className="material-symbols-outlined text-primary">
                 account_balance_wallet
               </span>
@@ -285,7 +285,7 @@ const Orders: React.FC = () => {
             <button className="w-full bg-primary text-background-dark font-black py-4 rounded-2xl hover:brightness-110 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
               Download Receipt
             </button>
-            <button className="w-full bg-slate-100 dark:bg-surface-dark text-slate-900 dark:text-white font-black py-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all border border-slate-200 dark:border-border-teal">
+            <button className="w-full bg-slate-100 dark:bg-surface-dark text-slate-900 dark:text-white font-black py-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-all border border_color dark:border-border-teal">
               Contact Customer
             </button>
           </div>

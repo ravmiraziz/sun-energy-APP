@@ -78,8 +78,8 @@ const Products: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg_card rounded-2xl border border-slate-200 dark:border-border-teal overflow-hidden shadow-sm flex flex-col">
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-border-teal flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
+      <div className="bg_card rounded-2xl border border_color dark:border-border-teal overflow-hidden shadow-sm flex flex-col">
+        <div className="px-6 py-4 border-b border_color dark:border-border-teal flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Showing{" "}
             <span className="font-semibold text-slate-900 dark:text-white">
@@ -97,7 +97,7 @@ const Products: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] font-bold tracking-widest border-b border-slate-200 dark:border-border-teal">
+              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] font-bold tracking-widest border-b border_color dark:border-border-teal">
                 <th className="px-6 py-4 w-16">Image</th>
                 <th className="px-6 py-4">Product Name</th>
                 <th className="px-6 py-4">Category</th>
@@ -114,7 +114,7 @@ const Products: React.FC = () => {
                 >
                   <td className="px-6 py-4">
                     <img
-                      className="size-12 rounded-lg object-cover bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-border-teal"
+                      className="size-12 rounded-lg object-cover bg-slate-100 dark:bg-slate-800 border border_color dark:border-border-teal"
                       src={product.image}
                       alt={product.name}
                     />
@@ -130,7 +130,7 @@ const Products: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border border-slate-200 dark:border-border-teal/50">
+                    <span className="bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border border_color dark:border-border-teal/50">
                       {product.category}
                     </span>
                   </td>
@@ -168,7 +168,7 @@ const Products: React.FC = () => {
           </table>
         </div>
 
-        <div className="px-6 py-4 border-t border-slate-200 dark:border-border-teal flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
+        <div className="px-6 py-4 border-t border_color dark:border-border-teal flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/20">
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-500 dark:text-slate-400">
               Rows per page:

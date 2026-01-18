@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { MdBolt, MdDashboard, MdInventory2, MdReceiptLong, MdGroup, MdSettings, MdAddCircle } from "react-icons/md";
 
 const Sidebar: React.FC = () => {
   return (
@@ -7,7 +8,7 @@ const Sidebar: React.FC = () => {
       <aside className="w-64 bg_mode border-r border_color not-sm:hidden flex flex-col z-20 transition-all duration-300">
         <div className="p-6 flex items-center gap-3">
           <div className="bg-primary size-10 rounded-lg flex items-center justify-center  shadow-lg shadow-primary/20">
-            <span className="material-symbols-outlined font-bold">bolt</span>
+            <MdBolt className="font-bold" />
           </div>
           <div>
             <h1 className="text-base font-bold leading-tight">Smart Energy</h1>
@@ -25,7 +26,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <span className="material-symbols-outlined">dashboard</span>
+            <MdDashboard />
             <span className="text-sm font-semibold">Boshqaruv</span>
           </NavLink>
           <NavLink
@@ -36,7 +37,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <span className="material-symbols-outlined">inventory_2</span>
+            <MdInventory2 />
             <span className="text-sm font-semibold">Mahsulotlar</span>
           </NavLink>
           <NavLink
@@ -47,7 +48,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <span className="material-symbols-outlined">receipt_long</span>
+            <MdReceiptLong />
             <span className="text-sm font-semibold">Buyurtmalar</span>
           </NavLink>
           <NavLink
@@ -58,7 +59,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <span className="material-symbols-outlined">group</span>
+            <MdGroup />
             <span className="text-sm font-semibold">Foydalanuvchilar</span>
           </NavLink>
           <NavLink
@@ -69,7 +70,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <span className="material-symbols-outlined">group</span>
+            <MdGroup />
             <span className="text-sm font-semibold">Serveslar</span>
           </NavLink>
           <NavLink
@@ -80,7 +81,7 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <span className="material-symbols-outlined">settings</span>
+            <MdSettings />
             <span className="text-sm font-semibold">Sozlamalar</span>
           </NavLink>
         </nav>
@@ -98,9 +99,7 @@ const Sidebar: React.FC = () => {
             </button>
           </div>
           <button className="w-full bg-primary py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
-            <span className="material-symbols-outlined text-sm">
-              add_circle
-            </span>
+            <MdAddCircle className="text-sm" />
             Add Node
           </button>
         </div>
@@ -115,7 +114,7 @@ const Sidebar: React.FC = () => {
             }`
           }
         >
-          <span className="material-symbols-outlined">dashboard</span>
+          <MdDashboard />
           <span className="text-sm font-semibold">Boshqaruv</span>
         </NavLink>
         <NavLink
@@ -126,7 +125,7 @@ const Sidebar: React.FC = () => {
             }`
           }
         >
-          <span className="material-symbols-outlined">inventory_2</span>
+          <MdInventory2 />
           <span className="text-sm font-semibold">Mahsulotlar</span>
         </NavLink>
         <NavLink
@@ -137,7 +136,7 @@ const Sidebar: React.FC = () => {
             }`
           }
         >
-          <span className="material-symbols-outlined">receipt_long</span>
+          <MdReceiptLong />
           <span className="text-sm font-semibold">Buyurtmalar</span>
         </NavLink>
         <NavLink
@@ -148,7 +147,7 @@ const Sidebar: React.FC = () => {
             }`
           }
         >
-          <span className="material-symbols-outlined">group</span>
+          <MdGroup />
           <span className="text-sm font-semibold">Foydalanuvchilar</span>
         </NavLink>
         <NavLink
@@ -159,7 +158,7 @@ const Sidebar: React.FC = () => {
             }`
           }
         >
-          <span className="material-symbols-outlined">group</span>
+          <MdGroup />
           <span className="text-sm font-semibold">Serveslar</span>
         </NavLink>
         <NavLink
@@ -170,7 +169,7 @@ const Sidebar: React.FC = () => {
             }`
           }
         >
-          <span className="material-symbols-outlined">settings</span>
+          <MdSettings />
           <span className="text-sm font-semibold">Sozlamalar</span>
         </NavLink>
       </nav>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { MdBolt, MdAdminPanelSettings, MdVisibility, MdArrowForward, MdVerifiedUser, MdShield, MdLock } from "react-icons/md";
 
 const Login: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -31,7 +32,7 @@ const Login: React.FC = () => {
       <header className="flex items-center justify-between px-8 py-4 border-b border-border-teal/30 z-10 backdrop-blur-sm">
         <div className="flex items-center gap-3 text-white">
           <div className="bg-primary p-1.5 rounded-lg text-background-dark">
-            <span className="material-symbols-outlined block">bolt</span>
+            <MdBolt />
           </div>
           <h1 className="text-lg font-bold tracking-tight">
             Smart Energy Admin
@@ -49,9 +50,7 @@ const Login: React.FC = () => {
             className={`w-full md:w-1/2 p-12 flex flex-col justify-center transition-all duration-500 ${step === 2 ? "opacity-40 grayscale pointer-events-none scale-95" : "opacity-100"}`}
           >
             <div className="flex flex-col items-center mb-10">
-              <span className="material-symbols-outlined text-primary text-5xl mb-4 filled-icon">
-                admin_panel_settings
-              </span>
+              <MdAdminPanelSettings className="text-primary text-5xl mb-4" />
               <h2 className="text-3xl font-black text-white text-center">
                 Admin Access
               </h2>
@@ -93,9 +92,7 @@ const Login: React.FC = () => {
                     type="password"
                     defaultValue="password123"
                   />
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 cursor-pointer hover:text-primary">
-                    visibility
-                  </span>
+                  <MdVisibility className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 cursor-pointer hover:text-primary" />
                 </div>
               </div>
               <button
@@ -105,9 +102,7 @@ const Login: React.FC = () => {
               >
                 {loading ? "Authenticating..." : "Continue"}
                 {!loading && (
-                  <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
-                    arrow_forward
-                  </span>
+                  <MdArrowForward className="group-hover:translate-x-1 transition-transform" />
                 )}
               </button>
             </form>
@@ -119,9 +114,7 @@ const Login: React.FC = () => {
           >
             <div className="flex flex-col items-center mb-10">
               <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 shadow-inner">
-                <span className="material-symbols-outlined text-primary text-4xl">
-                  verified_user
-                </span>
+                <MdVerifiedUser className="text-primary text-4xl" />
               </div>
               <h2 className="text-2xl font-black text-white text-center">
                 Two-Factor Auth
@@ -154,7 +147,7 @@ const Login: React.FC = () => {
             >
               {loading ? "Verifying..." : "Verify & Access"}
               {!loading && (
-                <span className="material-symbols-outlined">shield</span>
+                <MdShield />
               )}
             </button>
 
@@ -168,7 +161,7 @@ const Login: React.FC = () => {
             </div>
 
             <div className="mt-auto pt-8 flex items-center justify-center gap-2 opacity-30 text-white">
-              <span className="material-symbols-outlined text-sm">lock</span>
+              <MdLock className="text-sm" />
               <span className="text-[10px] uppercase font-black tracking-widest">
                 SSL Encrypted Session
               </span>

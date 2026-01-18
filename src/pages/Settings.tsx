@@ -1,4 +1,5 @@
 import React from "react";
+import { MdPalette, MdAccountCircle, MdPhotoCamera, MdExpandMore, MdSecurity } from "react-icons/md";
 
 const Settings: React.FC = () => {
   return (
@@ -24,9 +25,7 @@ const Settings: React.FC = () => {
 
       <section className="space-y-6">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">
-            palette
-          </span>
+          <MdPalette className="text-primary" />
           <h3 className="text-xl font-bold">Appearance & Theme</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -64,9 +63,7 @@ const Settings: React.FC = () => {
 
       <section className="space-y-6">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">
-            account_circle
-          </span>
+          <MdAccountCircle className="text-primary" />
           <h3 className="text-xl font-bold">Admin Profile</h3>
         </div>
         <div className="bg_card border border_color dark:border-border-teal rounded-2xl p-8 shadow-sm">
@@ -79,9 +76,7 @@ const Settings: React.FC = () => {
                 }}
               />
               <button className="absolute bottom-0 right-0 size-10 bg-primary text-background-dark rounded-full flex items-center justify-center border-4 border-white dark:border-card-dark hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-sm">
-                  photo_camera
-                </span>
+                <MdPhotoCamera className="text-sm" />
               </button>
             </div>
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
@@ -116,9 +111,7 @@ const Settings: React.FC = () => {
                           <option key={j}>{opt}</option>
                         ))}
                       </select>
-                      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                        expand_more
-                      </span>
+                      <MdExpandMore className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" />
                     </div>
                   ) : (
                     <input
@@ -136,9 +129,7 @@ const Settings: React.FC = () => {
 
       <section className="space-y-6 pb-20">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">
-            security
-          </span>
+          <MdSecurity className="text-primary" />
           <h3 className="text-xl font-bold">Module Access</h3>
         </div>
         <div className="bg_card border border_color dark:border-border-teal rounded-2xl overflow-hidden shadow-sm">

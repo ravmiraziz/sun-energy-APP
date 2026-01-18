@@ -1,4 +1,14 @@
 import React from "react";
+import {
+  MdNotifications,
+  MdSearch,
+  MdTune,
+  MdAutoAwesome,
+  MdCleaningServices,
+  MdMonitorHeart,
+  MdBatteryChargingFull,
+  MdStar
+} from "react-icons/md";
 
 const Services: React.FC = () => {
   return (
@@ -11,22 +21,18 @@ const Services: React.FC = () => {
           </p>
         </div>
         <button className="p-2 rounded-full bg-[#064e3b] border border-emerald-800">
-          <span className="material-symbols-outlined">notifications</span>
+          <MdNotifications />
         </button>
       </header>
 
       <div className="px-6 mb-6">
         <div className="relative">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400">
-            search
-          </span>
+          <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400" />
           <input
             className="w-full bg-[#064e3b] rounded-2xl pl-11 pr-4 py-4 text-sm focus:ring-[#FFB800]"
             placeholder="Xizmatni toping..."
           />
-          <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400">
-            tune
-          </span>
+          <MdTune className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-400" />
         </div>
       </div>
 
@@ -47,9 +53,7 @@ const Services: React.FC = () => {
           <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full blur-xl -mr-8 -mt-8"></div>
           <div className="flex justify-between items-start mb-6">
             <span className="px-3 py-1 bg-black/10 rounded-md text-[10px] font-bold uppercase flex items-center gap-1">
-              <span className="material-symbols-outlined text-xs">
-                auto_awesome
-              </span>{" "}
+              <MdAutoAwesome className="text-xs" />{" "}
               Premium
             </span>
             <button className="bg-black text-[#FFB800] px-4 py-1.5 rounded-full text-xs font-bold">
@@ -77,7 +81,7 @@ const Services: React.FC = () => {
           desc="Samaradorlikni oshirish"
           price="49$"
           rating="4.9"
-          icon="cleaning_services"
+          icon={<MdCleaningServices />}
           color="primary"
         />
         <ServiceCard
@@ -85,7 +89,7 @@ const Services: React.FC = () => {
           desc="Inverter holati"
           price="89$"
           rating="4.8"
-          icon="monitor_heart"
+          icon={<MdMonitorHeart />}
           color="blue"
         />
         <ServiceCard
@@ -93,7 +97,7 @@ const Services: React.FC = () => {
           desc="Optimallashtirish"
           price="120$"
           rating="5.0"
-          icon="battery_charging_full"
+          icon={<MdBatteryChargingFull />}
           color="emerald"
         />
       </div>
@@ -108,15 +112,13 @@ const ServiceCard: React.FC<{
   desc: string;
   price: string;
   rating: string;
-  icon: string;
+  icon: React.ReactNode;
   color: string;
 }> = ({ name, desc, price, rating, icon, color }) => (
   <div className="bg-[#064e3b] p-4 rounded-2xl flex items-center justify-between border border-emerald-800/50">
     <div className="flex items-center gap-4">
       <div className="w-12 h-12 bg-[#022c22] rounded-xl flex items-center justify-center">
-        <span
-          className={`material-symbols-outlined text-${color === "primary" ? "[#FFB800]" : color + "-400"}`}
-        >
+        <span className={color === "primary" ? "text-[#FFB800]" : "text-" + color + "-400"}>
           {icon}
         </span>
       </div>
@@ -124,9 +126,7 @@ const ServiceCard: React.FC<{
         <h4 className="font-bold text-sm">{name}</h4>
         <p className="text-[10px] text-emerald-400">{desc}</p>
         <div className="flex items-center mt-1 text-[10px]">
-          <span className="material-symbols-outlined text-[#FFB800] text-xs material-symbols-fill">
-            star
-          </span>
+          <MdStar className="text-[#FFB800] text-xs" />
           <span className="font-bold ml-1">{rating}</span>
         </div>
       </div>

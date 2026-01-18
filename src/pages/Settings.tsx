@@ -44,7 +44,7 @@ const Settings: React.FC = () => {
           ].map((item, i) => (
             <div
               key={i}
-              className="flex items-center justify-between p-6 rounded-2xl border border-slate-200 dark:border-border-teal bg_card shadow-sm"
+              className="flex items-center justify-between p-6 rounded-2xl border border_color dark:border-border-teal bg_card shadow-sm"
             >
               <div className="flex flex-col gap-1">
                 <p className="font-bold">{item.label}</p>
@@ -69,7 +69,7 @@ const Settings: React.FC = () => {
           </span>
           <h3 className="text-xl font-bold">Admin Profile</h3>
         </div>
-        <div className="bg_card border border-slate-200 dark:border-border-teal rounded-2xl p-8 shadow-sm">
+        <div className="bg_card border border_color dark:border-border-teal rounded-2xl p-8 shadow-sm">
           <div className="flex flex-col md:flex-row gap-10 items-start">
             <div className="relative group mx-auto md:mx-0">
               <div
@@ -111,7 +111,7 @@ const Settings: React.FC = () => {
                   </label>
                   {field.type === "select" ? (
                     <div className="relative">
-                      <select className="w-full bg_card border-slate-200 dark:border-border-teal rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary appearance-none transition-all">
+                      <select className="w-full bg_card border_color dark:border-border-teal rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary appearance-none transition-all">
                         {field.options?.map((opt, j) => (
                           <option key={j}>{opt}</option>
                         ))}
@@ -122,7 +122,7 @@ const Settings: React.FC = () => {
                     </div>
                   ) : (
                     <input
-                      className="w-full bg_card border-slate-200 dark:border-border-teal rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
+                      className="w-full bg_card border_color dark:border-border-teal rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
                       type={field.type}
                       defaultValue={field.val}
                     />
@@ -141,10 +141,10 @@ const Settings: React.FC = () => {
           </span>
           <h3 className="text-xl font-bold">Module Access</h3>
         </div>
-        <div className="bg_card border border-slate-200 dark:border-border-teal rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg_card border border_color dark:border-border-teal rounded-2xl overflow-hidden shadow-sm">
           <table className="w-full text-left">
             <thead className="bg-slate-50 dark:bg-slate-800/50">
-              <tr className="border-b border-slate-200 dark:border-border-teal">
+              <tr className="border-b border_color dark:border-border-teal">
                 <th className="px-6 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                   Module
                 </th>

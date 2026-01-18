@@ -76,7 +76,7 @@ const Users: React.FC = () => {
         ].map((stat, i) => (
           <div
             key={i}
-            className="bg_card rounded-2xl p-6 border border-slate-200 dark:border-border-teal shadow-sm"
+            className="bg_card rounded-2xl p-6 border border_color dark:border-border-teal shadow-sm"
           >
             <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">
               {stat.label}
@@ -91,7 +91,7 @@ const Users: React.FC = () => {
         ))}
       </div>
 
-      <div className="bg_card p-4 rounded-2xl border border-slate-200 dark:border-border-teal flex flex-col md:flex-row gap-4 items-center">
+      <div className="bg_card p-4 rounded-2xl border border_color dark:border-border-teal flex flex-col md:flex-row gap-4 items-center">
         <div className="flex-1 w-full relative">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
             search
@@ -113,10 +113,10 @@ const Users: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg_card rounded-2xl border border-slate-200 dark:border-border-teal overflow-hidden shadow-sm">
+      <div className="bg_card rounded-2xl border border_color dark:border-border-teal overflow-hidden shadow-sm">
         <table className="w-full text-left">
           <thead>
-            <tr className="card_btn border-b border-slate-200 dark:border-border-teal">
+            <tr className="card_btn border-b border_color dark:border-border-teal">
               <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 User
               </th>
@@ -139,7 +139,7 @@ const Users: React.FC = () => {
               <tr key={i} className="hover:bg-primary/5 transition-all group">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-full border-2 border-primary/20 group-hover:border-primary transition-all overflow-hidden">
+                    <div className="size-10 rounded-full border-2 border_color transition-all overflow-hidden">
                       <img
                         src={user.avatar}
                         alt={user.name}
@@ -150,9 +150,7 @@ const Users: React.FC = () => {
                       <span className="text-sm font-bold group-hover:text-primary transition-colors">
                         {user.name}
                       </span>
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
-                        {user.email}
-                      </span>
+                      <span className="text-xs card_text">{user.email}</span>
                     </div>
                   </div>
                 </td>
@@ -160,8 +158,8 @@ const Users: React.FC = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
                       user.role === "Admin"
-                        ? "bg-primary/10 text-primary border-primary/20"
-                        : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white border-slate-200 dark:border-white/20"
+                        ? "bg-primary/10 text-primary border_color"
+                        : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white border_color dark:border-white/20"
                     }`}
                   >
                     {user.role}
@@ -202,21 +200,21 @@ const Users: React.FC = () => {
             ))}
           </tbody>
         </table>
-        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-border-teal flex justify-between items-center">
+        <div className="px-6 py-4 card_btn border-t border_color dark:border-border-teal flex justify-between items-center">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
             Showing 1 to 4 of 1,284 users
           </span>
           <div className="flex gap-2">
-            <button className="px-3 py-1 rounded-lg bg_card text-[10px] font-bold border border-slate-200 dark:border-border-teal hover:border-primary transition-all">
+            <button className="px-3 py-1 rounded-lg bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
               Prev
             </button>
             <button className="px-3 py-1 rounded-lg bg-primary text-background-dark text-[10px] font-bold">
               1
             </button>
-            <button className="px-3 py-1 rounded-lg bg_card text-[10px] font-bold border border-slate-200 dark:border-border-teal hover:border-primary transition-all">
+            <button className="px-3 py-1 rounded-lg bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
               2
             </button>
-            <button className="px-3 py-1 rounded-lg bg_card text-[10px] font-bold border border-slate-200 dark:border-border-teal hover:border-primary transition-all">
+            <button className="px-3 py-1 rounded-lg bg_card text-[10px] font-bold border border_color dark:border-border-teal hover:border-primary transition-all">
               Next
             </button>
           </div>

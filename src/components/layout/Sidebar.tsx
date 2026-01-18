@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 const Sidebar: React.FC = () => {
   return (
     <>
-      <aside className="w-64 bg_mode border-r border-slate-200 not-sm:hidden flex flex-col z-20 transition-all duration-300">
+      <aside className="w-64 bg_mode border-r border_color not-sm:hidden flex flex-col z-20 transition-all duration-300">
         <div className="p-6 flex items-center gap-3">
           <div className="bg-primary size-10 rounded-lg flex items-center justify-center  shadow-lg shadow-primary/20">
             <span className="material-symbols-outlined font-bold">bolt</span>

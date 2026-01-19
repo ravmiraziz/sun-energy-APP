@@ -11,9 +11,17 @@ import {
 } from "react-icons/md";
 
 const Sidebar: React.FC = () => {
+  const navbars = [
+    { link: "/admin", icon: MdDashboard, label: "Boshqaruv" },
+    { link: "/admin/products", icon: MdInventory2, label: "Mahsulotlar" },
+    { link: "/admin/orders", icon: MdReceiptLong, label: "Buyurtmalar" },
+    { link: "/admin/users", icon: MdGroup, label: "Foydalanuvchilar" },
+    { link: "/admin/services", icon: MdDashboard, label: "Servislar" },
+    { link: "/admin/settings", icon: MdSettings, label: "Sozlamalar" },
+  ];
   return (
     <>
-      <aside className="w-64 bg_card border-r border_color not-sm:hidden flex flex-col z-20 transition-all duration-300">
+      <aside className="w-64 bg_card border-r border_color not-md:hidden flex flex-col z-20 transition-all duration-300">
         <div className="p-6 flex items-center gap-3">
           <div className="bg-primary size-10 rounded-lg flex items-center justify-center  shadow-lg shadow-primary/20">
             <MdBolt className="font-bold text-[24px]" />
@@ -25,73 +33,23 @@ const Sidebar: React.FC = () => {
         </div>
 
         <nav className="flex-1 px-4 space-y-2 mt-4">
-          <NavLink
-            to="/admin"
-            end
-            className={({ isActive }) =>
-              `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "card_text"
-              }`
-            }
-          >
-            <MdDashboard className="text-[24px]" />
-            <span className="text-sm font-semibold">Boshqaruv</span>
-          </NavLink>
-          <NavLink
-            to="/admin/products"
-            className={({ isActive }) =>
-              `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "card_text"
-              }`
-            }
-          >
-            <MdInventory2 className="text-[24px]" />
-            <span className="text-sm font-semibold">Mahsulotlar</span>
-          </NavLink>
-          <NavLink
-            to="/admin/orders"
-            className={({ isActive }) =>
-              `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "card_text"
-              }`
-            }
-          >
-            <MdReceiptLong className="text-[24px]" />
-            <span className="text-sm font-semibold">Buyurtmalar</span>
-          </NavLink>
-          <NavLink
-            to="/admin/users"
-            className={({ isActive }) =>
-              `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "card_text"
-              }`
-            }
-          >
-            <MdGroup className="text-[24px]" />
-            <span className="text-sm font-semibold">Foydalanuvchilar</span>
-          </NavLink>
-          <NavLink
-            to="/admin/services"
-            className={({ isActive }) =>
-              `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "card_text"
-              }`
-            }
-          >
-            <MdGroup className="text-[24px]" />
-            <span className="text-sm font-semibold">Serveslar</span>
-          </NavLink>
-          <NavLink
-            to="/admin/settings"
-            className={({ isActive }) =>
-              `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive ? "text-[#fbbf24]" : "card_text"
-              }`
-            }
-          >
-            <MdSettings className="text-[24px]" />
-            <span className="text-sm font-semibold">Sozlamalar</span>
-          </NavLink>
+          {navbars.map((navbar) => {
+            return (
+              <NavLink
+                key={navbar.link}
+                to={navbar.link}
+                end
+                className={({ isActive }) =>
+                  `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                    isActive ? "text-[#fbbf24]" : "card_text"
+                  }`
+                }
+              >
+                <navbar.icon className="text-[24px]" />
+                <span className="text-sm font-semibold">{navbar.label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
 
         <div className="p-4">
@@ -112,74 +70,24 @@ const Sidebar: React.FC = () => {
           </button>
         </div>
       </aside>
-      <nav className="fixed bottom-0 w-full bg-[#064e3b]/90 backdrop-blur-xl border-t border-emerald-900/50 pt-4 pb-8 flex justify-between items-center gap-1 z-50 rounded-t-3xl shadow-2xl sm:hidden">
-        <NavLink
-          to="/admin"
-          end
-          className={({ isActive }) =>
-            `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "card_text"
-            }`
-          }
-        >
-          <MdDashboard />
-          <span className="text-sm font-semibold">Boshqaruv</span>
-        </NavLink>
-        <NavLink
-          to="/admin/products"
-          className={({ isActive }) =>
-            `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "card_text"
-            }`
-          }
-        >
-          <MdInventory2 />
-          <span className="text-sm font-semibold">Mahsulotlar</span>
-        </NavLink>
-        <NavLink
-          to="/admin/orders"
-          className={({ isActive }) =>
-            `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "card_text"
-            }`
-          }
-        >
-          <MdReceiptLong />
-          <span className="text-sm font-semibold">Buyurtmalar</span>
-        </NavLink>
-        <NavLink
-          to="/admin/users"
-          className={({ isActive }) =>
-            `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "card_text"
-            }`
-          }
-        >
-          <MdGroup />
-          <span className="text-sm font-semibold">Foydalanuvchilar</span>
-        </NavLink>
-        <NavLink
-          to="/admin/services"
-          className={({ isActive }) =>
-            `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "card_text"
-            }`
-          }
-        >
-          <MdGroup />
-          <span className="text-sm font-semibold">Serveslar</span>
-        </NavLink>
-        <NavLink
-          to="/admin/settings"
-          className={({ isActive }) =>
-            `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-              isActive ? "text-[#fbbf24]" : "card_text"
-            }`
-          }
-        >
-          <MdSettings />
-          <span className="text-sm font-semibold">Sozlamalar</span>
-        </NavLink>
+      <nav className="fixed overflow-x-auto px-3 bottom-0 w-full bg-[#064e3b]/90 backdrop-blur-xl border-t border-emerald-900/50 pt-4 pb-2 flex justify-between items-center gap-4 z-50 rounded-t-3xl shadow-2xl md:hidden">
+        {navbars.map((navbar) => {
+          return (
+            <NavLink
+              key={navbar.link}
+              to={navbar.link}
+              end
+              className={({ isActive }) =>
+                `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
+                  isActive ? "text-[#fbbf24]" : "card_text"
+                }`
+              }
+            >
+              <navbar.icon />
+              <span className="text-sm font-semibold">{navbar.label}</span>
+            </NavLink>
+          );
+        })}
       </nav>
     </>
   );

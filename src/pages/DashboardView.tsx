@@ -25,34 +25,34 @@ import {
 } from "recharts";
 
 const data = [
-  { name: "Du", usage: 4000, solar: 2400 },
-  { name: "Se", usage: 3000, solar: 1398 },
-  { name: "Cho", usage: 2000, solar: 9800 },
-  { name: "Pa", usage: 2780, solar: 3908 },
-  { name: "Ju", usage: 1890, solar: 4800 },
-  { name: "Sha", usage: 2390, solar: 3800 },
-  { name: "Ya", usage: 3490, solar: 4300 },
+  { name: "Du", usage: 4000 },
+  { name: "Se", usage: 3000 },
+  { name: "Cho", usage: 2000 },
+  { name: "Pa", usage: 2780 },
+  { name: "Ju", usage: 1890 },
+  { name: "Sha", usage: 2390 },
+  { name: "Ya", usage: 3490 },
 ];
 
 const DashboardView: React.FC = () => {
   const kpis = [
     {
-      label: "Total Revenue",
-      value: "$45,231.89",
+      label: "Umumiy daromad",
+      value: "45,415,231 UZS",
       trend: "+12.5%",
       isPositive: true,
       icon: <MdPayments className="text-[26px]" />,
       colorClass: "revenue-card-gradient border-2 border-yellow-500",
     },
     {
-      label: "Energy Usage",
+      label: "Energiya sarfi",
       value: "12,840 kWh",
       trend: "+5.2%",
       isPositive: true,
       icon: <MdBolt className="text-[26px]" />,
     },
     {
-      label: "Total Orders",
+      label: "Jami buyurtmalar",
       value: "1,254",
       trend: "-2.4%",
       isPositive: false,
@@ -119,7 +119,7 @@ const DashboardView: React.FC = () => {
   ];
 
   return (
-    <div className="p-8 space-y-8 max-w-400 mx-auto w-full">
+    <div className="md:p-8 p-4 space-y-8 max-w-400 mx-auto w-full">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((kpi, idx) => (

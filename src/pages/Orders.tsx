@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   MdFilterList,
   MdOutlineFileDownload,
@@ -8,6 +8,7 @@ import {
   MdAccountBalanceWallet,
 } from "react-icons/md";
 const Orders: React.FC = () => {
+  const [showDetails, setShowDetails] = useState(false);
   const orders = [
     {
       id: "#8821",
@@ -125,6 +126,7 @@ const Orders: React.FC = () => {
               {orders.map((order, i) => (
                 <tr
                   key={i}
+                  onClick={() => setShowDetails(true)}
                   className={`cursor-pointer transition-all hover:bg-slate-800/30 ${i === 0 ? "bg-primarys border-l-4 border-l-orange-400" : ""}`}
                 >
                   <td className="px-6 py-5 font-bold text-sm">{order.id}</td>
@@ -183,10 +185,15 @@ const Orders: React.FC = () => {
         </div>
       </div>
 
-      <aside className="w-100 border-l border_color bg_card h-full flex flex-col shadow-[-10px_0_30px_-15px_rgba(0,0,0,0.1)] z-10 overflow-y-auto">
+      <aside
+        className={`${showDetails ? "w-100" : "w-0"} border-l border_color bg_card h-full flex flex-col shadow-[-10px_0_30px_-15px_rgba(0,0,0,0.1)] z-10 overflow-y-auto`}
+      >
         <div className="p-6 border-b border_color flex items-center justify-between">
           <h3 className="text-xl font-black">Order Details</h3>
-          <button className="text-slate-400 hover:text-primary transition-colors">
+          <button
+            onClick={() => setShowDetails(false)}
+            className="text-slate-400 hover:text-primary transition-colors"
+          >
             <MdClose className="text-[24px]" />
           </button>
         </div>

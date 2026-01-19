@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import ServiceDrawer from "../components/ui/ServiceDrawer";
 
 const SERVICES = [
   {
@@ -44,6 +45,29 @@ const SERVICES = [
 ];
 
 const Services: React.FC = () => {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<any>(null);
+
+  const fetchedOnce = useRef(false); // 🔥 MAGIC
+
+  const fetchServices = async () => {
+    setLoading(true);
+    try {
+      // const res = await get("/products");
+      // setProducts(res.data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (fetchedOnce.current) return;
+
+    fetchedOnce.current = true;
+    fetchServices();
+  }, []);
   return (
     <div className="flex-1 p-8  ">
       <div className="flex justify-between items-center">
@@ -55,9 +79,12 @@ const Services: React.FC = () => {
             Create, monitor, and manage your energy service offerings.
           </p>
         </div>
-        <button className="bg-primary text-background-dark px-6 py-3 rounded-xl font-black flex items-center gap-2 shadow-lg shadow-primary/20">
+        <button
+          onClick={() => setOpen(true)}
+          className="bg-primary text-background-dark px-6 py-3 rounded-xl font-black flex items-center gap-2 shadow-lg shadow-primary/20"
+        >
           <span className="material-symbols-outlined">add_circle</span>
-          Add New Service
+          Servis qo'shish
         </button>
       </div>
 
@@ -197,6 +224,15 @@ const Services: React.FC = () => {
           </tbody>
         </table>
       </div>
+      <ServiceDrawer
+        open={open}
+        initialValues={selected}
+        onClose={() => {
+          setOpen(false);
+          setSelected(null);
+        }}
+        onSuccess={() => fetchServices()}
+      />
     </div>
   );
 };

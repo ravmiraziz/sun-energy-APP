@@ -22,27 +22,13 @@
   --card-btn: #064e3b;
 }
 
-.material-symbols-outlined {
-  font-variation-settings:
-    "FILL" 0,
-    "wght" 400,
-    "GRAD" 0,
-    "opsz" 24;
-}
-.filled-icon {
-  font-variation-settings:
-    "FILL" 1,
-    "wght" 400,
-    "GRAD" 0,
-    "opsz" 24;
-}
 .revenue-card-gradient {
   background: linear-gradient(135deg, #065f46 0%, #047857 100%);
 }
 
 body {
-  scrollbar-width: thin;
-  scrollbar-color: #22493e transparent;
+  /* scrollbar-width: thin; */
+  /* scrollbar-color: #22493e transparent; */
   background: var(--bg);
   color: var(--text);
 }
@@ -96,4 +82,71 @@ button.bg-primary:hover {
 
 .border_color {
   border-color: var(--border);
+}
+
+.box_drawer {
+  background-color: var(--card-btn) !important;
+  color: var(--text) !important;
+}
+
+.box_drawer .ant-input,
+.box_drawer .ant-input-affix-wrapper,
+.box_drawer .ant-input-textarea textarea {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+  border: none !important;
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+
+/* HOVER */
+.box_drawer .ant-input:hover,
+.box_drawer .ant-input-affix-wrapper:hover,
+.box_drawer .ant-input-textarea textarea:hover {
+  background-color: var(--card) !important;
+}
+
+/* FOCUS */
+.box_drawer .ant-input:focus,
+.box_drawer .ant-input-affix-wrapper-focused,
+.box_drawer .ant-input-textarea textarea:focus {
+  background-color: var(--card) !important;
+  box-shadow: 0 0 0 1px var(--bg_primary) !important;
+}
+
+.box_drawer .ant-form-item-label > label {
+  color: var(--text) !important;
+  font-weight: 600;
+}
+
+.box_drawer .ant-form-item-required::before {
+  color: var(--bg_primary) !important;
+}
+
+.box_drawer .ant-switch {
+  background-color: var(--card);
+}
+
+.box_drawer .ant-switch-checked {
+  background-color: var(--bg_primary) !important;
+}
+
+.box_drawer .ant-upload,
+.box_drawer .ant-upload button {
+  background: var(--card) !important;
+  color: var(--text) !important;
+  border: none;
+  border-radius: 10px;
+  padding: 4px 8px;
+}
+
+.box_drawer .ant-upload button:hover {
+  border: none !important;
+}
+
+@media (min-width: 767px) {
+  body {
+    scrollbar-width: thin;
+    scrollbar-color: #22493e transparent;
+  }
 }

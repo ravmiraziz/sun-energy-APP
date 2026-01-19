@@ -34,11 +34,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   /* 🔁 Refresh’da tiklash */
   useEffect(() => {
-    const stored = localStorage.getItem("auth");
-    if (stored) {
-      const parsed: AuthData = JSON.parse(stored);
-      setUser(parsed.user);
-      setToken(parsed.token);
+    const user = localStorage.getItem("user");
+    const token = localStorage.getItem("access_token");
+    if (user) {
+      const parsed: AuthData = JSON.parse(user);
+      setUser(parsed);
+      setToken(token);
     }
   }, []);
 

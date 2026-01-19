@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   MdChevronRight,
   MdAdd,
@@ -8,9 +8,10 @@ import {
   MdChevronLeft,
   MdChevronRight as MdChevronRightIcon,
 } from "react-icons/md";
+import ProductDrawer from "../components/ui/ProductDrawer";
 
 const Products: React.FC = () => {
-  const [products] = useState([
+  const [productsData] = useState([
     {
       id: "1",
       name: "Elite Series PV-500",
@@ -58,8 +59,32 @@ const Products: React.FC = () => {
     },
   ]);
 
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<any>(null);
+
+  const fetchedOnce = useRef(false); // 🔥 MAGIC
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      // const res = await get("/products");
+      // setProducts(res.data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (fetchedOnce.current) return;
+
+    fetchedOnce.current = true;
+    fetchProducts();
+  }, []);
+
   return (
-    <div className="p-8 max-w-400 mx-auto w-full">
+    <div className="md:p-8 p-4 max-w-400 mx-auto w-full">
       <div className="flex items-center gap-2 text-sm text_primary mb-6">
         <a className="hover:text-primary transition-colors" href="#">
           Dashboard
@@ -68,7 +93,7 @@ const Products: React.FC = () => {
         <span className="text-white font-medium">Products Management</span>
       </div>
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-wrap justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-black tracking-tight">
             Products Management
@@ -77,9 +102,12 @@ const Products: React.FC = () => {
             Manage and track your energy asset inventory
           </p>
         </div>
-        <button className="bg-primary px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90 shadow-lg shadow-primary/20 transition-all transform hover:scale-[1.02]">
+        <button
+          onClick={() => setOpen(true)}
+          className="bg-primary px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-1 hover:opacity-90 shadow-lg shadow-primary/20 transition-all transform hover:scale-[1.02]"
+        >
           <MdAdd className="text-[20px]" />
-          Add Product
+          Qo'shish
         </button>
       </div>
 
@@ -109,7 +137,7 @@ const Products: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg_card">
-              {products.map((product) => (
+              {productsData.map((product) => (
                 <tr
                   key={product.id}
                   className="hover:bg-slate-800/30 transition-colors group"
@@ -165,7 +193,15 @@ const Products: React.FC = () => {
             </tbody>
           </table>
         </div>
-
+        <ProductDrawer
+          open={open}
+          initialValues={selected}
+          onClose={() => {
+            setOpen(false);
+            setSelected(null);
+          }}
+          onSuccess={() => fetchProducts()}
+        />
         <div className="px-6 py-4 border-t border_color flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xs text_primary">Rows per page:</span>

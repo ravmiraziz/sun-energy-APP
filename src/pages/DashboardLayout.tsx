@@ -10,7 +10,7 @@ const DashboardLayout: React.FC = () => {
 
       <div className="flex-1 flex flex-col min-w-0">
         <TopNav />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto not-md:pb-14">
           <Outlet />
         </main>
       </div>

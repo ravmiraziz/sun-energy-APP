@@ -6,8 +6,10 @@ import {
   MdExpandMore,
   MdSecurity,
   MdLogout,
+  MdHomeRepairService,
 } from "react-icons/md";
 import { useAuth } from "../context/AuthContext";
+import { IoMdCart } from "react-icons/io";
 
 const Settings: React.FC = () => {
   const { user, logout } = useAuth();
@@ -16,18 +18,19 @@ const Settings: React.FC = () => {
       <div className="flex flex-wrap justify-between items-end gap-6">
         <div>
           <h2 className="text-4xl font-black leading-tight tracking-tight">
-            Admin Settings
+            Admin Sozlamalari
           </h2>
           <p className="card_text text_primary text-base">
-            Manage your profile, permissions, and system preferences.
+            Profilingiz, ruxsatnomalaringiz va tizim sozlamalaringizni
+            boshqaring.
           </p>
         </div>
         <div className="flex gap-3">
           <button className="px-6 py-2.5 card_btn rounded-xl font-bold text-sm hover:opacity-90 transition-all">
-            Discard
+            Tashlab ketish
           </button>
           <button className="px-6 py-2.5 bg-primary rounded-xl font-bold text-sm shadow-lg  hover:scale-[1.02] active:scale-[0.98] transition-all">
-            Save Changes
+            O'zgarishlarni saqlash
           </button>
         </div>
       </div>
@@ -35,36 +38,32 @@ const Settings: React.FC = () => {
       <section className="space-y-6">
         <div className="flex items-center gap-2">
           <MdPalette className="text-primary text-[24px]" />
-          <h3 className="text-xl font-bold">Appearance & Theme</h3>
+          <h3 className="text-xl font-bold">Servis & Mahsulotlar</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             {
-              label: "Dark Mode",
-              desc: "Optimize interface for energy efficiency.",
-              active: true,
+              label: "Servis turlari",
+              desc: "Servis kategoriya turlari bo'limi",
+              icon: MdHomeRepairService,
             },
             {
-              label: "High Contrast",
-              desc: "Enhance visibility for key elements.",
-              active: false,
+              label: "Mahsulot turlari",
+              desc: "Mahsulotlar kategoriyasi sozlamalari",
+              icon: IoMdCart,
             },
           ].map((item, i) => (
             <div
               key={i}
-              className="flex items-center justify-between p-6 rounded-2xl border border_color bg_card shadow-sm"
+              className="flex items-center justify-between p-6 rounded-2xl border border_color bg_card shadow-sm cursor-pointer hover:opacity-70"
             >
               <div className="flex flex-col gap-1">
                 <p className="font-bold">{item.label}</p>
                 <p className="text-xs card_text">{item.desc}</p>
               </div>
-              <div
-                className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors ${item.active ? "bg-primary" : "bg-slate-400"}`}
-              >
-                <div
-                  className={`size-4 bg-white rounded-full shadow transition-transform ${item.active ? "translate-x-6" : "translate-x-0"}`}
-                ></div>
-              </div>
+              <item.icon
+                className={`text-3xl ${i === 1 ? "text-orange-400" : "text-blue-400"}`}
+              />
             </div>
           ))}
         </div>

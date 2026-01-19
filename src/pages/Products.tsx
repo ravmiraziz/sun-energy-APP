@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   MdChevronRight,
   MdAdd,
@@ -59,29 +59,29 @@ const Products: React.FC = () => {
     },
   ]);
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [products, setProducts] = useState([]);
+  // const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<any>(null);
 
-  const fetchedOnce = useRef(false); // 🔥 MAGIC
+  // const fetchedOnce = useRef(false); // 🔥 MAGIC
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      // const res = await get("/products");
-      // setProducts(res.data);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchProducts = async () => {
+  //   setLoading(true);
+  //   try {
+  //     // const res = await get("/products");
+  //     // setProducts(res.data);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (fetchedOnce.current) return;
+  // useEffect(() => {
+  //   if (fetchedOnce.current) return;
 
-    fetchedOnce.current = true;
-    fetchProducts();
-  }, []);
+  //   fetchedOnce.current = true;
+  //   fetchProducts();
+  // }, []);
 
   return (
     <div className="md:p-8 p-4 max-w-400 mx-auto w-full">
@@ -200,7 +200,7 @@ const Products: React.FC = () => {
             setOpen(false);
             setSelected(null);
           }}
-          onSuccess={() => fetchProducts()}
+          onSuccess={() => setOpen(false)}
         />
         <div className="px-6 py-4 border-t border_color flex items-center justify-between">
           <div className="flex items-center gap-2">

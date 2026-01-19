@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import ServiceDrawer from "../components/ui/ServiceDrawer";
 
 const SERVICES = [
@@ -45,38 +45,39 @@ const SERVICES = [
 ];
 
 const Services: React.FC = () => {
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [services, setServices] = useState([]);
+  // const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<any>(null);
 
-  const fetchedOnce = useRef(false); // 🔥 MAGIC
+  // const fetchedOnce = useRef(false); // 🔥 MAGIC
 
-  const fetchServices = async () => {
-    setLoading(true);
-    try {
-      // const res = await get("/products");
-      // setProducts(res.data);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchServices = async () => {
+  //   setLoading(true);
+  //   try {
+  //     // const res = await get("/products");
+  //     // setProducts(res.data);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (fetchedOnce.current) return;
+  // useEffect(() => {
+  //   if (fetchedOnce.current) return;
 
-    fetchedOnce.current = true;
-    fetchServices();
-  }, []);
+  //   fetchedOnce.current = true;
+  //   fetchServices();
+  // }, []);
   return (
     <div className="flex-1 p-8  ">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-4xl font-black text-white tracking-tight">
-            Services Management
+            Xizmatlarni boshqarish
           </h2>
           <p className="text-slate-400 mt-1">
-            Create, monitor, and manage your energy service offerings.
+            Energiya xizmatingiz takliflarini yarating, kuzatib boring va
+            boshqaring.
           </p>
         </div>
         <button
@@ -231,7 +232,7 @@ const Services: React.FC = () => {
           setOpen(false);
           setSelected(null);
         }}
-        onSuccess={() => fetchServices()}
+        onSuccess={() => setOpen(false)}
       />
     </div>
   );

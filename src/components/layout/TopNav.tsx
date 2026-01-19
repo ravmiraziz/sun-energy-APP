@@ -81,7 +81,7 @@ const TopNav: React.FC = () => {
             >
               <MdNotifications className="text-[22px]" />
               {notifications.length > 0 && (
-                <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white"></span>
+                <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white animate-bounce"></span>
               )}
             </button>
             {showNotificationPanel && (

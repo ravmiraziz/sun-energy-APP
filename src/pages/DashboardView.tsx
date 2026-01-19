@@ -125,7 +125,7 @@ const DashboardView: React.FC = () => {
         {kpis.map((kpi, idx) => (
           <div
             key={idx}
-            className={`${kpi.colorClass || "border border_color"} bg_card rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:shadow-primary/5 transition-all duration-300 h-[160px] group`}
+            className={`${kpi.colorClass || "border border_color"} bg_card rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:shadow-primary/5 transition-all duration-300 h-40 group`}
           >
             <div className="flex justify-between items-start">
               <p

@@ -310,7 +310,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
           </label>
 
           <label
-            className={`w-full h-32 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer ${
+            className={`w-full h-32 bg_card border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer ${
               errors.images ? "border-red-500" : "border-[#306959]"
             }`}
           >
@@ -351,6 +351,25 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               ))}
             </div>
           )}
+        </div>
+
+        <div className="col-span-2 flex items-center justify-between p-4 bg_card rounded-xl border border-transparent">
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-white">Faol holat</span>
+            <span className="text-xs text-slate-500 dark:text-[#8fccba]">
+              Ushbu bo'lim mahsulot qolmaganida o'chirilishi kerak
+            </span>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              name="is_active"
+              onChange={handleChange}
+              checked
+              className="sr-only peer"
+              type="checkbox"
+            />
+            <div className="w-11 h-6 bg-primary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+          </label>
         </div>
       </div>
 

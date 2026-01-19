@@ -48,7 +48,7 @@ const AddProduct: React.FC = () => {
       {/* Modal Backdrop Overlay */}
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         {/* Modal Container */}
-        <div className="bg-modal-dark w-full max-w-[560px] rounded-xl shadow-2xl border border-white/10 flex flex-col overflow-hidden">
+        <div className="bg-modal-dark w-full max-w-140 rounded-xl shadow-2xl border border-white/10 flex flex-col overflow-hidden">
           {/* Modal Header */}
           <div className="flex items-start justify-between p-6 border-b border-white/5">
             <div className="flex flex-col gap-1">
@@ -115,7 +115,7 @@ const AddProduct: React.FC = () => {
                 Availability Status
               </label>
               <div className="flex flex-wrap gap-3">
-                <label className="flex-1 text-sm font-medium leading-normal flex items-center justify-center rounded-xl border border-[#306959] px-4 h-14 text-white has-[:checked]:border-2 has-[:checked]:border-primary has-[:checked]:bg-primary/10 relative cursor-pointer transition-all">
+                <label className="flex-1 text-sm font-medium leading-normal flex items-center justify-center rounded-xl border border-[#306959] px-4 h-14 text-white has-checked:border-2 relative cursor-pointer transition-all">
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary text-[18px]">
                       check_circle
@@ -129,7 +129,7 @@ const AddProduct: React.FC = () => {
                     type="radio"
                   />
                 </label>
-                <label className="flex-1 text-sm font-medium leading-normal flex items-center justify-center rounded-xl border border-[#306959] px-4 h-14 text-white has-[:checked]:border-2 has-[:checked]:border-primary has-[:checked]:bg-primary/10 relative cursor-pointer transition-all">
+                <label className="flex-1 text-sm font-medium leading-normal flex items-center justify-center rounded-xl border border-[#306959] px-4 h-14 text-white has-checked:border-2 relative cursor-pointer transition-all">
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-white/40 text-[18px]">
                       block
@@ -161,10 +161,10 @@ const AddProduct: React.FC = () => {
           </div>
           {/* Modal Footer */}
           <div className="p-6 border-t border-white/5 bg-[#18342c]/20 flex items-center justify-end gap-3">
-            <button className="flex min-w-[100px] cursor-pointer items-center justify-center rounded-xl h-12 px-6 bg-transparent text-white border border-white/20 hover:bg-white/5 text-sm font-semibold transition-colors">
+            <button className="flex min-w-25 cursor-pointer items-center justify-center rounded-xl h-12 px-6 bg-transparent text-white border border-white/20 hover:bg-white/5 text-sm font-semibold transition-colors">
               <span>Cancel</span>
             </button>
-            <button className="flex min-w-[160px] cursor-pointer items-center justify-center gap-2 rounded-xl h-12 px-6 bg-primary text-[#10221d] text-sm font-bold hover:brightness-110 transition-all shadow-[0_0_20px_rgba(9,246,179,0.2)]">
+            <button className="flex min-w-40 cursor-pointer items-center justify-center gap-2 rounded-xl h-12 px-6 bg-primary text-[#10221d] text-sm font-bold hover:brightness-110 transition-all shadow-[0_0_20px_rgba(9,246,179,0.2)]">
               <span className="material-symbols-outlined text-[20px]">add</span>
               <span>Create Product</span>
             </button>

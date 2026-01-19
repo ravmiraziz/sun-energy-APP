@@ -10,11 +10,7 @@ export interface ServiceFormValues {
   description_ru: string;
   price: number;
   category_id: string;
-  watt: string;
-  brand: string;
-  model: string;
-  images: File[];
-  is_active?: string;
+  is_activate?: boolean;
 }
 
 interface ServiceDrawerProps {
@@ -40,10 +36,6 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     description_ru: "",
     price: 0,
     category_id: "",
-    watt: "",
-    brand: "",
-    images: [],
-    model: "",
   });
 
   /* ERROR STATE */
@@ -62,10 +54,6 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
           description_ru: "",
           price: 0,
           category_id: "",
-          watt: "",
-          brand: "",
-          images: [],
-          model: "",
         });
       }
       setErrors({});
@@ -84,28 +72,6 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     setErrors((prev) => ({ ...prev, [name]: false }));
   };
 
-  /* IMAGE UPLOAD */
-  const handleImageUpload = (files: FileList | null) => {
-    if (!files) return;
-
-    const fileArray = Array.from(files);
-
-    setValues((prev) => ({
-      ...prev,
-      images: [...prev.images, ...fileArray],
-    }));
-
-    setErrors((prev) => ({ ...prev, images: false }));
-  };
-
-  /* REMOVE IMAGE */
-  const removeImage = (index: number) => {
-    setValues((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
-  };
-
   /* VALIDATION */
   const validate = () => {
     const newErrors: Record<string, boolean> = {};
@@ -115,10 +81,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     if (!values.description_uz.trim()) newErrors.description_uz = true;
     if (!values.description_ru.trim()) newErrors.description_ru = true;
     if (!values.category_id) newErrors.category_id = true;
-    if (!values.model) newErrors.model = true;
-    if (!values.watt) newErrors.watt = true;
     if (!values.price) newErrors.price = true;
-    if (values.images.length === 0) newErrors.images = true;
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -147,17 +110,17 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     <BaseDrawer
       open={open}
       onClose={onClose}
-      title={isEdit ? "Mahsulotni tahrirlash" : "Yangi mahsulot qo‘shish"}
+      title={isEdit ? "Servisni tahrirlash" : "Yangi Servis qo‘shish"}
       width={700}
     >
       {/* HEADER */}
       <div className="flex items-start justify-between border-b border_color">
         <div>
           <h2 className="text-2xl font-bold">
-            {isEdit ? "Mahsulotni yangilash" : "Yangi Mahsulot Qo'shish"}
+            {isEdit ? "Servisni yangilash" : "Yangi Servis Qo'shish"}
           </h2>
           <p className="text-[#8fccba] text-sm mb-2">
-            Yangi energiya aktivini ro'yxatlash uchun tafsilotlarni to'ldiring.
+            Yangi servislarni ro'yxatlash uchun tafsilotlarni to'ldiring.
           </p>
         </div>
         <button
@@ -174,7 +137,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="font-medium">
-              Mahsulot nomi (UZ) <span className="text-red-500">*</span>
+              Servis nomi (UZ) <span className="text-red-500">*</span>
             </label>
             <input
               name="name_uz"
@@ -183,12 +146,12 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
               className={`form-input w-full h-14 rounded-xl bg-[#18342c] px-4 border ${
                 errors.name_uz ? "border-red-500" : "border-[#306959]"
               }`}
-              placeholder="ThinkPower 5 kVt inverter"
+              placeholder="Panelni Tozalash"
             />
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-medium">
-              Mahsulot nomi (RU) <span className="text-red-500">*</span>
+              Servis nomi (RU) <span className="text-red-500">*</span>
             </label>
             <input
               name="name_ru"
@@ -197,13 +160,13 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
               className={`form-input w-full h-14 rounded-xl bg-[#18342c] px-4 border ${
                 errors.name_ru ? "border-red-500" : "border-[#306959]"
               }`}
-              placeholder="Инвертор ThinkPower 5 кВт"
+              placeholder="Очистка панели"
             />
           </div>
         </div>
         <div className="flex flex-col gap-2">
           <label className="font-medium">
-            Mahsulotga tavsif (UZ) <span className="text-red-500">*</span>
+            Servisga tavsif (UZ) <span className="text-red-500">*</span>
           </label>
           <textarea
             name="description_uz"
@@ -212,12 +175,12 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
             className={`form-input w-full h-25 py-4 rounded-xl bg-[#18342c] px-4 border ${
               errors.description_uz ? "border-red-500" : "border-[#306959]"
             }`}
-            placeholder="Asosiy Texnik Ko‘rsatkichlar Nominal quvvat: 5000 Vt (5 kW) Maksimal chiqish quvvati: 5500 Vt AC chiqish kuchlanishi: 400 V (3 fazali) Chiqish chastotasi: 50/60 Hz Chiqish toki: 10 A Samaradorlik: Maksimal – 98.2%; Yevropa samaradorligi – 97.7% MPPT"
+            placeholder="Quyosh panellari quyosh nuri ko'p bo'lganda yaxshi ishlaydi. Chang, gulchang, barglar yoki qushlarning axlati quyosh nurini to'sib qo'yishi va panellaringizni kamroq samarali qilishi mumkin. Hatto kichik miqdordagi axloqsizlik ham tizimingiz ishlab chiqaradigan..."
           />
         </div>
         <div className="flex flex-col gap-2">
           <label className="font-medium">
-            Mahsulotga tavsif (RU) <span className="text-red-500">*</span>
+            Servisga tavsif (RU) <span className="text-red-500">*</span>
           </label>
           <textarea
             name="description_ru"
@@ -226,7 +189,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
             className={`form-input w-full h-25 py-4 rounded-xl bg-[#18342c] px-4 border ${
               errors.description_ru ? "border-red-500" : "border-[#306959]"
             }`}
-            placeholder="Основные технические характеристики Номинальная мощность: 5000 Вт (5 кВт) Максимальная выходная мощность: 5500 Вт Выходное напряжение переменного тока: 400 В (3-фазное) Выходная частота: 50/60 Гц Выходной ток: 10 А"
+            placeholder="Солнечные панели работают наиболее эффективно при достаточном количестве солнечного света. Пыль, пыльца, листья или птичий помет могут блокировать солнечный свет и снижать эффективность панелей. Даже небольшое количество..."
           />
         </div>
 
@@ -268,90 +231,6 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              Madeli <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="model"
-              type="text"
-              value={values.model}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg-[#18342c] px-4 border ${
-                errors.model ? "border-red-500" : "border-[#306959]"
-              }`}
-              placeholder="004030-3"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              WATT <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="watt"
-              type="number"
-              min={0}
-              inputMode="numeric"
-              value={values.watt}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg-[#18342c] px-4 border ${
-                errors.watt ? "border-red-500" : "border-[#306959]"
-              }`}
-              placeholder="5000"
-            />
-          </div>
-        </div>
-
-        {/* IMAGE UPLOAD */}
-        <div className="flex flex-col gap-2">
-          <label className="font-medium">
-            Mahsulot rasmi <span className="text-red-500">*</span>
-          </label>
-
-          <label
-            className={`w-full h-32 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer ${
-              errors.images ? "border-red-500" : "border-[#306959]"
-            }`}
-          >
-            <input
-              type="file"
-              multiple
-              hidden
-              name="images"
-              accept="image/*"
-              onChange={(e) => handleImageUpload(e.target.files)}
-            />
-            <span className="text-[#8fccba] p-5 text-center">
-              Bo'lim ustiga bosing yoki faylni shu yurga surib olib keling
-            </span>
-          </label>
-
-          {/* PREVIEW */}
-          {values.images.length > 0 && (
-            <div className="flex gap-3 flex-wrap">
-              {values.images.map((file, i) => (
-                <div
-                  key={i}
-                  className="relative w-20 h-20 rounded-lg overflow-hidden"
-                >
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt="preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(i)}
-                    className="absolute top-1 right-1 bg-black/60 rounded-full"
-                  >
-                    <MdClose />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
 
       {/* FOOTER */}
@@ -366,7 +245,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
           onClick={handleSubmit}
           className="h-12 px-6 rounded-xl bg-primary text-[#10221d] font-bold"
         >
-          {isEdit ? "Yangilash" : "Mahsultni qo'shish"}
+          {isEdit ? "Yangilash" : "Servis qo'shish"}
         </button>
       </div>
     </BaseDrawer>

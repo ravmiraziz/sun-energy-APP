@@ -267,7 +267,7 @@ const Orders: React.FC = () => {
               Grid Connection
             </h4>
             <div className="space-y-6 relative">
-              <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-primary/20"></div>
+              <div className="absolute left-1.75 top-2 bottom-2 w-0.5 bg-primary/20"></div>
               <div className="flex items-start gap-4 relative z-10">
                 <div className="size-4 rounded-full bg-primary border-4 border_color shadow-sm mt-1"></div>
                 <div>

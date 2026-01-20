@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   MdSettings,
   MdArrowForward,
-  MdShield,
+  MdSecurity,
   MdLock,
   MdVisibility,
 } from "react-icons/md";
@@ -168,7 +168,7 @@ const Login: React.FC = () => {
             )}
             {loading && (
               <div className="mt-6 flex items-center justify-center gap-2 text_primary text-xs">
-                <MdShield />
+                <MdSecurity />
                 Xavfsiz tekshirilmoqda...
               </div>
             )}

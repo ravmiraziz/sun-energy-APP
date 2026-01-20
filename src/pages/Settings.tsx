@@ -5,12 +5,12 @@ import {
   MdPhotoCamera,
   MdExpandMore,
   MdSecurity,
-  MdConstruction,
+  MdBuild,
   MdShoppingCart,
 } from "react-icons/md";
 
 import { useAuth } from "../context/AuthContext";
-import { IoLogOutOutline } from "react-icons/io5";
+import { IoLogOut } from "react-icons/io5";
 
 const Settings: React.FC = () => {
   const { user, logout } = useAuth();
@@ -46,7 +46,7 @@ const Settings: React.FC = () => {
             {
               label: "Servis turlari",
               desc: "Servis kategoriya turlari bo'limi",
-              icon: MdConstruction,
+              icon: MdBuild,
             },
             {
               label: "Mahsulot turlari",
@@ -130,7 +130,7 @@ const Settings: React.FC = () => {
                 className="absolute top-0 right-0 text-red-500 flex items-center gap-2 justify-center"
                 onClick={logout}
               >
-                Chiqish <IoLogOutOutline className="text-[20px]" />
+                Chiqish <IoLogOut className="text-[20px]" />
               </button>
             </div>
           </div>

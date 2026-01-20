@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   MdPalette,
   MdAccountCircle,
@@ -11,9 +11,13 @@ import {
 
 import { useAuth } from "../context/AuthContext";
 import { IoLogOut } from "react-icons/io5";
+import CategoryDrawer from "../components/ui/CategoryDrawer";
 
 const Settings: React.FC = () => {
   const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<any>(null);
+
   return (
     <div className="p-8 max-w-400 mx-auto w-full space-y-12">
       <div className="flex flex-wrap justify-between items-end gap-6">
@@ -56,6 +60,7 @@ const Settings: React.FC = () => {
           ].map((item, i) => (
             <div
               key={i}
+              onClick={() => setOpen(true)}
               className="flex items-center justify-between p-6 rounded-2xl border border_color bg_card shadow-sm cursor-pointer hover:opacity-70"
             >
               <div className="flex flex-col gap-1">
@@ -203,6 +208,15 @@ const Settings: React.FC = () => {
           </table>
         </div>
       </section>
+      <CategoryDrawer
+        open={open}
+        initialValues={selected}
+        onClose={() => {
+          setOpen(false);
+          setSelected(null);
+        }}
+        onSuccess={() => setOpen(false)}
+      />
     </div>
   );
 };

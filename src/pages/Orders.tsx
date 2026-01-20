@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import {
   MdFilterList,
-  MdOutlineFileDownload,
+  MdFileDownload,
   MdExpandMore,
   MdClose,
-  MdSolarPower,
+  MdEnergySavingsLeaf,
   MdAccountBalanceWallet,
 } from "react-icons/md";
 const Orders: React.FC = () => {
@@ -78,7 +78,7 @@ const Orders: React.FC = () => {
               Filter
             </button>
             <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-sm font-bold shadow-lg shadow-primary/20 hover:brightness-110 transition-all transform hover:scale-[1.02]">
-              <MdOutlineFileDownload className="text-[22px]" />
+              <MdFileDownload className="text-[22px]" />
               Export CSV
             </button>
           </div>
@@ -215,7 +215,7 @@ const Orders: React.FC = () => {
             </div>
             <div className="flex items-center gap-4">
               <div className="size-12 rounded-full bg-primary flex items-center justify-center shadow-sm">
-                <MdSolarPower className="text-2xl" />
+                <MdEnergySavingsLeaf className="text-2xl" />
               </div>
               <div>
                 <p className="text-[10px] card_text font-bold uppercase tracking-widest">

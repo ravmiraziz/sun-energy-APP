@@ -1,10 +1,10 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import {
-  MdBolt,
+  MdFlare,
   MdDashboard,
-  MdInventory2,
-  MdReceiptLong,
+  MdInventory,
+  MdReceipt,
   MdGroup,
   MdSettings,
   MdAddCircle,
@@ -13,8 +13,8 @@ import {
 const Sidebar: React.FC = () => {
   const navbars = [
     { link: "/admin", icon: MdDashboard, label: "Boshqaruv" },
-    { link: "/admin/products", icon: MdInventory2, label: "Mahsulotlar" },
-    { link: "/admin/orders", icon: MdReceiptLong, label: "Buyurtmalar" },
+    { link: "/admin/products", icon: MdInventory, label: "Mahsulotlar" },
+    { link: "/admin/orders", icon: MdReceipt, label: "Buyurtmalar" },
     { link: "/admin/users", icon: MdGroup, label: "Foydalanuvchilar" },
     { link: "/admin/services", icon: MdDashboard, label: "Servislar" },
     { link: "/admin/settings", icon: MdSettings, label: "Sozlamalar" },
@@ -24,7 +24,7 @@ const Sidebar: React.FC = () => {
       <aside className="w-64 bg_card border-r border_color not-md:hidden flex flex-col z-20 transition-all duration-300">
         <div className="p-6 flex items-center gap-3">
           <div className="bg-primary size-10 rounded-lg flex items-center justify-center  shadow-lg shadow-primary/20">
-            <MdBolt className="font-bold text-[24px]" />
+            <MdFlare className="font-bold text-[24px]" />
           </div>
           <div>
             <h1 className="text-base font-bold leading-tight">Smart Energy</h1>

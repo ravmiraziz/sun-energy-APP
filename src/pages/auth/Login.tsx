@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import {
-  MdAdminPanelSettings,
+  MdSettings,
   MdArrowForward,
   MdShield,
   MdLock,
   MdVisibility,
-  MdLockReset,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -77,7 +76,7 @@ const Login: React.FC = () => {
         <div className="w-full max-w-250 flex flex-col md:flex-row bg_card rounded-3xl shadow-2xl border border_color overflow-hidden min-h-150">
           <div className="w-full md:w-1/2 p-12 flex flex-col justify-center border-l border_color transition-all duration-500">
             <div className="text-center mb-10">
-              <MdAdminPanelSettings className="text-5xl mx-auto mb-4 size-20 p-3 rounded-full bg-primary flex items-center justify-center shadow-inner" />
+              <MdSettings className="text-5xl mx-auto mb-4 size-20 p-3 rounded-full bg-primary flex items-center justify-center shadow-inner" />
               <h2 className="text-3xl font-black text-white">
                 {view === "login"
                   ? "Administratorga kirish"
@@ -155,7 +154,7 @@ const Login: React.FC = () => {
                   className="w-full bg-primary py-3 rounded-xl font-bold flex items-center justify-center gap-2"
                 >
                   {loading ? "Yuborilmoqda..." : "Yangi parol yuborish"}
-                  {!loading && <MdLockReset className="text-2xl" />}
+                  {!loading && <MdLock className="text-2xl" />}
                 </button>
 
                 <button

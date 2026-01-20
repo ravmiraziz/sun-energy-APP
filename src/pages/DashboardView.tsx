@@ -1,9 +1,8 @@
 import React from "react";
 import {
-  MdPayments,
-  MdBolt,
+  MdPayment,
+  MdFlare,
   MdShoppingCart,
-  MdHub,
   MdTrendingUp,
   MdTrendingDown,
   MdRouter,
@@ -41,7 +40,7 @@ const DashboardView: React.FC = () => {
       value: "45,415,231 UZS",
       trend: "+12.5%",
       isPositive: true,
-      icon: <MdPayments className="text-[26px]" />,
+      icon: <MdPayment className="text-[26px]" />,
       colorClass: "revenue-card-gradient border-2 border-yellow-500",
     },
     {
@@ -49,7 +48,7 @@ const DashboardView: React.FC = () => {
       value: "12,840 kWh",
       trend: "+5.2%",
       isPositive: true,
-      icon: <MdBolt className="text-[26px]" />,
+      icon: <MdFlare className="text-[26px]" />,
     },
     {
       label: "Jami buyurtmalar",
@@ -63,7 +62,7 @@ const DashboardView: React.FC = () => {
       value: "842 Nodes",
       trend: "System Online",
       isPositive: true,
-      icon: <MdHub className="text-[26px]" />,
+      icon: <MdFlare className="text-[26px]" />,
     },
   ];
 

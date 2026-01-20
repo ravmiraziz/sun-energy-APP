@@ -3,7 +3,7 @@ import {
   MdPersonAdd,
   MdSearch,
   MdExpandMore,
-  MdEditNote,
+  MdEdit,
   MdDelete,
   MdChevronLeft,
   MdChevronRight as MdChevronRightIcon,
@@ -110,12 +110,10 @@ const Users: React.FC = () => {
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <button className="flex h-12 items-center justify-center gap-2 rounded-xl card_btn px-5 border border-transparent hover:border-primary/30 text-slate-700 dark:text-white text-sm font-medium transition-all">
-            All Roles{" "}
-            <MdExpandMore className="text-[24px]"/>
+            All Roles <MdExpandMore className="text-[24px]" />
           </button>
           <button className="flex h-12 items-center justify-center gap-2 rounded-xl card_btn px-5 border border-transparent hover:border-primary/30 text-slate-700 dark:text-white text-sm font-medium transition-all">
-            Status: Active{" "}
-            <MdExpandMore className="text-[24px]"/>
+            Status: Active <MdExpandMore className="text-[24px]" />
           </button>
         </div>
       </div>
@@ -190,7 +188,7 @@ const Users: React.FC = () => {
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-3 text-slate-400">
                     <button className="hover:text-orange-400 transition-colors">
-                      <MdEditNote className="text-xl" />
+                      <MdEdit className="text-xl" />
                     </button>
                     <button className="hover:text-red-500 transition-colors">
                       <MdDelete className="text-xl" />

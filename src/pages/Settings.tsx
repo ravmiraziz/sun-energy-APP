@@ -1,22 +1,219 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   MdPalette,
   MdAccountCircle,
   MdPhotoCamera,
-  MdExpandMore,
   MdSecurity,
   MdBuild,
   MdShoppingCart,
+  MdPersonAdd,
+  MdEdit,
+  MdDelete,
 } from "react-icons/md";
 
 import { useAuth } from "../context/AuthContext";
 import { IoLogOut } from "react-icons/io5";
 import CategoryDrawer from "../components/ui/CategoryDrawer";
+import { get, patch, putData } from "../api/api";
+import UserDrawer from "../components/ui/UserDrawer";
+
+interface AdminData {
+  created_at: string;
+  email: string;
+  first_name: string;
+  id: string;
+  image_url: string;
+  language: string;
+  last_name: string;
+  phone: string;
+}
+
+export interface CategoryData {
+  id?: string;
+  name_uz: string;
+  name_ru: string;
+  icon_name?: string;
+  created_at?: string;
+}
+
+interface UserForm {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  password?: string;
+  password_confirm?: string;
+}
 
 const Settings: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, getUser } = useAuth();
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<any>(null);
+  const [selected, setSelected] = useState("product");
+  const [openUser, setOpenUser] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<AdminData | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const limit = 10;
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [totalCountService, setTotalCountService] = useState<number>(0);
+  const [totalCountUser, setTotalCountUser] = useState<number>(0);
+  const [categories, setCategories] = useState<CategoryData[]>([]);
+  const [services, setServises] = useState<CategoryData[]>([]);
+  const [admins, setAdmins] = useState<AdminData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const fetchedOnce = useRef(false); // 🔥 MAGIC
+  const fetchedOnceUser = useRef(false);
+  const initialFromUser = (user: any): UserForm => ({
+    first_name: user?.first_name ?? "",
+    last_name: user?.last_name ?? "",
+    email: user?.email ?? "",
+    phone: user?.phone ?? "",
+  });
+  const [form, setForm] = useState<UserForm>(() => initialFromUser(user));
+
+  const [initialForm, setInitialForm] = useState<UserForm>(() =>
+    initialFromUser(user),
+  );
+
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      const mapped = initialFromUser(user);
+      setForm(mapped);
+      setInitialForm(mapped);
+    }
+  }, [user]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const isChanged = useMemo(() => {
+    return (
+      form.first_name !== initialForm.first_name ||
+      form.last_name !== initialForm.last_name ||
+      form.email !== initialForm.email ||
+      form.phone !== initialForm.phone ||
+      form.password
+    );
+  }, [form, initialForm]);
+
+  const updateUser = async () => {
+    setError(null);
+
+    if (form.password && form.password !== form.password_confirm) {
+      setError("Parollar mos emas");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const payload: any = {
+        id: user?.id,
+        first_name: form.first_name,
+        last_name: form.last_name,
+        email: form.email,
+        language: user?.language,
+        phone: form.phone,
+      };
+
+      if (form.password) {
+        payload.password = form.password;
+      }
+
+      await putData(`admin`, payload);
+
+      getUser(user?.id || "");
+    } catch (err) {
+      setError("Ma'lumotlarni yangilashda xatolik yuz berdi");
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelChanges = () => {
+    setForm(initialForm);
+    setError(null);
+  };
+
+  const fetchCategories = async (p = page) => {
+    setLoading(true);
+    try {
+      const { data } = await get("product-categories", { page, limit });
+
+      const { data: services } = await get("service-categories", {
+        page,
+        limit,
+      });
+      setCategories(data.product_categories || []);
+      setTotalCount(data.count || 0);
+      setServises(services.service_categories || []);
+      setTotalCountService(services?.count || 0);
+      setPage(p);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {}, [selected]);
+
+  const fetchUser = async (p = page) => {
+    setLoading(true);
+    try {
+      const { data } = await get("admins", { page: p, limit });
+      const filtered = data.admins.filter(
+        (item: AdminData) => item?.id !== user?.id,
+      );
+      console.log(data);
+
+      setAdmins(filtered || []);
+      setTotalCountUser(data.count || 0);
+      setPage(p);
+      console.log(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fileRef = useRef<HTMLInputElement | null>(null);
+
+  const handleButtonClick = () => {
+    fileRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("image", file);
+    try {
+      await patch(`admin/${user?.id}`, formData);
+      getUser(user?.id || "");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (fetchedOnce.current) return;
+
+    fetchedOnce.current = true;
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    if (fetchedOnceUser.current) return;
+
+    fetchedOnceUser.current = true;
+    fetchUser();
+  }, []);
 
   return (
     <div className="p-8 max-w-400 mx-auto w-full space-y-12">
@@ -31,11 +228,18 @@ const Settings: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="px-6 py-2.5 card_btn rounded-xl font-bold text-sm hover:opacity-90 transition-all">
-            Tashlab ketish
+          <button
+            onClick={logout}
+            className="px-6 py-2.5 bg-red-500 rounded-xl flex items-center justify-center gap-2 font-bold text-sm hover:opacity-90 transition-all"
+          >
+            Chiqish <IoLogOut className="text-[20px]" />
           </button>
-          <button className="px-6 py-2.5 bg-primary rounded-xl font-bold text-sm shadow-lg  hover:scale-[1.02] active:scale-[0.98] transition-all">
-            O'zgarishlarni saqlash
+          <button
+            onClick={() => setOpenUser(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-background-dark rounded-xl font-bold text-sm tracking-tight hover:brightness-110 shadow-lg shadow-primary/20 transition-all transform hover:scale-[1.02]"
+          >
+            <MdPersonAdd className="text-[24px]" />
+            Admin qo'shish
           </button>
         </div>
       </div>
@@ -48,11 +252,13 @@ const Settings: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             {
+              key: "service",
               label: "Servis turlari",
               desc: "Servis kategoriya turlari bo'limi",
               icon: MdBuild,
             },
             {
+              key: "product",
               label: "Mahsulot turlari",
               desc: "Mahsulotlar kategoriyasi sozlamalari",
               icon: MdShoppingCart,
@@ -60,7 +266,10 @@ const Settings: React.FC = () => {
           ].map((item, i) => (
             <div
               key={i}
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setOpen(true);
+                setSelected(item.key);
+              }}
               className="flex items-center justify-between p-6 rounded-2xl border border_color bg_card shadow-sm cursor-pointer hover:opacity-70"
             >
               <div className="flex flex-col gap-1">
@@ -73,6 +282,71 @@ const Settings: React.FC = () => {
             </div>
           ))}
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="">
+            <div className="relative bg-primary rounded-3xl p-6 shadow-xl shadow-primary/10 overflow-hidden h-full">
+              <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-black/10 backdrop-blur-md">
+                  <span className="material-symbols-outlined text-[14px] text-black mr-1 leading-none">
+                    auto_awesome
+                  </span>
+                  <span className="text-[10px] font-bold tracking-wider text-black uppercase">
+                    Premium
+                  </span>
+                </div>
+                <button className="bg-black text-primary px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-gray-900 transition-colors">
+                  Sotib Olish
+                </button>
+              </div>
+              <h3 className="text-2xl font-extrabold text-black mb-1 relative z-10 leading-tight">
+                Yillik Quyosh
+                <br />
+                Tekshiruvi
+              </h3>
+              <p className="text-black/80 text-sm mb-6 max-w-[80%] font-medium leading-relaxed relative z-10">
+                Tizimni to'liq diagnostika qilish va tozalash paketi.
+              </p>
+              <div className="flex items-baseline space-x-2 relative z-10">
+                <span className="text-2xl font-bold text-black">129$</span>
+                <span className="text-sm font-medium text-black/40 line-through">
+                  180$
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="">
+            <div className="relative bg-primary rounded-3xl p-6 shadow-xl shadow-primary/10 overflow-hidden h-full">
+              <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-black/10 backdrop-blur-md">
+                  <span className="material-symbols-outlined text-[14px] text-black mr-1 leading-none">
+                    auto_awesome
+                  </span>
+                  <span className="text-[10px] font-bold tracking-wider text-black uppercase">
+                    Yangi
+                  </span>
+                </div>
+                <button className="bg-black text-primary px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-gray-900 transition-colors">
+                  Ko'rish
+                </button>
+              </div>
+              <h3 className="text-2xl font-extrabold text-black mb-1 relative z-10 leading-tight">
+                PowerWall Pro 3
+              </h3>
+              <p className="text-black/80 text-sm mb-6 max-w-[80%] font-medium leading-relaxed relative z-10">
+                Sizning aqlli uyingiz uchun keyingi avlod energiya saqlash
+                tizimi.
+              </p>
+              <div className="flex items-baseline space-x-2 relative z-10">
+                <span className="text-2xl font-bold text-black">129$</span>
+                <span className="text-sm font-medium text-black/40 line-through">
+                  180$
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="space-y-6">
@@ -83,60 +357,88 @@ const Settings: React.FC = () => {
         <div className="bg_card border border_color rounded-2xl p-8 shadow-sm">
           <div className="flex flex-col md:flex-row gap-10 items-start">
             <div className="relative group mx-auto md:mx-0">
-              <div
-                className="size-32 rounded-full bg-center bg-cover border-4 border_color shadow-xl"
-                style={{
-                  backgroundImage: `url('https://picsum.photos/200/200?random=1')`,
-                }}
+              {user?.image_url ? (
+                <img
+                  src={user?.image_url}
+                  loading="lazy"
+                  alt="profile_image"
+                  className="size-32 rounded-full bg-center bg-cover border-4 border_color shadow-xl"
+                />
+              ) : (
+                <div className="size-32 rounded-full flex items-center justify-center text-5xl bg-center bg-cover border-4 border_color shadow-xl">
+                  {user?.first_name?.slice(0, 1)}
+                </div>
+              )}
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleFileChange}
               />
-              <button className="absolute bottom-0 right-0 size-10 bg-primary text-background-dark rounded-full flex items-center justify-center border-4 border-white dark:border-card-dark hover:scale-110 transition-transform">
+
+              {/* BUTTON */}
+              <button
+                type="button"
+                onClick={handleButtonClick}
+                className="absolute bottom-0 right-0 size-10 bg-primary text-background-dark rounded-full flex items-center justify-center border-4 border-white dark:border-card-dark hover:scale-110 transition-transform"
+              >
                 <MdPhotoCamera className="text-md" />
               </button>
             </div>
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full relative">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
               {[
-                { label: "Ism", val: user?.first_name, type: "text" },
-                { label: "Familiya", val: user?.last_name, type: "text" },
+                { label: "Ism", name: "first_name", type: "text" },
+                { label: "Familiya", name: "last_name", type: "text" },
+                { label: "E-pochta manzil", name: "email", type: "email" },
+                { label: "Telefon raqam", name: "phone", type: "text" },
+                { label: "Yangi Parol", name: "password", type: "password" },
                 {
-                  label: "E-pochta manzil",
-                  val: user?.email,
-                  type: "email",
+                  label: "Parolni tasdiqlash",
+                  name: "password_confirm",
+                  type: "password",
                 },
-                {
-                  label: "Timezone",
-                  val: "(GMT-08:00) Pacific Time",
-                  type: "select",
-                  options: ["(GMT-08:00) Pacific Time", "(GMT+00:00) London"],
-                },
-              ].map((field, i) => (
-                <div key={i} className="space-y-2">
-                  <label className="text-[10px] font-bold card_text dark:text_primary/60 uppercase tracking-widest">
+              ].map((field) => (
+                <div key={field.name} className="space-y-2">
+                  <label className="text-[10px] font-bold card_text uppercase tracking-widest">
                     {field.label}
                   </label>
-                  {field.type === "select" ? (
-                    <div className="relative">
-                      <select className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary appearance-none transition-all">
-                        {field.options?.map((opt, j) => (
-                          <option key={j}>{opt}</option>
-                        ))}
-                      </select>
-                      <MdExpandMore className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-[24px]" />
-                    </div>
-                  ) : (
-                    <input
-                      className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
-                      type={field.type}
-                      defaultValue={field.val}
-                    />
-                  )}
+                  <input
+                    name={field.name}
+                    type={field.type}
+                    value={form[field.name] ?? ""}
+                    onChange={handleChange}
+                    placeholder="**************"
+                    className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
+                  />
                 </div>
               ))}
-              <button
-                className="absolute top-0 right-0 text-red-500 flex items-center gap-2 justify-center"
-                onClick={logout}
-              >
-                Chiqish <IoLogOut className="text-[20px]" />
-              </button>
+
+              {/* ERROR */}
+              {error && (
+                <div className="md:col-span-2 text-red-500 text-sm">
+                  {error}
+                </div>
+              )}
+
+              {/* BUTTONS */}
+              {isChanged && (
+                <>
+                  <button
+                    onClick={cancelChanges}
+                    className="bg_card border border_color p-2 rounded-lg w-full"
+                  >
+                    Bekor qilish
+                  </button>
+                  <button
+                    onClick={updateUser}
+                    disabled={loading}
+                    className="bg-primary p-2 rounded-lg w-full disabled:opacity-50"
+                  >
+                    {loading ? "Saqlanmoqda..." : "O'zgartirish"}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -145,62 +447,56 @@ const Settings: React.FC = () => {
       <section className="space-y-6 pb-20">
         <div className="flex items-center gap-2">
           <MdSecurity className="text-primary text-[24px]" />
-          <h3 className="text-xl font-bold">Module Access</h3>
+          <h3 className="text-xl font-bold">Adminlar ro'yxati</h3>
         </div>
-        <div className="bg_card border border_color rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg_card border border_color rounded-2xl overflow-x-auto shadow-sm">
           <table className="w-full text-left">
             <thead className="card_btn">
               <tr className="border-b border_color">
                 <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase tracking-widest">
-                  Module
+                  Ism
                 </th>
                 <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                  Read
+                  E-pochta
                 </th>
                 <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                  Write
+                  Telefon
                 </th>
                 <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                  Delete
+                  Qo'shilgan vaqti
+                </th>
+                <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
+                  Qo'shimcha
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-border-teal">
-              {[
-                { name: "Energy Monitoring", desc: "Real-time grid analytics" },
-                {
-                  name: "Commerce & Billing",
-                  desc: "Transaction logs & invoices",
-                },
-                {
-                  name: "API Configuration",
-                  desc: "External service integration",
-                },
-              ].map((mod, i) => (
+              {admins.map((user, i) => (
                 <tr key={i} className="hover:bg-primary/5 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="text-sm font-bold">{mod.name}</p>
-                    <p className="text-[10px] card_text">{mod.desc}</p>
+                    <p className="text-sm font-bold">{user.first_name}</p>
+                    <p className="text-[10px] card_text">{user.last_name}</p>
+                  </td>
+                  <td className="px-6 py-4 text-center">{user.email}</td>
+                  <td className="px-6 py-4 text-center">{user.phone}</td>
+                  <td className="px-6 py-4 text-center">
+                    {new Date(user.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <input
-                      type="checkbox"
-                      defaultChecked
-                      className="rounded border-slate-300 text_primary focus:ring-primary bg-transparent"
-                    />
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <input
-                      type="checkbox"
-                      defaultChecked={i === 0}
-                      className="rounded border-slate-300 text_primary focus:ring-primary bg-transparent"
-                    />
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <input
-                      type="checkbox"
-                      className="rounded border-slate-300 text_primary focus:ring-primary bg-transparent"
-                    />
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setOpenUser(true);
+                        }}
+                        className="p-1.5 hover:text-primary transition-colors text-slate-400"
+                      >
+                        <MdEdit className="text-[18px]" />
+                      </button>
+                      <button className="p-1.5 hover:text-red-500 transition-colors text-slate-400">
+                        <MdDelete className="text-[18px]" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -209,13 +505,31 @@ const Settings: React.FC = () => {
         </div>
       </section>
       <CategoryDrawer
+        type={selected}
         open={open}
-        initialValues={selected}
+        page={page}
+        limit={limit}
+        totalCount={
+          selected === "product"
+            ? totalCount
+            : selected === "service"
+              ? totalCountService
+              : totalCountUser
+        }
+        initialValues={selected === "service" ? services : categories}
         onClose={() => {
           setOpen(false);
-          setSelected(null);
         }}
-        onSuccess={() => setOpen(false)}
+        onSuccess={(p) => fetchCategories(p)}
+      />
+      <UserDrawer
+        open={openUser}
+        initialValues={selectedUser}
+        onClose={() => {
+          setOpenUser(false);
+          setSelectedUser(null);
+        }}
+        onSuccess={() => fetchUser(page)}
       />
     </div>
   );

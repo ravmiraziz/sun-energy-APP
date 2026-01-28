@@ -2,7 +2,7 @@
 export type Role = "admin" | "user";
 
 export const requireAdmin = () => {
-  const userId = localStorage.getItem("user");
+  const userId = localStorage.getItem("user_id");
 
   if (!userId) {
     throw new Response("Unauthorized", {

@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import {
   MdFlare,
   MdDashboard,
@@ -22,14 +22,17 @@ const Sidebar: React.FC = () => {
   return (
     <>
       <aside className="w-64 bg_card border-r border_color not-md:hidden flex flex-col z-20 transition-all duration-300">
-        <div className="p-6 flex items-center gap-3">
-          <div className="bg-primary size-10 rounded-lg flex items-center justify-center  shadow-lg shadow-primary/20">
-            <MdFlare className="font-bold text-[24px]" />
-          </div>
-          <div>
-            <h1 className="text-base font-bold leading-tight">Smart Energy</h1>
-            <p className="text-xs text-slate-400">Enterprise Control</p>
-          </div>
+        <div className="px-10 flex items-center gap-3">
+          <Link to="/admin">
+            <img src="/logo.svg" alt="logo" className="object-contain" />
+          </Link>
+          {/* <div className="bg-white size-10 rounded-lg object-contain flex items-center justify-center  shadow-lg"></div> */}
+          {/* <div>
+            <h1 className="text-base font-bold leading-tight text-nowrap">
+              Amirbek Sunny Trade
+            </h1>
+            <p className="text-xs text-slate-400">Admin boshqaruvi</p>
+          </div> */}
         </div>
 
         <nav className="flex-1 px-4 space-y-2 mt-4">

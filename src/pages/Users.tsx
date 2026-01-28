@@ -1,49 +1,60 @@
-import React from "react";
-import {
-  MdPersonAdd,
-  MdSearch,
-  MdExpandMore,
-  MdEdit,
-  MdDelete,
-  MdChevronLeft,
-  MdChevronRight as MdChevronRightIcon,
-} from "react-icons/md";
+import React, { useEffect, useRef, useState } from "react";
+import { MdSearch, MdPersonSearch } from "react-icons/md";
+import { get } from "../api/api";
+import Pagination from "../components/ui/Pagination";
+import { TbReload } from "react-icons/tb";
+
+interface User {
+  id?: string;
+  email: string;
+  first_name: string;
+  image_url: string;
+  created_at: string;
+  address?: string;
+  language: string;
+  last_name: string;
+  password?: string;
+  phone: string;
+  lat?: number;
+  long?: number;
+}
+
+interface ResData {
+  data: {
+    users: User[];
+    count: number;
+  };
+}
 
 const Users: React.FC = () => {
-  const users = [
-    {
-      name: "Alex Rivera",
-      email: "alex.rivera@smartenergy.io",
-      role: "Admin",
-      status: "Active",
-      login: "2 hours ago",
-      avatar: "https://picsum.photos/40/40?random=1",
-    },
-    {
-      name: "Sarah Chen",
-      email: "s.chen@energy.com",
-      role: "User",
-      status: "Active",
-      login: "Oct 24, 2023",
-      avatar: "https://picsum.photos/40/40?random=2",
-    },
-    {
-      name: "Marcus Thompson",
-      email: "m.thompson@dev.io",
-      role: "User",
-      status: "Inactive",
-      login: "Never",
-      avatar: "https://picsum.photos/40/40?random=3",
-    },
-    {
-      name: "Jasmine V.",
-      email: "jasmine@smartenergy.io",
-      role: "Admin",
-      status: "Active",
-      login: "Just now",
-      avatar: "https://picsum.photos/40/40?random=4",
-    },
-  ];
+  const [users, setUsers] = useState<User[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const limit = 20;
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const fetchedOnce = useRef(false); // 🔥 MAGIC
+
+  const fetchUsers = async (p = page) => {
+    setLoading(true);
+    try {
+      const { data }: ResData = await get("/users", { page: p, limit, search });
+      console.log(data);
+      setUsers(data.users || []);
+      setTotalCount(data.count);
+      setPage(p);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (fetchedOnce.current) return;
+
+    fetchedOnce.current = true;
+    fetchUsers();
+  }, []);
 
   return (
     <div className="p-8 max-w-400 mx-auto w-full space-y-8">
@@ -56,86 +67,62 @@ const Users: React.FC = () => {
             Manage administrative roles and end-user permissions.
           </p>
         </div>
-        <button className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-background-dark rounded-xl font-bold text-sm tracking-tight hover:brightness-110 shadow-lg shadow-primary/20 transition-all transform hover:scale-[1.02]">
-          <MdPersonAdd className="text-[24px]" />
-          Create New User
-        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          {
-            label: "Total Users",
-            val: "1,284",
-            trend: "+12%",
-            color: "text_primary",
-          },
-          {
-            label: "Active Admins",
-            val: "42",
-            trend: "0%",
-            color: "text-slate-400",
-          },
-          {
-            label: "Energy Consumers",
-            val: "1,242",
-            trend: "-2.4%",
-            color: "text-orange-500",
-          },
-        ].map((stat, i) => (
-          <div
-            key={i}
-            className="bg_card rounded-2xl p-6 border border_color shadow-sm"
-          >
-            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">
-              {stat.label}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg_card rounded-2xl p-6 border border_color shadow-sm">
+          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">
+            Barcha foydalanuvchilar
+          </p>
+          <div className="flex items-baseline gap-2">
+            <p className="text-3xl font-bold">{totalCount}</p>
+            <p className={`text_primary text-xs font-semibold`}>
+              {/* {stat.trend} */}
             </p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold">{stat.val}</p>
-              <p className={`${stat.color} text-xs font-semibold`}>
-                {stat.trend}
-              </p>
-            </div>
           </div>
-        ))}
+        </div>
+        <div className="bg_card p-4 rounded-2xl border border_color flex flex-col md:flex-row gap-4 items-center">
+          <div className="flex-1 w-full relative">
+            <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[24px]" />
+            <input
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full card_btn border-none rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder:text-slate-400"
+              placeholder="Ism buyicha qidiruv..."
+            />
+            {search ? (
+              <button
+                onClick={() => fetchUsers(1)}
+                className="absolute bg-primary right-2 top-1/2 -translate-y-1/2 text-[24px] rounded-md p-1"
+              >
+                <MdPersonSearch />
+              </button>
+            ) : (
+              <button
+                onClick={() => fetchUsers(1)}
+                className="absolute bg-primary right-2 top-1/2 -translate-y-1/2 text-[24px] rounded-md p-1"
+              >
+                <TbReload className={`${loading && "animate-spin"} text-2xl`} />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="bg_card p-4 rounded-2xl border border_color flex flex-col md:flex-row gap-4 items-center">
-        <div className="flex-1 w-full relative">
-          <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[24px]" />
-          <input
-            className="w-full card_btn border-none rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder:text-slate-400"
-            placeholder="Search by name, email or role..."
-          />
-        </div>
-        <div className="flex gap-3 w-full md:w-auto">
-          <button className="flex h-12 items-center justify-center gap-2 rounded-xl card_btn px-5 border border-transparent hover:border-primary/30 text-slate-700 dark:text-white text-sm font-medium transition-all">
-            All Roles <MdExpandMore className="text-[24px]" />
-          </button>
-          <button className="flex h-12 items-center justify-center gap-2 rounded-xl card_btn px-5 border border-transparent hover:border-primary/30 text-slate-700 dark:text-white text-sm font-medium transition-all">
-            Status: Active <MdExpandMore className="text-[24px]" />
-          </button>
-        </div>
-      </div>
-
-      <div className="bg_card rounded-2xl border border_color overflow-hidden shadow-sm">
+      <div className="bg_card rounded-2xl border border_color overflow-x-auto shadow-sm">
         <table className="w-full text-left">
           <thead>
             <tr className="card_btn border-b border_color">
               <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                User
+                Foydalanuvchi
               </th>
               <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                Role
+                Manzil
               </th>
               <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                Status
+                Telefon raqam
               </th>
               <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                Last Login
-              </th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary text-right">
-                Actions
+                Qo'shilgan vaqt
               </th>
             </tr>
           </thead>
@@ -145,15 +132,21 @@ const Users: React.FC = () => {
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="size-10 rounded-full border-2 border_color transition-all overflow-hidden">
-                      <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className="object-cover w-full h-full"
-                      />
+                      {user.image_url ? (
+                        <img
+                          src={user.image_url}
+                          alt={user.first_name}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <span className="flex items-center justify-center uppercase h-full card_btn">
+                          {user.first_name.slice(0, 1)}
+                        </span>
+                      )}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold group-hover:text-primary transition-colors">
-                        {user.name}
+                      <span className="text-sm font-bold group-hover:text-primary transition-colors text-nowrap">
+                        {user.first_name} {user.last_name}
                       </span>
                       <span className="text-xs card_text">{user.email}</span>
                     </div>
@@ -161,66 +154,26 @@ const Users: React.FC = () => {
                 </td>
                 <td className="px-6 py-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
-                      user.role === "Admin"
-                        ? "card_btn border_color"
-                        : "card_btn border_color"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border border_color text-nowrap`}
                   >
-                    {user.role}
+                    {user.address}
                   </span>
                 </td>
+                <td className="px-6 py-4">{user.phone}</td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-10 h-5 rounded-full p-1 cursor-pointer transition-colors ${user.status === "Active" ? "bg-primary" : "bg-slate-400"}`}
-                    >
-                      <div
-                        className={`size-3 bg-white rounded-full transition-transform ${user.status === "Active" ? "translate-x-5" : "translate-x-0"}`}
-                      ></div>
-                    </div>
-                    <span className="text-xs font-medium card_text">
-                      {user.status}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-xs card_text">{user.login}</td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex justify-end gap-3 text-slate-400">
-                    <button className="hover:text-orange-400 transition-colors">
-                      <MdEdit className="text-xl" />
-                    </button>
-                    <button className="hover:text-red-500 transition-colors">
-                      <MdDelete className="text-xl" />
-                    </button>
-                  </div>
+                  <span>{new Date(user.created_at).toLocaleDateString()}</span>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <div className="px-6 py-4 card_btn border-t border_color flex justify-between items-center">
-          <span className="text-[10px] font-bold text_primary uppercase tracking-widest">
-            Showing 1 to 4 of 1,284 users
-          </span>
-          <div className="flex items-center gap-2">
-            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
-              <MdChevronLeft className="text-[20px]" />
-            </button>
-            <button className="size-8 flex items-center justify-center rounded-lg bg-primary text-xs font-bold">
-              1
-            </button>
-            <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
-              2
-            </button>
-            <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
-              3
-            </button>
-            <span className="px-2 text-slate-400 text-xs">...</span>
-            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
-              <MdChevronRightIcon className="text-[20px]" />
-            </button>
-          </div>
+        <div className="px-6 py-4 card_btn border-t border_color flex justify-end items-center">
+          <Pagination
+            page={page}
+            limit={limit}
+            allCount={totalCount}
+            onChange={(p) => fetchUsers(p)}
+          />
         </div>
       </div>
     </div>

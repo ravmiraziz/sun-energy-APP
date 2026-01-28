@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   MdSettings,
   MdArrowForward,
@@ -7,9 +7,19 @@ import {
   MdVisibility,
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, type User } from "../../context/AuthContext";
+import { post } from "../../api/api";
 
 type View = "login" | "forgot";
+const OTP_LENGTH = 6;
+
+interface LoginData {
+  data: {
+    admin: User;
+    access_token: string;
+    refresh_token: string;
+  };
+}
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -20,48 +30,112 @@ const Login: React.FC = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [checkCode, setCheckCode] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
+  const [timer, setTimer] = useState(60);
+
+  const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+
+  /* TIMER */
+  useEffect(() => {
+    if (view === "forgot" && timer > 0) {
+      const interval = setInterval(() => setTimer((t) => t - 1), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [view, timer]);
 
   /* LOGIN */
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    console.log("LOGIN DATA:", { email, password });
-
-    setTimeout(() => {
-      login({
-        user: {
-          id: "1",
-          first_name: "John",
-          last_name: "Doe",
-          email,
-          phone: "+998934905134",
-          password,
-          image_url: "https://picsum.photos/100/100?random=10",
-          language: "ru",
-          refresh_token: "FAKE_REFRESH_TOKEN",
-          created_at: "01.01.2000",
-          deleted_at: "",
-        },
-        token: "FAKE_ADMIN_TOKEN",
+    try {
+      const { data }: LoginData = await post("admin-login", {
+        email,
+        password,
       });
-
-      navigate("/admin");
-    }, 1500);
+      console.log(data);
+      if (data) {
+        login({
+          user: data.admin,
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        });
+        navigate("/admin");
+      }
+    } catch (err) {
+      if (err?.response?.data?.StatusCode === 400) {
+        setErrorMessage("Login yoki Parol xato!");
+      }
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /* FORGOT PASSWORD */
-  const handleForgot = (e: React.FormEvent) => {
+  const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    console.log("SEND RESET PASSWORD TO:", email);
-
-    setTimeout(() => {
-      alert("Yangi parol emailingizga yuborildi");
+    try {
+      const { data } = await post("admin-register", { email });
+      console.log(data);
       setLoading(false);
-      setView("login");
-    }, 1500);
+      setTimer(60);
+      setCheckCode(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleOtpChange = (value: string, index: number) => {
+    if (!/^\d?$/.test(value)) return;
+
+    const updated = [...otp];
+    updated[index] = value;
+    setOtp(updated);
+
+    if (value && index < OTP_LENGTH - 1) {
+      inputsRef.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number,
+  ) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputsRef.current[index - 1]?.focus();
+    }
+  };
+
+  const handleVerify = async () => {
+    setLoading(true);
+    const code = otp.join("");
+
+    try {
+      const { data }: LoginData = await post("admin-verify", {
+        code: Number(code),
+        email,
+      });
+      console.log(data);
+
+      if (data) {
+        console.log("Keldi");
+        login({
+          user: data.admin,
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+        });
+        navigate("/admin");
+      }
+    } catch (error) {
+      setErrorMessage("Nimadir xato ketti!");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -149,8 +223,25 @@ const Login: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                 />
 
+                {checkCode && (
+                  <div className="grid grid-cols-6 gap-3 mb-6">
+                    {otp.map((val, i) => (
+                      <input
+                        key={i}
+                        ref={(el) => (inputsRef.current[i] = el)}
+                        value={val}
+                        onChange={(e) => handleOtpChange(e.target.value, i)}
+                        onKeyDown={(e) => handleOtpKeyDown(e, i)}
+                        className="aspect-square text-center text-xl font-black rounded-xl bg-card border border_color"
+                        maxLength={1}
+                      />
+                    ))}
+                  </div>
+                )}
+
                 <button
                   disabled={loading}
+                  onClick={() => checkCode && handleVerify()}
                   className="w-full bg-primary py-3 rounded-xl font-bold flex items-center justify-center gap-2"
                 >
                   {loading ? "Yuborilmoqda..." : "Yangi parol yuborish"}
@@ -165,6 +256,11 @@ const Login: React.FC = () => {
                   ← Login’ga qaytish
                 </button>
               </form>
+            )}
+            {errorMessage && (
+              <span className="text-red-500 text-center my-2">
+                {errorMessage}
+              </span>
             )}
             {loading && (
               <div className="mt-6 flex items-center justify-center gap-2 text_primary text-xs">

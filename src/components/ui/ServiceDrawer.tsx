@@ -1,23 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import BaseDrawer from "../../components/ui/BaseDrawer";
 import { MdClose } from "react-icons/md";
-
-export interface ServiceFormValues {
-  id?: string;
-  name_uz: string;
-  name_ru: string;
-  description_uz: string;
-  description_ru: string;
-  price: number;
-  category_id: string;
-  is_activate?: boolean;
-}
+import { post, putData } from "../../api/api";
+import { PaginatedSelect } from "./PaginationSelect";
+import type { ServiceFormValues } from "../../pages/Services";
 
 interface ServiceDrawerProps {
   open: boolean;
   onClose: () => void;
   initialValues?: ServiceFormValues | null;
   onSuccess: () => void;
+}
+
+interface Service {
+  id: number;
+  name_ru: string;
+  name_uz: string;
+  icon_name: string;
 }
 
 const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
@@ -35,11 +34,13 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     description_uz: "",
     description_ru: "",
     price: 0,
+    is_active: true,
     category_id: "",
   });
 
   /* ERROR STATE */
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [serviceData, setServiceData] = useState<Service | null>(null);
 
   /* RESET / EDIT */
   useEffect(() => {
@@ -53,6 +54,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
           description_uz: "",
           description_ru: "",
           price: 0,
+          is_active: true,
           category_id: "",
         });
       }
@@ -80,7 +82,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     if (!values.name_ru.trim()) newErrors.name_ru = true;
     if (!values.description_uz.trim()) newErrors.description_uz = true;
     if (!values.description_ru.trim()) newErrors.description_ru = true;
-    if (!values.category_id) newErrors.category_id = true;
+    if (!serviceData) newErrors.category_id = true;
     if (!values.price) newErrors.price = true;
 
     setErrors(newErrors);
@@ -94,12 +96,13 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     const payload = {
       ...values,
       id: initialValues?.id,
+      category_id: serviceData?.id,
     };
 
     if (isEdit) {
-      console.log("UPDATE PRODUCT:", payload);
+      await putData(`/app-service`, payload);
     } else {
-      console.log("CREATE PRODUCT:", payload);
+      await post("/app-service", payload);
     }
 
     onSuccess();
@@ -195,23 +198,19 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
 
         {/* CATEGORY + PRICE */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
+          <div
+            className={`flex flex-col border gap-2 ${errors.category_id ? "border-red-500" : "border-transparent"}`}
+          >
             <label className="font-medium">
               Kategoriya <span className="text-red-500">*</span>
             </label>
-            <select
-              name="category_id"
-              value={values.category_id}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg-[#18342c] px-4 border ${
-                errors.category_id ? "border-red-500" : "border-[#306959]"
-              }`}
-            >
-              <option value="">Turini tanlang</option>
-              <option value="solar">Solar</option>
-              <option value="wind">Wind</option>
-              <option value="battery">Battery</option>
-            </select>
+            <PaginatedSelect<Service>
+              value={serviceData}
+              onChange={setServiceData}
+              endpoint="service-categories"
+              labelKey="name_uz"
+              placeholder="Category tanlang"
+            />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -224,11 +223,36 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
               inputMode="numeric"
               value={values.price}
               onChange={handleChange}
-              className={`h-14 rounded-xl bg-[#18342c] px-4 border ${
-                errors.price ? "border-red-500" : "border-[#306959]"
+              className={`h-14 rounded-xl bg_card px-4 border ${
+                errors.price ? "border-red-500" : "border_color"
               }`}
               placeholder="0.00"
             />
+          </div>
+          <div className="col-span-2 flex items-center justify-between p-4 bg_card rounded-xl border border-transparent">
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-white">Faol holat</span>
+              <span className="text-xs text-slate-500 dark:text-[#8fccba]">
+                Ushbu bo'lim mahsulot qolmaganida o'chirilishi kerak
+              </span>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                name="is_active"
+                checked={values.is_active}
+                onChange={(e) =>
+                  setValues((prev) => ({
+                    ...prev,
+                    is_active: e.target.checked,
+                  }))
+                }
+                className="sr-only peer"
+                type="checkbox"
+              />
+              <div
+                className={`w-11 h-6 ${values.is_active ? "bg-primary" : "card_btn"} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary`}
+              ></div>
+            </label>
           </div>
         </div>
       </div>

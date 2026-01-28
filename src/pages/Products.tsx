@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   MdChevronRight,
   MdAdd,
@@ -9,94 +9,96 @@ import {
   MdChevronRight as MdChevronRightIcon,
 } from "react-icons/md";
 import ProductDrawer from "../components/ui/ProductDrawer";
+import { get, patch, putData } from "../api/api";
+import Pagination from "../components/ui/Pagination";
+import { AiOutlineProduct } from "react-icons/ai";
+
+export interface ProductImage {
+  id?: string; // backenddan kelgan bo‘lishi mumkin
+  image_url?: string;
+  file?: File; // yangi yuklangan
+  preview?: string; // preview URL
+}
+
+export interface Product {
+  brand: string;
+  category_id: string;
+  created_at: string;
+  description_ru: string;
+  description_uz: string;
+  id: string;
+  images: ProductImage[];
+  is_active: boolean;
+  model: string;
+  name_ru: string;
+  name_uz: string;
+  price: string;
+  watt: number;
+}
+
+interface ResData {
+  data: {
+    products: Product[] | null;
+    count: number;
+  };
+}
 
 const Products: React.FC = () => {
-  const [productsData] = useState([
-    {
-      id: "1",
-      name: "Elite Series PV-500",
-      sku: "SOL-500-ELT",
-      category: "Solar Panels",
-      price: "$1,299.00",
-      status: true,
-      image: "https://picsum.photos/100/100?random=20",
-    },
-    {
-      id: "2",
-      name: "Home Logic Smart Meter",
-      sku: "MET-HL-01",
-      category: "Meters",
-      price: "$145.00",
-      status: true,
-      image: "https://picsum.photos/100/100?random=21",
-    },
-    {
-      id: "3",
-      name: "Storage Tech Giga-Cell",
-      sku: "BAT-ST-10K",
-      category: "Batteries",
-      price: "$3,500.00",
-      status: false,
-      image: "https://picsum.photos/100/100?random=22",
-    },
-    {
-      id: "4",
-      name: "Energy Flow Inverter X",
-      sku: "INV-EF-X1",
-      category: "Inverters",
-      price: "$890.00",
-      status: true,
-      image: "https://picsum.photos/100/100?random=23",
-    },
-    {
-      id: "5",
-      name: "Precision Pro Sensor",
-      sku: "SEN-PRS-99",
-      category: "Sensors",
-      price: "$45.00",
-      status: true,
-      image: "https://picsum.photos/100/100?random=24",
-    },
-  ]);
-
-  // const [products, setProducts] = useState([]);
-  // const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<any>(null);
+  const [page, setPage] = useState<number>(1);
+  const limit = 10;
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [selected, setSelected] = useState<Product | null>(null);
 
-  // const fetchedOnce = useRef(false); // 🔥 MAGIC
+  const fetchedOnce = useRef(false); // 🔥 MAGIC
 
-  // const fetchProducts = async () => {
-  //   setLoading(true);
-  //   try {
-  //     // const res = await get("/products");
-  //     // setProducts(res.data);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const fetchProducts = async (p = page) => {
+    setLoading(true);
+    try {
+      const { data }: ResData = await get("/products");
+      console.log(data);
 
-  // useEffect(() => {
-  //   if (fetchedOnce.current) return;
+      setProducts(data.products || []);
+      setTotalCount(data.count);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  //   fetchedOnce.current = true;
-  //   fetchProducts();
-  // }, []);
+  useEffect(() => {
+    if (fetchedOnce.current) return;
+
+    fetchedOnce.current = true;
+    fetchProducts();
+  }, []);
+
+  const handleToggle = async (id: string, current: boolean) => {
+    const newStatus = !current;
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, is_active: newStatus } : p)),
+    );
+
+    try {
+      await patch(`product-status/${id}`, {
+        id,
+        is_active: newStatus,
+      });
+    } catch (error) {
+      setProducts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, is_active: current } : p)),
+      );
+      console.error("Status update failed", error);
+    }
+  };
 
   return (
     <div className="md:p-8 p-4 max-w-400 mx-auto w-full">
-      <div className="flex items-center gap-2 text-sm text_primary mb-6">
-        <a className="hover:text-primary transition-colors" href="#">
-          Dashboard
-        </a>
-        <MdChevronRight className="text-[16px]" />
-        <span className="text-white font-medium">Products Management</span>
-      </div>
-
       <div className="flex flex-wrap justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-black tracking-tight">
-            Products Management
+            Mahsulotlar boshqaruvi
           </h1>
           <p className="text-sm text-slate-500 mt-1">
             Manage and track your energy asset inventory
@@ -128,68 +130,94 @@ const Products: React.FC = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="uppercase text-[11px] font-bold tracking-widest border-b border_color">
-                <th className="px-6 py-4 w-16">Image</th>
-                <th className="px-6 py-4">Product Name</th>
-                <th className="px-6 py-4">Category</th>
-                <th className="px-6 py-4">Price</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-6 py-4 w-16">Rasm</th>
+                <th className="px-6 py-4">Nomi</th>
+                <th className="px-6 py-4">Brend</th>
+                <th className="px-6 py-4">Narx</th>
+                <th className="px-6 py-4">Qo'shilgan vaqti</th>
+                <th className="px-6 py-4">Holati</th>
+                <th className="px-6 py-4 text-right">Qo'shimcha </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg_card">
-              {productsData.map((product) => (
-                <tr
-                  key={product.id}
-                  className="hover:bg-slate-800/30 transition-colors group"
-                >
-                  <td className="px-6 py-4">
-                    <img
-                      className="size-12 rounded-lg object-cover bg-slate-800 border border_color"
-                      src={product.image}
-                      alt={product.name}
-                    />
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-white transition-colors">
-                        {product.name}
+              {products?.length > 0 &&
+                products.map((product) => (
+                  <tr
+                    key={product.id}
+                    className="hover:bg-slate-800/30 transition-colors group"
+                  >
+                    <td className="px-4 py-4">
+                      {product?.images?.length > 0 ? (
+                        <img
+                          className="h-12 w-full overflow-hidden rounded-lg object-contain bg-slate-800 border border_color"
+                          src={product?.images[0].image_url}
+                          alt={product.name_uz}
+                        />
+                      ) : (
+                        <div className="h-12 w-full overflow-hidden rounded-lg flex items-center justify-center text-2xl text_primary bg-slate-800 border border_color">
+                          <AiOutlineProduct />
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-white transition-colors text-nowrap">
+                          {product.name_uz}
+                        </span>
+                        <span className="text-xs text-slate-500 font-mono uppercase tracking-tighter">
+                          WATT: {product.watt}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="card_btn px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border border_color/50">
+                        {product.brand}
                       </span>
-                      <span className="text-xs text-slate-500 font-mono uppercase tracking-tighter">
-                        SKU: {product.sku}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm font-bold text-yellow-500">
+                        {product.price}
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="card_btn px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border border_color/50">
-                      {product.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm font-bold text-yellow-500">
-                      {product.price}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div
-                      className={`w-10 h-5 rounded-full p-1 cursor-pointer transition-colors ${product.status ? "bg-primary" : "bg-slate-700"}`}
-                    >
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm font-bold text_primary text-nowrap">
+                        {new Date(product.created_at).toLocaleDateString()}
+                        {" | "}
+                        {new Date(product.created_at).toLocaleTimeString()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
                       <div
-                        className={`size-3 bg-white rounded-full shadow transition-transform ${product.status ? "translate-x-5" : "translate-x-0"}`}
-                      ></div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button className="p-1.5 hover:text-primary transition-colors text-slate-400">
-                        <MdEdit className="text-[18px]" />
-                      </button>
-                      <button className="p-1.5 hover:text-red-500 transition-colors text-slate-400">
-                        <MdDelete className="text-[18px]" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        onClick={() =>
+                          handleToggle(product.id, product.is_active)
+                        }
+                        className={`w-10 h-5 rounded-full p-1 cursor-pointer transition-colors
+      ${product.is_active ? "bg-primary" : "bg-slate-700"}`}
+                      >
+                        <div
+                          className={`size-3 bg-white rounded-full shadow transition-transform
+        ${product.is_active ? "translate-x-5" : "translate-x-0"}`}
+                        />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setSelected(product);
+                            setOpen(true);
+                          }}
+                          className="p-1.5 hover:text-primary transition-colors text-slate-400"
+                        >
+                          <MdEdit className="text-[18px]" />
+                        </button>
+                        <button className="p-1.5 hover:text-red-500 transition-colors text-slate-400">
+                          <MdDelete className="text-[18px]" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -200,35 +228,15 @@ const Products: React.FC = () => {
             setOpen(false);
             setSelected(null);
           }}
-          onSuccess={() => setOpen(false)}
+          onSuccess={() => fetchProducts(1)}
         />
-        <div className="px-6 py-4 border-t border_color flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text_primary">Rows per page:</span>
-            <select className="bg-transparent border-none text-xs font-bold bg_card focus:ring-0 p-0 pr-6">
-              <option>10</option>
-              <option>20</option>
-              <option>50</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
-              <MdChevronLeft className="text-[20px]" />
-            </button>
-            <button className="size-8 flex items-center justify-center rounded-lg bg-primary text-xs font-bold">
-              1
-            </button>
-            <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
-              2
-            </button>
-            <button className="size-8 flex items-center justify-center rounded-lg text_primary hover:bg-slate-800 transition-colors text-xs font-semibold">
-              3
-            </button>
-            <span className="px-2 text-slate-400 text-xs">...</span>
-            <button className="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 transition-colors">
-              <MdChevronRightIcon className="text-[20px]" />
-            </button>
-          </div>
+        <div className="px-6 py-4 card_btn border-t border_color flex justify-end items-center">
+          <Pagination
+            page={page}
+            limit={limit}
+            allCount={totalCount}
+            onChange={(p) => fetchProducts(p)}
+          />
         </div>
       </div>
     </div>

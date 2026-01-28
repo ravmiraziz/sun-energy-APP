@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import DashboardView from "../pages/DashboardView";
 import Products from "../pages/Products";
 import DashboardLayout from "../pages/DashboardLayout";
@@ -12,12 +12,12 @@ import NoAccess from "../pages/NoAccess";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Login />,
-  },
-  {
     path: "/login",
-    element: <Login />,
+    element: localStorage.getItem("user_id") ? (
+      <Navigate to="/admin" />
+    ) : (
+      <Login />
+    ),
   },
   {
     path: "/403",
@@ -35,5 +35,11 @@ export const router = createBrowserRouter([
       { path: "users", element: <Users /> },
       { path: "orders", element: <Orders /> },
     ],
+  },
+  {
+    path: "*",
+    element: (
+      <Navigate to={localStorage.getItem("user") ? "/admin" : "/login"} />
+    ),
   },
 ]);

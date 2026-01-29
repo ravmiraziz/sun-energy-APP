@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import BaseDrawer from "../../components/ui/BaseDrawer";
-import { MdAddCircleOutline, MdClose, MdDelete, MdEdit } from "react-icons/md";
+import { MdAddCircleOutline, MdClose, MdEdit } from "react-icons/md";
 import Pagination from "./Pagination";
 import { post, putData } from "../../api/api";
 import { GrClearOption } from "react-icons/gr";
+import DeleteModal from "../modals/DeleteModal";
 
 export interface ProductFormValues {
   id?: string;
@@ -281,9 +282,11 @@ const CategoryDrawer: React.FC<ProductDrawerProps> = ({
                       >
                         <MdEdit className="text-2xl" />
                       </button>
-                      <button className="p-2 card_text hover:text-red-400 hover:bg-red-400/10 rounded-md transition-all">
-                        <MdDelete className="text-2xl" />
-                      </button>
+                      <DeleteModal
+                        itemId={item?.id || ""}
+                        path={`${type}-category`}
+                        confirm={() => onSuccess(page)}
+                      />
                     </div>
                   </div>
                 );

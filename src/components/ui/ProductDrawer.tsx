@@ -3,7 +3,13 @@ import BaseDrawer from "../../components/ui/BaseDrawer";
 import { MdClose } from "react-icons/md";
 import { PaginatedSelect } from "./PaginationSelect";
 import { post, putData, remove } from "../../api/api";
-import type { Product, ProductImage } from "../../pages/Products";
+import type { Product } from "../../pages/Products";
+
+interface ProductImage {
+  file?: File; // yangi yuklangan rasm
+  id?: string; // backenddagi eski rasm
+  preview: string; // ko‘rsatish uchun URL
+}
 
 export interface ProductFormValues {
   id?: string;
@@ -62,39 +68,45 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
 
   /* RESET / EDIT */
   useEffect(() => {
-    if (open) {
-      if (initialValues && initialValues.images) {
-        setValues({
-          ...initialValues,
-          images: initialValues.images
-            ? initialValues?.images?.map((url: string) => ({
-                preview: url.image_url, // 🔥 eng muhim joy
-                file: url, // eski rasm
-              }))
-            : [],
-        });
-      } else if (initialValues && !initialValues.images) {
-        setValues({
-          ...initialValues,
-          images: [],
-        });
-      } else {
-        setValues({
-          name_uz: "",
-          name_ru: "",
-          description_uz: "",
-          description_ru: "",
-          price: 0,
-          category_id: "",
-          watt: "",
-          brand: "",
-          model: "",
-          images: [],
-          is_active: true,
-        });
-      }
-      setErrors({});
+    if (!open) return;
+
+    if (initialValues) {
+      setValues({
+        id: initialValues.id,
+        name_uz: initialValues.name_uz,
+        name_ru: initialValues.name_ru,
+        description_uz: initialValues.description_uz,
+        description_ru: initialValues.description_ru,
+        price: Number(initialValues.price),
+        category_id: String(initialValues.category_id),
+        watt: String(initialValues.watt),
+        brand: initialValues.brand,
+        model: initialValues.model,
+        is_active: initialValues.is_active,
+        images: initialValues.images
+          ? initialValues.images.map((img) => ({
+              id: String(img.id),
+              preview: img.image_url,
+            }))
+          : [],
+      });
+    } else {
+      setValues({
+        name_uz: "",
+        name_ru: "",
+        description_uz: "",
+        description_ru: "",
+        price: 0,
+        category_id: "",
+        watt: "",
+        brand: "",
+        model: "",
+        images: [],
+        is_active: true,
+      });
     }
+
+    setErrors({});
   }, [open, initialValues]);
 
   /* INPUT CHANGE */
@@ -120,23 +132,25 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
 
     setValues((prev) => ({
       ...prev,
-      images: [...prev?.images, ...mapped],
+      images: [...prev.images, ...mapped],
     }));
   };
 
   /* REMOVE IMAGE */
   const removeImage = async (image: ProductImage, index: number) => {
     try {
-      if (initialValues && image?.file) {
-        await remove("product-image", String(image?.file?.id));
+      // faqat backenddagi rasm bo‘lsa
+      if (image.id) {
+        await remove("product-image", String(image.id));
         onSuccess();
       }
+
       setValues((prev) => ({
         ...prev,
         images: prev.images.filter((_, i) => i !== index),
       }));
     } catch (error) {
-      console.log(error);
+      return;
     }
   };
 
@@ -331,8 +345,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
             </label>
             <PaginatedSelect<Category>
               value={category}
-              onChange={setCategory}
-              endpoint="/product-categories"
+              onChange={(e) => setCategory(e)}
+              endpoint="product-categories"
               labelKey="name_uz"
               placeholder="Category tanlang"
             />

@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import ServiceDrawer from "../components/ui/ServiceDrawer";
 import { get, putData } from "../api/api";
-import { MdDelete, MdEdit, MdSearch } from "react-icons/md";
+import { MdAdd, MdEdit, MdInventory, MdSearch } from "react-icons/md";
 import Pagination from "../components/ui/Pagination";
 import { TbDatabaseSearch, TbReload } from "react-icons/tb";
+import DeleteModal from "../components/modals/DeleteModal";
+import { formatPrice } from "../utils/formatter";
 
 export interface ServiceFormValues {
   id?: string;
@@ -38,7 +40,7 @@ const Services: React.FC = () => {
   const fetchServices = async (p = page) => {
     setLoading(true);
     try {
-      const { data }: DataService = await get("/app-services", {
+      const { data }: DataService = await get("app-services", {
         page: p,
         limit,
         search,
@@ -92,7 +94,7 @@ const Services: React.FC = () => {
           onClick={() => setOpen(true)}
           className="bg-primary text-background-dark px-6 py-3 rounded-xl font-black flex items-center gap-2 shadow-lg shadow-primary/20"
         >
-          <span className="material-symbols-outlined">add_circle</span>
+          <MdAdd className="text-[20px]" />
           Servis qo'shish
         </button>
       </div>
@@ -103,7 +105,7 @@ const Services: React.FC = () => {
             <p className="text-[10px] font-bold uppercase tracking-widest">
               Jami Servislar soni
             </p>
-            <span className="material-symbols-outlined">inventory_2</span>
+            <MdInventory className="text-2xl" />
           </div>
           <div className="flex items-baseline gap-2">
             <p className="text-3xl font-black text-white">{totalCount}</p>
@@ -138,19 +140,23 @@ const Services: React.FC = () => {
       </div>
 
       <div className="bg_card rounded-2xl border border_color shadow-xl overflow-hidden overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="card_btn text-[10px] font-bold uppercase tracking-widest text_primary border-b border_color">
-              <th className="px-8 py-5">Service</th>
-              <th className="px-8 py-5">Tafsif</th>
-              <th className="px-8 py-5">Price Model</th>
-              <th className="px-8 py-5">Status</th>
-              <th className="px-8 py-5 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-800">
-            {services?.length > 0 &&
-              services.map((s) => (
+        {loading ? (
+          <div className="flex items-center justify-center h-full py-6 w-full animate-pulse">
+            Yuklanmoqda...
+          </div>
+        ) : services?.length > 0 ? (
+          <table className="w-full text-left">
+            <thead>
+              <tr className="card_btn text-[10px] font-bold uppercase tracking-widest text_primary border-b border_color">
+                <th className="px-8 py-5">Service</th>
+                <th className="px-8 py-5">Tafsif</th>
+                <th className="px-8 py-5">Price Model</th>
+                <th className="px-8 py-5">Status</th>
+                <th className="px-8 py-5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800">
+              {services.map((s) => (
                 <tr
                   key={s.id}
                   className="hover:bg-primary/5 transition-colors group"
@@ -179,8 +185,8 @@ const Services: React.FC = () => {
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-highlight-yellow">
-                        {s?.price}
+                      <span className="text-sm font-bold text-highlight-yellow text-nowrap">
+                        {formatPrice(s?.price)} so'm
                       </span>
                     </div>
                   </td>
@@ -207,15 +213,22 @@ const Services: React.FC = () => {
                       >
                         <MdEdit className="text-[18px]" />
                       </button>
-                      <button className="p-1.5 hover:text-red-500 transition-colors text-slate-400">
-                        <MdDelete className="text-[18px]" />
-                      </button>
+                      <DeleteModal
+                        itemId={s?.id || ""}
+                        path="app-service"
+                        confirm={() => fetchServices()}
+                      />
                     </div>
                   </td>
                 </tr>
               ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        ) : (
+          <div className="flex items-center py-6 justify-center h-full w-full">
+            Ma'lumtlar qo'shilmagan
+          </div>
+        )}
         <div className="py-4 px-6 border-t border_color flex justify-end items-center card_btn">
           <Pagination
             page={page}

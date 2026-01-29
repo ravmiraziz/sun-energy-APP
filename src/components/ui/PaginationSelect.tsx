@@ -1,30 +1,69 @@
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { get } from "../../api/api";
-import type { CategoryData } from "../../pages/Settings";
+
+export interface BaseCategory {
+  id: string;
+  name_uz: string;
+  name_ru: string;
+}
+
+// product category
+export interface ProductCategory extends BaseCategory {
+  created_at: string;
+}
+
+// service category
+export interface ServiceCategory extends BaseCategory {
+  icon_name: string;
+  created_at: string;
+}
+
+export type EndpointType = "service-categories" | "product-categories";
+
+export interface PaginatedApiResponse {
+  product_categories?: ProductCategory[];
+  service_categories?: ServiceCategory[];
+  count: number;
+}
+
+export async function fetchCategories<T>(
+  endpoint: EndpointType,
+  params: {
+    page: number;
+    limit: number;
+    search?: string;
+  },
+): Promise<{ items: T[]; count: number }> {
+  const { data }: { data: PaginatedApiResponse } = await get(endpoint, params);
+
+  if (endpoint === "service-categories") {
+    return {
+      items: (data.service_categories ?? []) as T[],
+      count: data.count,
+    };
+  }
+
+  return {
+    items: (data.product_categories ?? []) as T[],
+    count: data.count,
+  };
+}
 
 interface PaginatedSelectProps<T> {
+  endpoint: EndpointType;
   value?: T | null;
   onChange: (item: T) => void;
-  endpoint: string;
   labelKey: keyof T;
   placeholder?: string;
   limit?: number;
   className?: string;
 }
 
-interface DataRes {
-  data: {
-    product_categories?: CategoryData[];
-    service_categories?: CategoryData[];
-    count: number;
-  };
-}
-
-export function PaginatedSelect<T extends { id: number | string }>({
+export function PaginatedSelect<T extends { id: string | number }>({
+  endpoint,
   value,
   onChange,
-  endpoint,
   labelKey,
   placeholder = "Select...",
   limit = 10,
@@ -41,55 +80,47 @@ export function PaginatedSelect<T extends { id: number | string }>({
 
   const loadData = async (reset = false) => {
     setLoading(true);
-    const { data }: DataRes = await get(endpoint, {
+
+    const { items: newItems, count } = await fetchCategories<T>(endpoint, {
       page: reset ? 1 : page,
       limit,
       search,
     });
 
-    console.log(data);
-
-    if (endpoint === "service-categories") {
-      setItems((prev) =>
-        reset ? data.service_categories : [...prev, ...data.service_categories],
-      );
-    } else {
-      setItems((prev) =>
-        reset ? data.product_categories : [...prev, ...data.product_categories],
-      );
-    }
-
-    setTotal(data.count);
+    setItems((prev) => (reset ? newItems : [...prev, ...newItems]));
+    setTotal(count);
     setLoading(false);
   };
 
+  // open yoki search o‘zgarsa
   useEffect(() => {
-    if (open) loadData(true);
+    if (open) {
+      setPage(1);
+      loadData(true);
+    }
   }, [open, search]);
 
+  // pagination
   useEffect(() => {
     if (page > 1) loadData();
   }, [page]);
 
   const handleScroll = () => {
-    if (!listRef.current) return;
+    if (!listRef.current || loading) return;
+
     const { scrollTop, scrollHeight, clientHeight } = listRef.current;
 
-    if (
-      scrollTop + clientHeight >= scrollHeight - 10 &&
-      items.length < total &&
-      !loading
-    ) {
+    if (scrollTop + clientHeight >= scrollHeight - 10 && items.length < total) {
       setPage((p) => p + 1);
     }
   };
 
   return (
     <div className={clsx("relative", className)}>
-      {/* SELECT INPUT */}
+      {/* SELECT */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full h-12 px-4 bg_card rounded-xl bg-nav text-left flex items-center justify-between"
+        className="w-full h-12 px-4 bg_card rounded-xl bg-nav flex justify-between items-center"
       >
         <span>{value ? String(value[labelKey]) : placeholder}</span>
         <span>▾</span>
@@ -97,13 +128,13 @@ export function PaginatedSelect<T extends { id: number | string }>({
 
       {/* DROPDOWN */}
       {open && (
-        <div className="absolute z-50 mt-2 w-full rounded-xl bg_card card_text border border-white/10">
+        <div className="absolute z-50 w-full mt-2 rounded-xl bg_card border border-white/10">
           {/* SEARCH */}
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
-            className="w-full px-4 py-2 bg_card border-b border-white/10 outline-none"
+            className="w-full px-4 py-2 border-b border-white/10 bg-transparent outline-none"
           />
 
           {/* LIST */}
@@ -112,30 +143,25 @@ export function PaginatedSelect<T extends { id: number | string }>({
             onScroll={handleScroll}
             className="max-h-60 overflow-y-auto"
           >
-            {items?.length > 0 &&
-              items.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    onChange(item);
-                    setOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 hover:bg-white/10"
-                >
-                  {String(item[labelKey])}
-                </button>
-              ))}
+            {items.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  onChange(item);
+                  setOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left hover:bg-white/10"
+              >
+                {String(item[labelKey])}
+              </button>
+            ))}
 
             {loading && (
-              <p className="text-center py-2 text-white/40 text-sm">
-                Loading...
-              </p>
+              <p className="py-2 text-center text-sm opacity-50">Loading...</p>
             )}
 
-            {!loading && items?.length === 0 && (
-              <p className="text-center py-2 text-white/40 text-sm">
-                No results
-              </p>
+            {!loading && items.length === 0 && (
+              <p className="py-2 text-center text-sm opacity-50">No results</p>
             )}
           </div>
         </div>

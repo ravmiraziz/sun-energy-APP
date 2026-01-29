@@ -1,70 +1,18 @@
 import React, { useState } from "react";
-import { Bell, X } from "lucide-react";
-import { MdNotifications, MdSearch } from "react-icons/md";
+import { MdNotifications } from "react-icons/md";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
+import Notification from "../modals/Notification";
 
 const TopNav: React.FC = () => {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState<string[]>([]);
-  const [showNotificationPanel, setShowNotificationPanel] = useState(false);
-
-  const handleNotificationClick = async () => {
-    // Browser notification permission so'rash
-    if ("Notification" in window) {
-      if (Notification.permission === "granted") {
-        // Ruxsat berilgan bo'lsa, notification ko'rsatish
-        sendNotification();
-      } else if (Notification.permission !== "denied") {
-        // Permission so'rash
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") {
-          sendNotification();
-        }
-      }
-    } else {
-      alert("Browser notification qo'llab-quvvatlanmaydi");
-    }
-
-    setShowNotificationPanel(!showNotificationPanel);
-  };
-
-  const sendNotification = () => {
-    const messages = [
-      "Yangi order keldi! 🎯",
-      "Data synchronized ✓",
-      "System update available 📦",
-      "New user joined 👤",
-      "Report ready for download 📊",
-    ];
-
-    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-
-    // Browser notification
-    new Notification("Notification", {
-      body: randomMessage,
-      icon: "https://picsum.photos/100/100?random=1",
-      tag: "notification-" + Date.now(),
-    });
-
-    // Panel ga ham qo'shish
-    const newNotification = `${randomMessage} - ${new Date().toLocaleTimeString()}`;
-    setNotifications((prev) => [newNotification, ...prev].slice(0, 10));
-  };
-
-  const clearNotifications = () => {
-    setNotifications([]);
-  };
-
-  const removeNotification = (index: number) => {
-    setNotifications((prev) => prev.filter((_, i) => i !== index));
-  };
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      <header className="h-16 border-b border_color flex items-center justify-between px-8 sticky gap-4 top-0 bg_card backdrop-blur-md z-30 transition-colors">
-        <div className="flex items-center gap-4 not-md:w-full w-1/3">
-          <Link to="/admin">
+      <header className="h-16 border-b border_color flex items-center justify-between z-50 px-8 sticky gap-4 top-0 bg_card backdrop-blur-md transition-colors">
+        <div>
+          <Link to="/admin" className="md:hidden">
             <img src="/logo.svg" alt="logo" className="object-contain h-18" />
           </Link>
         </div>
@@ -72,59 +20,11 @@ const TopNav: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="flex gap-2">
             <button
-              onClick={handleNotificationClick}
+              onClick={() => setOpen(true)}
               className="size-10 flex items-center justify-center rounded-xl card_btn text-slate-600 dark:text-slate-400 relative hover:text-primary transition-colors"
             >
               <MdNotifications className="text-[22px]" />
-              {notifications.length > 0 && (
-                <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white animate-bounce"></span>
-              )}
             </button>
-            {showNotificationPanel && (
-              <div className="absolute top-full right-0 mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 z-50">
-                <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                  <h3 className="font-bold text-sm">Notifications</h3>
-                  {notifications.length > 0 && (
-                    <button
-                      onClick={clearNotifications}
-                      className="text-xs text-blue-500 hover:text-blue-600"
-                    >
-                      Clear all
-                    </button>
-                  )}
-                </div>
-
-                <div className="max-h-96 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="p-8 text-center">
-                      <Bell className="mx-auto text-4xl text-slate-300 dark:text-slate-600 mb-2" />
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        No notifications yet
-                      </p>
-                    </div>
-                  ) : (
-                    notifications.map((notif, index) => (
-                      <div
-                        key={index}
-                        className="p-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-start gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <p className="text-sm text-slate-700 dark:text-slate-300">
-                            {notif}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => removeNotification(index)}
-                          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
           <div className="h-8 w-px bg-slate-200 dark:bg-border-teal"></div>
@@ -151,13 +51,8 @@ const TopNav: React.FC = () => {
             </div>
           </Link>
         </div>
+        {open && <Notification close={() => setOpen(false)} />}
       </header>
-      {showNotificationPanel && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setShowNotificationPanel(false)}
-        />
-      )}
     </>
   );
 };

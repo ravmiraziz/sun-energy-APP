@@ -8,14 +8,15 @@ import {
   MdShoppingCart,
   MdPersonAdd,
   MdEdit,
-  MdDelete,
 } from "react-icons/md";
 
-import { useAuth } from "../context/AuthContext";
+import { useAuth, type User } from "../context/AuthContext";
 import { IoLogOut } from "react-icons/io5";
 import CategoryDrawer from "../components/ui/CategoryDrawer";
 import { get, patch, putData } from "../api/api";
 import UserDrawer from "../components/ui/UserDrawer";
+import DeleteModal from "../components/modals/DeleteModal";
+import Announcement from "../components/ui/Announcement";
 
 interface AdminData {
   created_at: string;
@@ -26,6 +27,14 @@ interface AdminData {
   language: string;
   last_name: string;
   phone: string;
+}
+
+export interface AnnouncementData {
+  name_uz: string;
+  name_ru: string;
+  description_uz: string;
+  description_ru: string;
+  price: number;
 }
 
 export interface CategoryData {
@@ -44,6 +53,29 @@ interface UserForm {
   password?: string;
   password_confirm?: string;
 }
+
+interface ResData {
+  data: {
+    admins: User[];
+    count: number;
+  };
+}
+
+interface CatRes {
+  data: {
+    product_categories?: CategoryData[];
+    count: number;
+  };
+}
+
+interface SerRes {
+  data: {
+    service_categories?: CategoryData[];
+    count: number;
+  };
+}
+
+type UserFormKey = keyof UserForm;
 
 const Settings: React.FC = () => {
   const { user, logout, getUser } = useAuth();
@@ -132,11 +164,27 @@ const Settings: React.FC = () => {
       getUser(user?.id || "");
     } catch (err) {
       setError("Ma'lumotlarni yangilashda xatolik yuz berdi");
-      console.log(err);
     } finally {
       setLoading(false);
     }
   };
+
+  const fields: {
+    label: string;
+    name: UserFormKey;
+    type: string;
+  }[] = [
+    { label: "Ism", name: "first_name", type: "text" },
+    { label: "Familiya", name: "last_name", type: "text" },
+    { label: "E-pochta manzil", name: "email", type: "email" },
+    { label: "Telefon raqam", name: "phone", type: "text" },
+    { label: "Yangi Parol", name: "password", type: "password" },
+    {
+      label: "Parolni tasdiqlash",
+      name: "password_confirm",
+      type: "password",
+    },
+  ];
 
   const cancelChanges = () => {
     setForm(initialForm);
@@ -146,9 +194,9 @@ const Settings: React.FC = () => {
   const fetchCategories = async (p = page) => {
     setLoading(true);
     try {
-      const { data } = await get("product-categories", { page, limit });
+      const { data }: CatRes = await get("product-categories", { page, limit });
 
-      const { data: services } = await get("service-categories", {
+      const { data: services }: SerRes = await get("service-categories", {
         page,
         limit,
       });
@@ -167,16 +215,10 @@ const Settings: React.FC = () => {
   const fetchUser = async (p = page) => {
     setLoading(true);
     try {
-      const { data } = await get("admins", { page: p, limit });
-      const filtered = data.admins.filter(
-        (item: AdminData) => item?.id !== user?.id,
-      );
-      console.log(data);
-
-      setAdmins(filtered || []);
+      const { data }: ResData = await get("admins", { page: p, limit });
+      setAdmins(data.admins || []);
       setTotalCountUser(data.count || 0);
       setPage(p);
-      console.log(data);
     } finally {
       setLoading(false);
     }
@@ -197,7 +239,7 @@ const Settings: React.FC = () => {
       await patch(`admin/${user?.id}`, formData);
       getUser(user?.id || "");
     } catch (err) {
-      console.error(err);
+      return;
     }
   };
 
@@ -283,69 +325,35 @@ const Settings: React.FC = () => {
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="">
-            <div className="relative bg-primary rounded-3xl p-6 shadow-xl shadow-primary/10 overflow-hidden h-full">
-              <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-black/10 backdrop-blur-md">
-                  <span className="material-symbols-outlined text-[14px] text-black mr-1 leading-none">
-                    auto_awesome
-                  </span>
-                  <span className="text-[10px] font-bold tracking-wider text-black uppercase">
-                    Premium
-                  </span>
-                </div>
-                <button className="bg-black text-primary px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-gray-900 transition-colors">
-                  Sotib Olish
-                </button>
-              </div>
-              <h3 className="text-2xl font-extrabold text-black mb-1 relative z-10 leading-tight">
-                Yillik Quyosh
-                <br />
-                Tekshiruvi
-              </h3>
-              <p className="text-black/80 text-sm mb-6 max-w-[80%] font-medium leading-relaxed relative z-10">
-                Tizimni to'liq diagnostika qilish va tozalash paketi.
-              </p>
-              <div className="flex items-baseline space-x-2 relative z-10">
-                <span className="text-2xl font-bold text-black">129$</span>
-                <span className="text-sm font-medium text-black/40 line-through">
-                  180$
+          <Announcement mode="create" type="service" />
+          <Announcement mode="create" type="product" />
+
+          {/* <div className="relative bg-primary rounded-3xl p-6 shadow-xl shadow-primary/10 overflow-hidden h-full">
+            <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
+            <div className="flex justify-between items-start mb-4 relative z-10">
+              <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-black/10 backdrop-blur-md">
+                <MdAutoAwesome className="text-[16px] text-black mr-1 leading-none" />
+                <span className="text-[10px] font-bold tracking-wider text-black uppercase">
+                  Yangi
                 </span>
               </div>
+              <button className="bg-black text-primary px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-gray-900 transition-colors">
+                Ko'rish
+              </button>
             </div>
-          </div>
-          <div className="">
-            <div className="relative bg-primary rounded-3xl p-6 shadow-xl shadow-primary/10 overflow-hidden h-full">
-              <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-black/10 backdrop-blur-md">
-                  <span className="material-symbols-outlined text-[14px] text-black mr-1 leading-none">
-                    auto_awesome
-                  </span>
-                  <span className="text-[10px] font-bold tracking-wider text-black uppercase">
-                    Yangi
-                  </span>
-                </div>
-                <button className="bg-black text-primary px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-gray-900 transition-colors">
-                  Ko'rish
-                </button>
-              </div>
-              <h3 className="text-2xl font-extrabold text-black mb-1 relative z-10 leading-tight">
-                PowerWall Pro 3
-              </h3>
-              <p className="text-black/80 text-sm mb-6 max-w-[80%] font-medium leading-relaxed relative z-10">
-                Sizning aqlli uyingiz uchun keyingi avlod energiya saqlash
-                tizimi.
-              </p>
-              <div className="flex items-baseline space-x-2 relative z-10">
-                <span className="text-2xl font-bold text-black">129$</span>
-                <span className="text-sm font-medium text-black/40 line-through">
-                  180$
-                </span>
-              </div>
+            <h3 className="text-2xl font-extrabold text-black mb-1 relative z-10 leading-tight">
+              PowerWall Pro 3
+            </h3>
+            <p className="text-black/80 text-sm mb-6 max-w-[80%] font-medium leading-relaxed relative z-10">
+              Sizning aqlli uyingiz uchun keyingi avlod energiya saqlash tizimi.
+            </p>
+            <div className="flex items-baseline space-x-2 relative z-10">
+              <span className="text-2xl font-bold text-black">129$</span>
+              <span className="text-sm font-medium text-black/40 line-through">
+                180$
+              </span>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
 
@@ -387,18 +395,7 @@ const Settings: React.FC = () => {
               </button>
             </div>
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              {[
-                { label: "Ism", name: "first_name", type: "text" },
-                { label: "Familiya", name: "last_name", type: "text" },
-                { label: "E-pochta manzil", name: "email", type: "email" },
-                { label: "Telefon raqam", name: "phone", type: "text" },
-                { label: "Yangi Parol", name: "password", type: "password" },
-                {
-                  label: "Parolni tasdiqlash",
-                  name: "password_confirm",
-                  type: "password",
-                },
-              ].map((field) => (
+              {fields.map((field) => (
                 <div key={field.name} className="space-y-2">
                   <label className="text-[10px] font-bold card_text uppercase tracking-widest">
                     {field.label}
@@ -408,8 +405,7 @@ const Settings: React.FC = () => {
                     type={field.type}
                     value={form[field.name] ?? ""}
                     onChange={handleChange}
-                    placeholder="**************"
-                    className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
+                    className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm"
                   />
                 </div>
               ))}
@@ -450,58 +446,81 @@ const Settings: React.FC = () => {
           <h3 className="text-xl font-bold">Adminlar ro'yxati</h3>
         </div>
         <div className="bg_card border border_color rounded-2xl overflow-x-auto shadow-sm">
-          <table className="w-full text-left">
-            <thead className="card_btn">
-              <tr className="border-b border_color">
-                <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase tracking-widest">
-                  Ism
-                </th>
-                <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                  E-pochta
-                </th>
-                <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                  Telefon
-                </th>
-                <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                  Qo'shilgan vaqti
-                </th>
-                <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                  Qo'shimcha
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-border-teal">
-              {admins.map((user, i) => (
-                <tr key={i} className="hover:bg-primary/5 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-bold">{user.first_name}</p>
-                    <p className="text-[10px] card_text">{user.last_name}</p>
-                  </td>
-                  <td className="px-6 py-4 text-center">{user.email}</td>
-                  <td className="px-6 py-4 text-center">{user.phone}</td>
-                  <td className="px-6 py-4 text-center">
-                    {new Date(user.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setOpenUser(true);
-                        }}
-                        className="p-1.5 hover:text-primary transition-colors text-slate-400"
-                      >
-                        <MdEdit className="text-[18px]" />
-                      </button>
-                      <button className="p-1.5 hover:text-red-500 transition-colors text-slate-400">
-                        <MdDelete className="text-[18px]" />
-                      </button>
-                    </div>
-                  </td>
+          {loading ? (
+            <div className="flex items-center justify-center h-full py-6 w-full animate-pulse">
+              Yuklanmoqda...
+            </div>
+          ) : admins?.length > 0 ? (
+            <table className="w-full text-left">
+              <thead className="card_btn">
+                <tr className="border-b border_color">
+                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase tracking-widest">
+                    Ism
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
+                    E-pochta
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
+                    Telefon
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
+                    Qo'shilgan vaqti
+                  </th>
+                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
+                    Qo'shimcha
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-border-teal">
+                {admins.map((item, i) => (
+                  <tr
+                    key={i}
+                    className={
+                      user?.id === item.id
+                        ? "opacity-40 touch-none"
+                        : "hover:bg-primary/5 transition-colors"
+                    }
+                  >
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-bold">{item.first_name}</p>
+                      <p className="text-[10px] card_text">{item.last_name}</p>
+                    </td>
+                    <td className="px-6 py-4 text-center">{item.email}</td>
+                    <td className="px-6 py-4 text-center">+{item.phone}</td>
+                    <td className="px-6 py-4 text-center">
+                      {new Date(item.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {user?.id === item.id ? (
+                        <span>Bu siz</span>
+                      ) : (
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedUser(item);
+                              setOpenUser(true);
+                            }}
+                            className="p-1.5 hover:text-primary transition-colors text-slate-400"
+                          >
+                            <MdEdit className="text-[18px]" />
+                          </button>
+                          <DeleteModal
+                            itemId={user?.id || ""}
+                            path="admin"
+                            confirm={() => fetchUser()}
+                          />
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="flex items-center py-6 justify-center h-full w-full">
+              Ma'lumtlar qo'shilmagan
+            </div>
+          )}
         </div>
       </section>
       <CategoryDrawer

@@ -135,7 +135,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
       </div>
 
       {/* BODY */}
-      <div className="p-6 space-y-6 overflow-y-auto max-h-screen">
+      <div className="p-6 space-y-6">
         {/* NAME */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">

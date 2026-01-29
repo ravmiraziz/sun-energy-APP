@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth, type User } from "../../context/AuthContext";
 import { post } from "../../api/api";
+import axios from "axios";
 
 type View = "login" | "forgot";
 const OTP_LENGTH = 6;
@@ -55,7 +56,6 @@ const Login: React.FC = () => {
         email,
         password,
       });
-      console.log(data);
       if (data) {
         login({
           user: data.admin,
@@ -65,10 +65,11 @@ const Login: React.FC = () => {
         navigate("/admin");
       }
     } catch (err) {
-      if (err?.response?.data?.StatusCode === 400) {
-        setErrorMessage("Login yoki Parol xato!");
+      if (axios.isAxiosError(err)) {
+        if (err.response?.data?.StatusCode === 400) {
+          setErrorMessage("Login yoki Parol xato!");
+        }
       }
-      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -79,13 +80,12 @@ const Login: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await post("admin-register", { email });
-      console.log(data);
+      await post("admin-register", { email });
       setLoading(false);
       setTimer(60);
       setCheckCode(true);
     } catch (error) {
-      console.log(error);
+      return;
     }
   };
 
@@ -119,10 +119,7 @@ const Login: React.FC = () => {
         code: Number(code),
         email,
       });
-      console.log(data);
-
       if (data) {
-        console.log("Keldi");
         login({
           user: data.admin,
           access_token: data.access_token,
@@ -132,7 +129,6 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       setErrorMessage("Nimadir xato ketti!");
-      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -228,7 +224,9 @@ const Login: React.FC = () => {
                     {otp.map((val, i) => (
                       <input
                         key={i}
-                        ref={(el) => (inputsRef.current[i] = el)}
+                        ref={(el) => {
+                          inputsRef.current[i] = el;
+                        }}
                         value={val}
                         onChange={(e) => handleOtpChange(e.target.value, i)}
                         onKeyDown={(e) => handleOtpKeyDown(e, i)}

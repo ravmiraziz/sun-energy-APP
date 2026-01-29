@@ -1,23 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  MdChevronRight,
-  MdAdd,
-  MdFilterList,
-  MdEdit,
-  MdDelete,
-  MdChevronLeft,
-  MdChevronRight as MdChevronRightIcon,
-} from "react-icons/md";
+import { MdAdd, MdFilterList, MdEdit, MdSearch } from "react-icons/md";
 import ProductDrawer from "../components/ui/ProductDrawer";
-import { get, patch, putData } from "../api/api";
+import { get, patch } from "../api/api";
 import Pagination from "../components/ui/Pagination";
 import { AiOutlineProduct } from "react-icons/ai";
+import DeleteModal from "../components/modals/DeleteModal";
+import { TbDatabaseSearch, TbReload } from "react-icons/tb";
+import { formatPrice } from "../utils/formatter";
 
-export interface ProductImage {
-  id?: string; // backenddan kelgan bo‘lishi mumkin
-  image_url?: string;
-  file?: File; // yangi yuklangan
-  preview?: string; // preview URL
+interface ProductImage {
+  id?: number;
+  image_url: string;
 }
 
 export interface Product {
@@ -51,17 +44,21 @@ const Products: React.FC = () => {
   const limit = 10;
   const [totalCount, setTotalCount] = useState<number>(0);
   const [selected, setSelected] = useState<Product | null>(null);
+  const [search, setSearch] = useState("");
 
   const fetchedOnce = useRef(false); // 🔥 MAGIC
 
   const fetchProducts = async (p = page) => {
     setLoading(true);
     try {
-      const { data }: ResData = await get("/products");
-      console.log(data);
-
+      const { data }: ResData = await get("/products", {
+        page: p,
+        limit,
+        search,
+      });
       setProducts(data.products || []);
       setTotalCount(data.count);
+      setPage(p);
     } finally {
       setLoading(false);
     }
@@ -115,33 +112,56 @@ const Products: React.FC = () => {
 
       <div className="card_btn rounded-2xl border border_color overflow-hidden shadow-sm flex flex-col">
         <div className="px-6 py-4 border-b border_color flex items-center justify-between">
-          <p className="text-sm text_primary">
-            Showing <span className="font-semibold text-white">1-5</span> of 250
-            products
-          </p>
           <div className="flex items-center gap-2">
             <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400">
               <MdFilterList />
             </button>
           </div>
+          <div className="flex-1 w-full relative">
+            <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[24px]" />
+            <input
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg_mode border-none rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder:text-slate-400 min-w-50"
+              placeholder="Mahsulot nomi bo'yicha qidiruv"
+            />
+            {search ? (
+              <button
+                onClick={() => fetchProducts(1)}
+                className="absolute bg-primary right-2 top-1/2 -translate-y-1/2 text-[24px] rounded-md p-1"
+              >
+                <TbDatabaseSearch />
+              </button>
+            ) : (
+              <button
+                onClick={() => fetchProducts(1)}
+                className="absolute bg-primary right-2 top-1/2 -translate-y-1/2 text-[24px] rounded-md p-1"
+              >
+                <TbReload className={`${loading && "animate-spin"} text-2xl`} />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="uppercase text-[11px] font-bold tracking-widest border-b border_color">
-                <th className="px-6 py-4 w-16">Rasm</th>
-                <th className="px-6 py-4">Nomi</th>
-                <th className="px-6 py-4">Brend</th>
-                <th className="px-6 py-4">Narx</th>
-                <th className="px-6 py-4">Qo'shilgan vaqti</th>
-                <th className="px-6 py-4">Holati</th>
-                <th className="px-6 py-4 text-right">Qo'shimcha </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 bg_card">
-              {products?.length > 0 &&
-                products.map((product) => (
+          {loading ? (
+            <div className="flex items-center justify-center h-full py-6 w-full animate-pulse">
+              Yuklanmoqda...
+            </div>
+          ) : products?.length > 0 ? (
+            <table className="w-full text-left">
+              <thead>
+                <tr className="uppercase text-[11px] font-bold tracking-widest border-b border_color">
+                  <th className="px-6 py-4 w-16">Rasm</th>
+                  <th className="px-6 py-4">Nomi</th>
+                  <th className="px-6 py-4">Brend</th>
+                  <th className="px-6 py-4">Narx</th>
+                  <th className="px-6 py-4">Qo'shilgan vaqti</th>
+                  <th className="px-6 py-4">Holati</th>
+                  <th className="px-6 py-4 text-right">Qo'shimcha </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 bg_card">
+                {products.map((product) => (
                   <tr
                     key={product.id}
                     className="hover:bg-slate-800/30 transition-colors group"
@@ -175,8 +195,8 @@ const Products: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm font-bold text-yellow-500">
-                        {product.price}
+                      <span className="text-sm font-bold text-yellow-500 text-nowrap">
+                        {formatPrice(product.price)} so'm
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -211,15 +231,22 @@ const Products: React.FC = () => {
                         >
                           <MdEdit className="text-[18px]" />
                         </button>
-                        <button className="p-1.5 hover:text-red-500 transition-colors text-slate-400">
-                          <MdDelete className="text-[18px]" />
-                        </button>
+                        <DeleteModal
+                          itemId={product?.id || ""}
+                          path="product"
+                          confirm={() => fetchProducts()}
+                        />
                       </div>
                     </td>
                   </tr>
                 ))}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          ) : (
+            <div className="flex items-center py-6 justify-center h-full w-full">
+              Ma'lumtlar qo'shilmagan
+            </div>
+          )}
         </div>
         <ProductDrawer
           open={open}

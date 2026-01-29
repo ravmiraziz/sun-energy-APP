@@ -62,8 +62,6 @@ api.interceptors.response.use(
               if (!originalRequest.headers) {
                 originalRequest.headers = {};
               }
-              console.log(token);
-
               originalRequest.headers.Authorization = "Bearer " + token;
               resolve(api(originalRequest));
             },

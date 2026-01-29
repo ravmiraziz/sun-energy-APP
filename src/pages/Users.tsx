@@ -40,7 +40,6 @@ const Users: React.FC = () => {
     setLoading(true);
     try {
       const { data }: ResData = await get("/users", { page: p, limit, search });
-      console.log(data);
       setUsers(data.users || []);
       setTotalCount(data.count);
       setPage(p);
@@ -61,10 +60,10 @@ const Users: React.FC = () => {
       <div className="flex flex-wrap justify-between items-center gap-4">
         <div>
           <h1 className="text-4xl font-black leading-tight tracking-tight">
-            User Management
+            Foydalanuvchilar ma'lumotlari
           </h1>
           <p className="text_primary text-sm mt-1">
-            Manage administrative roles and end-user permissions.
+            Barcha foydalanuvchilar bo'yicha ko'rsatkichlar
           </p>
         </div>
       </div>
@@ -109,64 +108,76 @@ const Users: React.FC = () => {
       </div>
 
       <div className="bg_card rounded-2xl border border_color overflow-x-auto shadow-sm">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="card_btn border-b border_color">
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                Foydalanuvchi
-              </th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                Manzil
-              </th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                Telefon raqam
-              </th>
-              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                Qo'shilgan vaqt
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, i) => (
-              <tr key={i} className="hover:bg-primary/5 transition-all group">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-full border-2 border_color transition-all overflow-hidden">
-                      {user.image_url ? (
-                        <img
-                          src={user.image_url}
-                          alt={user.first_name}
-                          className="object-cover w-full h-full"
-                        />
-                      ) : (
-                        <span className="flex items-center justify-center uppercase h-full card_btn">
-                          {user.first_name.slice(0, 1)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold group-hover:text-primary transition-colors text-nowrap">
-                        {user.first_name} {user.last_name}
-                      </span>
-                      <span className="text-xs card_text">{user.email}</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border border_color text-nowrap`}
-                  >
-                    {user.address}
-                  </span>
-                </td>
-                <td className="px-6 py-4">{user.phone}</td>
-                <td className="px-6 py-4">
-                  <span>{new Date(user.created_at).toLocaleDateString()}</span>
-                </td>
+        {loading ? (
+          <div className="flex items-center justify-center h-full py-6 w-full animate-pulse">
+            Yuklanmoqda...
+          </div>
+        ) : users?.length > 0 ? (
+          <table className="w-full text-left">
+            <thead>
+              <tr className="card_btn border-b border_color">
+                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
+                  Foydalanuvchi
+                </th>
+                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
+                  Manzil
+                </th>
+                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
+                  Telefon raqam
+                </th>
+                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
+                  Qo'shilgan vaqt
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((user, i) => (
+                <tr key={i} className="hover:bg-primary/5 transition-all group">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 rounded-full border-2 border_color transition-all overflow-hidden">
+                        {user.image_url ? (
+                          <img
+                            src={user.image_url}
+                            alt={user.first_name}
+                            className="object-cover w-full h-full"
+                          />
+                        ) : (
+                          <span className="flex items-center justify-center uppercase h-full card_btn">
+                            {user.first_name.slice(0, 1)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold group-hover:text-primary transition-colors text-nowrap">
+                          {user.first_name} {user.last_name}
+                        </span>
+                        <span className="text-xs card_text">{user.email}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border border_color text-nowrap`}
+                    >
+                      {user.address}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">+{user.phone}</td>
+                  <td className="px-6 py-4">
+                    <span>
+                      {new Date(user.created_at).toLocaleDateString()}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="flex items-center py-6 justify-center h-full w-full">
+            Ma'lumtlar qo'shilmagan
+          </div>
+        )}
         <div className="px-6 py-4 card_btn border-t border_color flex justify-end items-center">
           <Pagination
             page={page}

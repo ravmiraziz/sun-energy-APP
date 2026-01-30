@@ -46,19 +46,11 @@ const Sidebar: React.FC = () => {
           })}
         </nav>
 
-        <div className="p-4">
-          <div className="bg-card p-4 rounded-xl mb-4">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-              Support
+        <div className="px-4">
+          <div className="bg-card p-4 rounded-xl mt-4">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 text-center">
+              Powered by EVORIX
             </p>
-            <p className="text-xs text-slate-400 mb-3 leading-tight">
-              Ma'lumotlarni boshqarishda yordam kerak?
-            </p>
-            <Link to="https://t.me/IboduIIa">
-              <button className="w-full bg-slate-900 text-white py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-slate-800 transition-colors">
-                Yordam?
-              </button>
-            </Link>
           </div>
         </div>
       </aside>

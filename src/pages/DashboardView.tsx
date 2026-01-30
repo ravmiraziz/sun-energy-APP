@@ -197,7 +197,7 @@ const DashboardView: React.FC = () => {
             <div className="xl:col-span-2 bg_card border border_color rounded-2xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h2 className="text-lg font-bold">To'liq Sotuv Jarayomi</h2>
+                  <h2 className="text-lg font-bold">To'liq Sotuv Jarayoni</h2>
                   <p className="text-sm text-slate-400">
                     Ma'lum vaqt oralig'idagi bo'lib o'tgan sotuvlar
                   </p>

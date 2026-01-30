@@ -295,7 +295,8 @@ const Login: React.FC = () => {
       </main>
 
       <footer className="p-8 text-center card_text text-[10px] font-bold uppercase tracking-widest border-t border_color bg_card backdrop-blur-sm">
-        © 2024 Smart Energy & Commerce Admin Panel. Version 2.4.0-Stable
+        <span className="text-yellow-400">Powered by EVORIX</span> © 2024 Smart
+        Energy & Commerce Admin Panel. Version 1.2.0-Stable
       </footer>
     </div>
   );

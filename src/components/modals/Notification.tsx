@@ -1,9 +1,28 @@
-import { useState } from "react";
-import { MdCampaign, MdClose } from "react-icons/md";
-import { post } from "../../api/api";
+import { useEffect, useState } from "react";
+import { MdCampaign, MdClear, MdClose, MdEdit } from "react-icons/md";
+import { get, post, putData } from "../../api/api";
+import DeleteModal from "./DeleteModal";
+import Pagination from "../ui/Pagination";
 
 interface Props {
   close: () => void;
+}
+
+interface NotData {
+  created_at: string;
+  deleted_at: string;
+  description_ru: string;
+  description_uz: string;
+  id: string;
+  title_ru: string;
+  title_uz: string;
+}
+
+interface ResData {
+  data: {
+    notifications: NotData[];
+    count: number;
+  };
 }
 
 const Notification = ({ close }: Props) => {
@@ -14,14 +33,50 @@ const Notification = ({ close }: Props) => {
     description_ru: "",
   });
 
+  const [notifications, setNotifications] = useState<NotData[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const limit = 10;
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const [update, setUpdate] = useState<NotData | null>(null);
   const [error, setError] = useState("");
+
+  const clear = () => {
+    setUpdate(null);
+    setForm({
+      title_uz: "",
+      description_uz: "",
+      title_ru: "",
+      description_ru: "",
+    });
+  };
 
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  const fetchData = async (p = page) => {
+    try {
+      const { data }: ResData = await get("notifications", { page: p, limit });
+      setNotifications(data.notifications || []);
+      setTotalCount(data.count);
+      setPage(p);
+    } catch (error) {
+      console.log();
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (update) {
+      setForm(update);
+    }
+  }, [update]);
 
   const validate = () => {
     return Object.values(form).every((v) => v.trim() !== "");
@@ -37,9 +92,14 @@ const Notification = ({ close }: Props) => {
     setError("");
 
     try {
-      await post("notification", form);
-      alert("Bildirishnoma yuborildi!");
-      close();
+      if (update) {
+        await putData("notification", { ...form, id: update?.id });
+      } else {
+        await post("notification", form);
+        alert("Bildirishnoma yuborildi!");
+      }
+      clear();
+      fetchData();
     } catch (e) {
       setError("Xatolik yuz berdi, qayta urinib ko'ring");
     } finally {
@@ -78,9 +138,16 @@ const Notification = ({ close }: Props) => {
 
           {/* UZ */}
           <div className="flex flex-col gap-3 justify-center items-start">
-            <span className="card_btn text-[10px] font-bold px-2 py-0.5 rounded uppercase">
-              UZ
-            </span>
+            <div className="flex items-center justify-between w-full">
+              <span className="card_btn text-[10px] font-bold px-2 py-0.5 rounded uppercase">
+                UZ
+              </span>
+              {update && (
+                <button onClick={clear} className="bg-primary px-1 rounded-lg">
+                  <MdClear />
+                </button>
+              )}
+            </div>
 
             <input
               name="title_uz"
@@ -122,6 +189,64 @@ const Notification = ({ close }: Props) => {
               rows={3}
               className="w-full card_btn rounded-xl px-4 py-3 text-sm resize-none"
             />
+          </div>
+
+          <div className="text-[10px] flex items-center justify-between p-2 font-bold text-slate-400 uppercase tracking-widest mb-1">
+            <p>Yuborilaganlar</p>{" "}
+            <p>
+              Jami:
+              <span className="text-yellow-500"> {totalCount} </span> ta
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            {notifications.length > 0 &&
+              notifications.map((item) => {
+                return (
+                  <div
+                    key={item?.id}
+                    className="flex items-center justify-between p-3 bg_card border border_color rounded-xl hover:border-slate-700 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-white">
+                          {item.title_uz}
+                        </span>
+                        <span className="text-[11px] text_primary">
+                          {item.description_uz}
+                        </span>
+                        <span className="text-[11px] card_text">
+                          {new Date(item.created_at).toLocaleDateString()}
+                          {" | "}
+                          {new Date(item.created_at).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => {
+                          setUpdate(item);
+                        }}
+                        className="p-2 card_text hover:text-white hover:bg-slate-800 rounded-md transition-all"
+                      >
+                        <MdEdit />
+                      </button>
+                      <DeleteModal
+                        itemId={item?.id || ""}
+                        path={`notification`}
+                        confirm={() => fetchData()}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            <div className="px-6 py-4 card_btn border-t border_color flex justify-end items-center">
+              <Pagination
+                page={page}
+                limit={limit}
+                allCount={totalCount}
+                onChange={(p) => fetchData(p)}
+              />
+            </div>
           </div>
         </div>
 

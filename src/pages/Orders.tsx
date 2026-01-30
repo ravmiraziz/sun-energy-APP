@@ -285,7 +285,10 @@ const Orders: React.FC = () => {
                                 : "bg-red-500/40 text-red-500"
                         }`}
                       >
-                        {order.status}
+                        {order.status === "new" && "Yangi"}
+                        {order.status === "delivered" && "Jarayonda"}
+                        {order.status === "success" && "Bajarilgan"}
+                        {order.status === "canceled" && "Bekor qilingan"}
                       </span>
                     </td>
                   </tr>

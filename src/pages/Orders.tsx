@@ -9,7 +9,6 @@ import { get, putData } from "../api/api";
 import Pagination from "../components/ui/Pagination";
 import { TbDatabaseSearch, TbReload } from "react-icons/tb";
 import { formatPrice } from "../utils/formatter";
-import { generateReceiptPDF } from "../utils/generateReceipt";
 import { PiFilePdfFill } from "react-icons/pi";
 import OrderStatusUpdater from "../components/ui/OrderStatusUpdater";
 
@@ -52,6 +51,7 @@ interface User {
 
 export interface Order {
   created_at: string;
+  file_url?: string;
   id: string;
   items?: Product[];
   service?: Service;
@@ -60,6 +60,7 @@ export interface Order {
   phone_number?: string;
   order_id?: string;
   service_id?: string;
+  payment_method: string;
   status: string;
   total_price: string;
   user: User;
@@ -123,6 +124,21 @@ const Orders: React.FC = () => {
     }
   };
 
+  const getDownload = async (file_link: string) => {
+    try {
+      const response = await fetch(file_link);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "receipt.pdf";
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
+  };
+
   const onTabChange = (type: OrderType) => {
     setActiveTab(type);
     setPage(1);
@@ -145,6 +161,8 @@ const Orders: React.FC = () => {
       return;
     }
   };
+
+  console.log(orders);
 
   return (
     <div className="relative flex h-full overflow-auto">
@@ -360,9 +378,9 @@ const Orders: React.FC = () => {
                 <div
                   onClick={() => {
                     if (activeTab === "product")
-                      generateReceiptPDF(showDetails);
+                      getDownload(String(showDetails.file_url));
                   }}
-                  className={`size-12 rounded-full bg-primary flex items-center justify-center shadow-sm ${activeTab === "product" ? "cursor-pointer" : "cursor-no-drop"}`}
+                  className={`size-10 p-2 rounded-full bg-primary flex items-center justify-center shadow-sm ${activeTab === "product" ? "cursor-pointer" : "cursor-no-drop"}`}
                 >
                   <PiFilePdfFill className="text-2xl" />
                 </div>
@@ -382,23 +400,24 @@ const Orders: React.FC = () => {
                 To'lovlarning taqsimlanishi
               </h4>
               <div className="space-y-4">
-                {showDetails.items ? (
-                  showDetails.items.map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex justify-between text-sm font-medium"
-                    >
-                      <div>
-                        <span className="text_primary">{item.amount} ta</span>{" "}
-                        <span className="card_text">
-                          {item.product_info.name_uz}
-                        </span>
-                      </div>
-                      <span className="text-white">
-                        {formatPrice(item.total_price)} so'm
-                      </span>
-                    </div>
-                  ))
+                {showDetails.items ? (<table className="w-full">
+                  <thead>
+                    <tr>
+                      <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">Mahsulot</th>
+                      <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">Soni</th>
+                      <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">Narx</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {showDetails.items.map((item, i) => (
+                      <tr key={i}>
+                        <td className="border border_color p-1 text-md text-center">{item.product_info.name_uz}</td>
+                        <td className="border border_color p-1 text-md text-center">{item.amount}</td>
+                        <td className="border border_color p-1 text-md text-center">{formatPrice(item.total_price)} so'm</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
                 ) : (
                   <div>
                     <div className="flex justify-between text-sm font-medium">
@@ -440,14 +459,14 @@ const Orders: React.FC = () => {
                   <p className="text-[10px] card_text font-bold uppercase">
                     To'lov turi
                   </p>
-                  <p className="text-xs font-black">Naqt to'lov</p>
+                  <p className="text-xs font-black uppercase">{showDetails.payment_method === "cash" ? "Naqt to'lov" : showDetails.payment_method === "uzum_nasiya" ? "uzum nasiya" : showDetails.payment_method}</p>
                 </div>
               </div>
               <div className="pt-4 border-t border_color flex justify-between items-baseline">
                 <span className="font-bold text-sm">Jami to'lov:</span>
-                <span className="font-black text_primary text-2xl">
-                  {formatPrice(showDetails.total_price)} so'm
-                </span>
+                <b className="font-black text_primary text-2xl">
+                  <span className="text-yellow-500 font-bold">{formatPrice(showDetails.total_price)}</span> so'm
+                </b>
               </div>
             </div>
 

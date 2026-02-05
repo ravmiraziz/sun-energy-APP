@@ -3,6 +3,8 @@ import { MdSearch, MdPersonSearch } from "react-icons/md";
 import { get } from "../api/api";
 import Pagination from "../components/ui/Pagination";
 import { TbReload } from "react-icons/tb";
+import { Link } from "react-router-dom";
+import { FaMapLocationDot } from "react-icons/fa6";
 
 interface User {
   id?: string;
@@ -40,6 +42,8 @@ const Users: React.FC = () => {
     setLoading(true);
     try {
       const { data }: ResData = await get("/users", { page: p, limit, search });
+      console.log(data);
+
       setUsers(data.users || []);
       setTotalCount(data.count);
       setPage(p);
@@ -128,6 +132,9 @@ const Users: React.FC = () => {
                 <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
                   Qo'shilgan vaqt
                 </th>
+                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
+                  Xarita
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -149,7 +156,7 @@ const Users: React.FC = () => {
                         )}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold group-hover:text-primary transition-colors text-nowrap">
+                        <span className="text-sm font-bold group-hover:text-yellow-500 transition-colors text-nowrap">
                           {user.first_name} {user.last_name}
                         </span>
                         <span className="text-xs card_text">{user.email}</span>
@@ -168,6 +175,19 @@ const Users: React.FC = () => {
                     <span>
                       {new Date(user.created_at).toLocaleDateString()}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    {user.lat && user.long ? (
+                      <Link
+                        className="group-hover:text-yellow-500"
+                        target="_blank"
+                        to={`https://yandex.uz/maps/?ll=${user.long},${user.lat}&z=16&pt=${user.long},${user.lat},pm2rdm`}
+                      >
+                        <FaMapLocationDot className="text-2xl" />
+                      </Link>
+                    ) : (
+                      <span>---</span>
+                    )}
                   </td>
                 </tr>
               ))}

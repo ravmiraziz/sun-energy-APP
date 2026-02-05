@@ -20,7 +20,6 @@ import {
 } from "recharts";
 import { get } from "../api/api";
 import { formatPrice } from "../utils/formatter";
-import { Link } from "react-router-dom";
 
 const data = [
   { date: "Du", amount: 2 },
@@ -131,12 +130,18 @@ const DashboardView: React.FC = () => {
     },
   ];
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (fromDate?: string, toDate?: string) => {
+    console.log(fromDate + "---" + toDate);
+
     setLoading(true);
     try {
       const { data }: getData = await get("/dashboard", {
-        from_date: "2026-01-01",
-        to_date: "2026-01-31",
+        from_date:
+          fromDate ||
+          new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+            .toISOString()
+            .split("T")[0],
+        to_date: toDate || new Date().toISOString().split("T")[0],
       });
 
       setDashboard(data);
@@ -147,9 +152,20 @@ const DashboardView: React.FC = () => {
 
   useEffect(() => {
     if (fetchedOnce.current) return;
+    const newDate = new Date();
+    const year = newDate.getFullYear();
+    const month = newDate.getMonth();
+    const lastDay = new Date(year, month + 1, 0);
 
     fetchedOnce.current = true;
-    fetchProducts();
+    fetchProducts(
+      new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        1,
+      ).toLocaleDateString("en-CA"),
+      lastDay.toLocaleDateString("en-CA"),
+    );
   }, []);
 
   return (
@@ -301,7 +317,7 @@ const DashboardView: React.FC = () => {
                       </p>
                     </div>
                     <span
-                      className={`text-[10px] font-bold px-2 py-1 rounded transition-all ${
+                      className={`text-[14px] font-bold px-2 py-1 rounded transition-all ${
                         node.status === "new"
                           ? "bg-orange-500/20 text-orange-500"
                           : node.status === "delivered"
@@ -317,13 +333,68 @@ const DashboardView: React.FC = () => {
                 ))}
               </div>
 
-              <div className="mt-6 pt-6 border-t border_color">
-                <Link to="/admin/orders">
-                  <button className="w-full py-3 text-xs font-bold bg-primary rounded-xl transition-all active:scale-[0.98]">
-                    Barchasini ko'rish
-                  </button>
-                </Link>
-              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const fromDate = formData.get("from_date") as string;
+                  const toDate = formData.get("to_date") as string;
+                  fetchProducts(fromDate, toDate);
+                }}
+                className="mt-6 pt-6 border-t border_color space-y-4"
+              >
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                      Dan
+                    </label>
+                    <input
+                      type="date"
+                      name="from_date"
+                      defaultValue={new Date(
+                        new Date().getFullYear(),
+                        new Date().getMonth(),
+                        1,
+                      ).toLocaleDateString("en-CA")}
+                      className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm"
+                      onChange={(e) => {
+                        const newDate = new Date(e.target.value);
+                        const year = newDate.getFullYear();
+                        const month = newDate.getMonth();
+                        const lastDay = new Date(year, month + 1, 0);
+                        const toDateInput = e.target.form?.elements.namedItem(
+                          "to_date",
+                        ) as HTMLInputElement;
+                        if (toDateInput) {
+                          toDateInput.value =
+                            lastDay.toLocaleDateString("en-CA");
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                      Gacha
+                    </label>
+                    <input
+                      type="date"
+                      defaultValue={new Date(
+                        new Date().getFullYear(),
+                        new Date().getMonth() + 1,
+                        0,
+                      ).toLocaleDateString("en-CA")}
+                      className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm"
+                      name="to_date"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-3 text-xs font-bold bg-primary rounded-xl transition-all active:scale-[0.98]"
+                >
+                  Ko'rish
+                </button>
+              </form>
             </div>
           </div>
 

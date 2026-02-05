@@ -3,6 +3,7 @@ import { MdCampaign, MdClear, MdClose, MdEdit } from "react-icons/md";
 import { get, post, putData } from "../../api/api";
 import DeleteModal from "./DeleteModal";
 import Pagination from "../ui/Pagination";
+import { CiMobile3 } from "react-icons/ci";
 
 interface Props {
   close: () => void;
@@ -40,6 +41,8 @@ const Notification = ({ close }: Props) => {
   const [loading, setLoading] = useState(false);
   const [update, setUpdate] = useState<NotData | null>(null);
   const [error, setError] = useState("");
+  const [currentVersion, setCurrentVersion] = useState("");
+  const [versionRequired, setVersionRequired] = useState(false);
 
   const clear = () => {
     setUpdate(null);
@@ -68,8 +71,34 @@ const Notification = ({ close }: Props) => {
     }
   };
 
+  const fetchVersion = async () => {
+    setLoading(true);
+    try {
+      const { data }: { data: { version_name: string; is_required: boolean } } =
+        await get("version");
+      setCurrentVersion(data.version_name);
+      setVersionRequired(data.is_required);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const updateVersion = async () => {
+    try {
+      await post("version", {
+        version_name: currentVersion,
+        is_required: versionRequired,
+      });
+      fetchVersion();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchVersion();
   }, []);
 
   useEffect(() => {
@@ -127,7 +156,40 @@ const Notification = ({ close }: Props) => {
             <MdClose className="text-2xl" />
           </button>
         </div>
-
+        <div className="flex flex-col items-center justify-between gap-4 m-6">
+          <div>
+            <label htmlFor="version">Ilova versiyasi</label>
+            <div className="flex items-center gap-2">
+              <input
+                id="version"
+                value={currentVersion}
+                onChange={(e) => setCurrentVersion(e.target.value)}
+                type="text"
+                className="border border_color rounded-lg py-1 px-2"
+              />
+              <button
+                onClick={updateVersion}
+                className="bg-primary rounded-lg p-1"
+              >
+                <CiMobile3 className="text-2xl" />
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="version">
+              O'zgarishni o'rnatish majburiy qilish:
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                id="version"
+                checked={versionRequired}
+                onChange={(e) => setVersionRequired(e.target.checked)}
+                type="checkbox"
+                className="border border_color rounded-lg p-2"
+              />
+            </div>
+          </div>
+        </div>
         {/* BODY */}
         <div className="p-6 space-y-8 max-h-[70vh] overflow-y-auto">
           {error && (

@@ -405,6 +405,7 @@ const Settings: React.FC = () => {
                     type={field.type}
                     value={form[field.name] ?? ""}
                     onChange={handleChange}
+                    placeholder="********"
                     className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm"
                   />
                 </div>

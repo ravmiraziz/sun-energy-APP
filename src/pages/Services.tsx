@@ -245,7 +245,7 @@ const Services: React.FC = () => {
           setOpen(false);
           setSelected(null);
         }}
-        onSuccess={() => setOpen(false)}
+        onSuccess={() => fetchServices(1)}
       />
     </div>
   );

@@ -279,10 +279,16 @@ const Orders: React.FC = () => {
                     >
                       {order.user.first_name} {order.user.last_name}
                     </td>
-                    <td className="px-6 py-5 text-sm card_text">
+                    <td
+                      onClick={() => setShowDetails(order)}
+                      className="px-6 py-5 text-sm card_text"
+                    >
                       +{order.user.phone}
                     </td>
-                    <td className="px-6 py-5 font-bold text-sm text-yellow-500 text-nowrap">
+                    <td
+                      onClick={() => setShowDetails(order)}
+                      className="px-6 py-5 font-bold text-sm text-yellow-500 text-nowrap"
+                    >
                       {formatPrice(order.total_price)} so'm
                     </td>
                     <td className="px-6 py-5 text_primary text-xs text-nowrap">
@@ -303,9 +309,10 @@ const Orders: React.FC = () => {
                                 : "bg-red-500/40 text-red-500"
                         }`}
                       >
-                        {order.status === "new" && "Yangi"}
-                        {order.status === "delivered" && "Jarayonda"}
-                        {order.status === "success" && "Bajarilgan"}
+                        {order.status === "new" && "Yangi Buyurtma"}
+                        {order.status === "delivered" && "To'liq yakunlangan"}
+                        {order.status === "success" &&
+                          "To'lov qilingan. Xizmat ko'rsatilmagan!"}
                         {order.status === "canceled" && "Bekor qilingan"}
                       </span>
                     </td>
@@ -400,24 +407,37 @@ const Orders: React.FC = () => {
                 To'lovlarning taqsimlanishi
               </h4>
               <div className="space-y-4">
-                {showDetails.items ? (<table className="w-full">
-                  <thead>
-                    <tr>
-                      <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">Mahsulot</th>
-                      <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">Soni</th>
-                      <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">Narx</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {showDetails.items.map((item, i) => (
-                      <tr key={i}>
-                        <td className="border border_color p-1 text-md text-center">{item.product_info.name_uz}</td>
-                        <td className="border border_color p-1 text-md text-center">{item.amount}</td>
-                        <td className="border border_color p-1 text-md text-center">{formatPrice(item.total_price)} so'm</td>
+                {showDetails.items ? (
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">
+                          Mahsulot
+                        </th>
+                        <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">
+                          Soni
+                        </th>
+                        <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">
+                          Narx
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {showDetails.items.map((item, i) => (
+                        <tr key={i}>
+                          <td className="border border_color p-1 text-md text-center">
+                            {item.product_info.name_uz}
+                          </td>
+                          <td className="border border_color p-1 text-md text-center">
+                            {item.amount}
+                          </td>
+                          <td className="border border_color p-1 text-md text-center">
+                            {formatPrice(item.total_price)} so'm
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 ) : (
                   <div>
                     <div className="flex justify-between text-sm font-medium">
@@ -459,13 +479,22 @@ const Orders: React.FC = () => {
                   <p className="text-[10px] card_text font-bold uppercase">
                     To'lov turi
                   </p>
-                  <p className="text-xs font-black uppercase">{showDetails.payment_method === "cash" ? "Naqt to'lov" : showDetails.payment_method === "uzum_nasiya" ? "uzum nasiya" : showDetails.payment_method}</p>
+                  <p className="text-xs font-black uppercase">
+                    {showDetails.payment_method === "cash"
+                      ? "Naqt to'lov"
+                      : showDetails.payment_method === "uzum_nasiya"
+                        ? "uzum nasiya"
+                        : showDetails.payment_method}
+                  </p>
                 </div>
               </div>
               <div className="pt-4 border-t border_color flex justify-between items-baseline">
                 <span className="font-bold text-sm">Jami to'lov:</span>
                 <b className="font-black text_primary text-2xl">
-                  <span className="text-yellow-500 font-bold">{formatPrice(showDetails.total_price)}</span> so'm
+                  <span className="text-yellow-500 font-bold">
+                    {formatPrice(showDetails.total_price)}
+                  </span>{" "}
+                  so'm
                 </b>
               </div>
             </div>

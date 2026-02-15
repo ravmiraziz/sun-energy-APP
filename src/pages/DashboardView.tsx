@@ -109,14 +109,14 @@ const DashboardView: React.FC = () => {
     },
     {
       id: "2",
-      name: "Jarayondagi buyurtmalar",
+      name: "Yakunlangan buyurtmalar",
       count: dashboard?.orders_count.delivered,
       status: "delivered",
       icon: <MdPower className="text-[26px]" />,
     },
     {
       id: "3",
-      name: "Bajarilgan buyurtmalar",
+      name: "Jarayondagi buyurtmalar",
       count: dashboard?.orders_count.success,
       status: "success",
       icon: <MdCheckCircle className="text-[26px]" />,
@@ -301,12 +301,12 @@ const DashboardView: React.FC = () => {
                     <div
                       className={`size-10 rounded-full flex items-center justify-center transition-colors ${
                         node.status === "new"
-                          ? "bg-orange-500/20 text-orange-500"
+                          ? "text-orange-500"
                           : node.status === "delivered"
-                            ? "bg-blue-500/10 text-blue-500"
+                            ? "text-blue-500"
                             : node.status === "success"
-                              ? "bg-green-500/30 text-green-500"
-                              : "bg-red-500/40 text-red-500"
+                              ? "text-green-500"
+                              : "text-red-500"
                       }`}
                     >
                       <span className="text-xl">{node.icon}</span>
@@ -319,12 +319,12 @@ const DashboardView: React.FC = () => {
                     <span
                       className={`text-[14px] font-bold px-2 py-1 rounded transition-all ${
                         node.status === "new"
-                          ? "bg-orange-500/20 text-orange-500"
+                          ? "text-orange-500"
                           : node.status === "delivered"
-                            ? "bg-blue-500/20 text-blue-500"
+                            ? "text-blue-500"
                             : node.status === "success"
-                              ? "bg-green-500/30 text-green-500"
-                              : "bg-red-500/40 text-red-500"
+                              ? "text-green-500"
+                              : "text-red-500"
                       }`}
                     >
                       {node.count}

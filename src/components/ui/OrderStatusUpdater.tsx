@@ -16,8 +16,8 @@ const OrderStatusUpdater = ({ item, onUpdateStatus }: Props) => {
 
   const statuses = [
     { value: "new", label: "Yangi" },
-    { value: "delivered", label: "Jarayonda" },
-    { value: "success", label: "Bajarilgan" },
+    { value: "delivered", label: "Yakunlangan" },
+    { value: "success", label: "Jarayonda" },
     { value: "canceled", label: "Bekor qilingan" },
   ] as const;
 
@@ -37,7 +37,7 @@ const OrderStatusUpdater = ({ item, onUpdateStatus }: Props) => {
           return (
             <label
               key={item.value}
-              className={`relative border p-3 rounded-lg cursor-pointer transition-all
+              className={`relative border p-3 rounded-lg cursor-pointer transition-all text-center
                 ${
                   isActive
                     ? "border-yellow-500 text-yellow-500"
@@ -54,11 +54,6 @@ const OrderStatusUpdater = ({ item, onUpdateStatus }: Props) => {
                 onChange={() => setSelectedStatus(item.value)}
                 className="hidden"
               />
-
-              <span className="absolute right-2 top-1 text-xs text_primary">
-                {item.value}
-              </span>
-
               <span className="font-bold">{item.label}</span>
             </label>
           );

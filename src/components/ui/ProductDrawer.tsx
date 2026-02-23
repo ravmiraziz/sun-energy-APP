@@ -427,7 +427,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="font-medium">
-              IKPU kodi (ИКПУ код: "00702001001000001")
+              МХИК коди: "00702001001000001"
               <span className="text-red-500">*</span>
             </label>
             <input
@@ -443,7 +443,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-medium">
-              Paket kodi (Код упаковки для конкретного товара. ИКПУ: "123456" )
+              Ўлчов бирлиги: "1837252"
               <span className="text-red-500">*</span>
             </label>
             <input
@@ -461,11 +461,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              Birliklar ("241092" значение изменится в зависимости от вида
-              товара)
-              <span className="text-red-500">*</span>
-            </label>
+            <label className="font-medium">Қадоқлар</label>
             <input
               name="units"
               type="number"
@@ -478,9 +474,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              QQS (%) <span className="text-red-500">*</span>
-            </label>
+            <label className="font-medium">QQS (%)</label>
             <input
               name="vat_percent"
               type="number"

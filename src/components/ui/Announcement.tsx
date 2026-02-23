@@ -177,13 +177,13 @@ export default function Announcement({
 
           <div className="grid grid-cols-2 gap-4">
             <input
-              placeholder="IKPU kodi"
+              placeholder="МХИК коди: '00702001001000001'"
               value={postData.ikpu_code}
               onChange={(e) => handleChange("ikpu_code", e.target.value)}
               className="w-full h-11 px-4 rounded-xl card_btn"
             />
             <input
-              placeholder="Paket kodi"
+              placeholder="Ўлчов бирлиги: '1837252'"
               value={postData.package_code}
               onChange={(e) => handleChange("package_code", e.target.value)}
               className="w-full h-11 px-4 rounded-xl card_btn"
@@ -193,7 +193,7 @@ export default function Announcement({
           <div className="grid grid-cols-2 gap-4">
             <input
               type="number"
-              placeholder="Birliklar"
+              placeholder="Қадоқлар"
               value={postData.units || ""}
               onChange={(e) => handleChange("units", Number(e.target.value))}
               className="w-full h-11 px-4 rounded-xl card_btn"

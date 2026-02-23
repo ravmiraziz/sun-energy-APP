@@ -172,9 +172,6 @@ const Orders: React.FC = () => {
             <h1 className="text-3xl font-black leading-tight tracking-tight">
               Buyurtmalar boshqaruvi
             </h1>
-            <p className="text_primary text-sm mt-1">
-              Review and manage all incoming energy commerce transactions.
-            </p>
           </div>
           {/* <div className="flex gap-3">
             <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border_color bg_card text-sm font-bold transition-all">

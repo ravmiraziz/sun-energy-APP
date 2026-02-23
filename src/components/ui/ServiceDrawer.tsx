@@ -36,6 +36,10 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     price: 0,
     is_active: true,
     category_id: "",
+    ikpu_code: "",
+    package_code: "",
+    units: 0,
+    vat_percent: 0,
   });
 
   /* ERROR STATE */
@@ -56,6 +60,10 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
           price: 0,
           is_active: true,
           category_id: "",
+          ikpu_code: "",
+          package_code: "",
+          units: 0,
+          vat_percent: 0,
         });
       }
       setErrors({});
@@ -84,6 +92,9 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     if (!values.description_ru.trim()) newErrors.description_ru = true;
     if (!serviceData) newErrors.category_id = true;
     if (!values.price) newErrors.price = true;
+    if (!values.ikpu_code) newErrors.ikpu_code = true;
+    if (!values.package_code) newErrors.package_code = true;
+    if (!values.units) newErrors.units = true;
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -93,20 +104,27 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
   const handleSubmit = async () => {
     if (!validate()) return;
 
-    const payload = {
-      ...values,
-      id: initialValues?.id,
-      category_id: serviceData?.id,
-    };
+    try {
+      const payload = {
+        ...values,
+        units: Number(values.units),
+        vat_percent: Number(values.vat_percent),
+        id: initialValues?.id,
+        category_id: serviceData?.id,
+      };
 
-    if (isEdit) {
-      await putData(`/app-service`, payload);
-    } else {
-      await post("/app-service", payload);
+      console.log(payload);
+
+      if (isEdit) {
+        await putData(`/app-service`, payload);
+      } else {
+        await post("/app-service", payload);
+      }
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.log(error);
     }
-
-    onSuccess();
-    onClose();
   };
 
   return (
@@ -229,32 +247,106 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
               placeholder="0.00"
             />
           </div>
-          <div className="col-span-2 flex items-center justify-between p-4 bg_card rounded-xl border border-transparent">
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-white">Faol holat</span>
-              <span className="text-xs text-slate-500 dark:text-[#8fccba]">
-                Ushbu bo'lim mahsulot qolmaganida o'chirilishi kerak
-              </span>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                name="is_active"
-                checked={values.is_active}
-                onChange={(e) =>
-                  setValues((prev) => ({
-                    ...prev,
-                    is_active: e.target.checked,
-                  }))
-                }
-                className="sr-only peer"
-                type="checkbox"
-              />
-              <div
-                className={`w-11 h-6 ${values.is_active ? "bg-primary" : "card_btn"} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary`}
-              ></div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="font-medium">
+              IKPU kodi (ИКПУ код: "00702001001000001")
+              <span className="text-red-500">*</span>
             </label>
+            <input
+              name="ikpu_code"
+              type="text"
+              value={values.ikpu_code}
+              onChange={handleChange}
+              className={`h-11 rounded-xl bg_card px-4 border ${
+                errors.ikpu_code ? "border-red-500" : "border_color"
+              }`}
+              placeholder="00101001001000000"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-medium">
+              Paket kodi (Код упаковки для конкретного товара. ИКПУ: "123456" )
+              <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="package_code"
+              type="text"
+              value={values.package_code}
+              onChange={handleChange}
+              className={`h-11 rounded-xl bg_card px-4 border ${
+                errors.package_code ? "border-red-500" : "border_color"
+              }`}
+              placeholder="123456"
+            />
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="font-medium">
+              Birliklar ("241092" значение изменится в зависимости от вида
+              товара)<span className="text-red-500">*</span>
+            </label>
+            <input
+              name="units"
+              type="number"
+              value={values.units}
+              onChange={handleChange}
+              className={`h-11 rounded-xl bg_card px-4 border ${
+                errors.units ? "border-red-500" : "border_color"
+              }`}
+              placeholder="1"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-medium">
+              QQS (%) <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="vat_percent"
+              type="number"
+              value={values.vat_percent}
+              onChange={handleChange}
+              className={`h-11 rounded-xl bg_card px-4 border ${
+                errors.vat_percent ? "border-red-500" : "border_color"
+              }`}
+              placeholder="12"
+            />
+          </div>
+        </div>
+
+        {initialValues && (
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+            <div className="col-span-1 flex items-center justify-between p-4 bg_card rounded-xl border border-transparent">
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-white">Faol holat</span>
+                <span className="text-xs text-slate-500 dark:text-[#8fccba]">
+                  Ushbu bo'lim mahsulot qolmaganida o'chirilishi kerak
+                </span>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  name="is_active"
+                  checked={values.is_active}
+                  onChange={(e) =>
+                    setValues((prev) => ({
+                      ...prev,
+                      is_active: e.target.checked,
+                    }))
+                  }
+                  className="sr-only peer"
+                  type="checkbox"
+                />
+                <div
+                  className={`w-11 h-6 ${values.is_active ? "bg-primary" : "card_btn"} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary`}
+                ></div>
+              </label>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* FOOTER */}

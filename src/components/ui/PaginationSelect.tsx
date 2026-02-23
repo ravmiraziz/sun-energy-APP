@@ -133,7 +133,7 @@ export function PaginatedSelect<T extends { id: string | number }>({
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search..."
+            placeholder="Qidirish..."
             className="w-full px-4 py-2 border-b border-white/10 bg-transparent outline-none"
           />
 

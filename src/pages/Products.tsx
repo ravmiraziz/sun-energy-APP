@@ -27,6 +27,10 @@ export interface Product {
   name_uz: string;
   price: string;
   watt: number;
+  ikpu_code: string;
+  package_code: string;
+  units: number;
+  vat_percent: number;
 }
 
 interface ResData {
@@ -97,9 +101,6 @@ const Products: React.FC = () => {
           <h1 className="text-3xl font-black tracking-tight">
             Mahsulotlar boshqaruvi
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Manage and track your energy asset inventory
-          </p>
         </div>
         <button
           onClick={() => setOpen(true)}

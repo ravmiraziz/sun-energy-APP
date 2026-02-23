@@ -146,9 +146,6 @@ const CategoryDrawer: React.FC<ProductDrawerProps> = ({
               <MdClose className="text-2xl" />
             </button>
           </div>
-          <p className="card_text text-xs">
-            Organize your products and services into distinct categories.
-          </p>
         </div>
         <div className="p-6 space-y-5 border-b border_color">
           <div className="space-y-4">

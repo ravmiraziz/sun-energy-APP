@@ -11,9 +11,9 @@ import {
 const Sidebar: React.FC = () => {
   const navbars = [
     { link: "/admin", icon: MdDashboard, label: "Boshqaruv" },
-    { link: "/admin/products", icon: MdInventory, label: "Mahsulotlar" },
-    { link: "/admin/orders", icon: MdReceipt, label: "Buyurtmalar" },
     { link: "/admin/users", icon: MdGroup, label: "Foydalanuvchilar" },
+    { link: "/admin/orders", icon: MdReceipt, label: "Buyurtmalar" },
+    { link: "/admin/products", icon: MdInventory, label: "Mahsulotlar" },
     { link: "/admin/services", icon: MdDashboard, label: "Servislar" },
     { link: "/admin/settings", icon: MdSettings, label: "Sozlamalar" },
   ];

@@ -15,6 +15,10 @@ export interface AnnouncementData {
   description_ru: string;
   price: number;
   created_at?: string;
+  ikpu_code: string;
+  package_code: string;
+  units: number;
+  vat_percent: number;
 }
 
 interface AnnouncementProps {
@@ -39,6 +43,10 @@ export default function Announcement({
       description_uz: "",
       description_ru: "",
       price: 0,
+      ikpu_code: "",
+      package_code: "",
+      units: 0,
+      vat_percent: 0,
     },
   );
 
@@ -162,10 +170,44 @@ export default function Announcement({
           <input
             type="number"
             placeholder="Narx"
-            value={postData.price}
+            value={postData.price || ""}
             onChange={(e) => handleChange("price", Number(e.target.value))}
             className="w-full h-11 px-4 rounded-xl card_btn"
           />
+
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              placeholder="IKPU kodi"
+              value={postData.ikpu_code}
+              onChange={(e) => handleChange("ikpu_code", e.target.value)}
+              className="w-full h-11 px-4 rounded-xl card_btn"
+            />
+            <input
+              placeholder="Paket kodi"
+              value={postData.package_code}
+              onChange={(e) => handleChange("package_code", e.target.value)}
+              className="w-full h-11 px-4 rounded-xl card_btn"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="number"
+              placeholder="Birliklar"
+              value={postData.units || ""}
+              onChange={(e) => handleChange("units", Number(e.target.value))}
+              className="w-full h-11 px-4 rounded-xl card_btn"
+            />
+            <input
+              type="number"
+              placeholder="QQS (%)"
+              value={postData.vat_percent || ""}
+              onChange={(e) =>
+                handleChange("vat_percent", Number(e.target.value))
+              }
+              className="w-full h-11 px-4 rounded-xl card_btn"
+            />
+          </div>
 
           <button
             disabled={loading}

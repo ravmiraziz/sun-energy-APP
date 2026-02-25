@@ -67,7 +67,7 @@ const Notification = ({ close }: Props) => {
       setTotalCount(data.count);
       setPage(p);
     } catch (error) {
-      console.log();
+      return;
     }
   };
 

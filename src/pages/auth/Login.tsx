@@ -85,7 +85,7 @@ const Login: React.FC = () => {
       setTimer(60);
       setCheckCode(true);
     } catch (error) {
-      return;
+      setLoading(false);
     }
   };
 
@@ -127,8 +127,8 @@ const Login: React.FC = () => {
         });
         navigate("/admin");
       }
-    } catch (error) {
-      setErrorMessage("Nimadir xato ketti!");
+    } catch (error: any) {
+      setErrorMessage(error?.response?.data?.Data);
     } finally {
       setLoading(false);
     }
@@ -295,8 +295,8 @@ const Login: React.FC = () => {
       </main>
 
       <footer className="p-8 text-center card_text text-[10px] font-bold uppercase tracking-widest border-t border_color bg_card backdrop-blur-sm">
-        <span className="text-yellow-400">Powered by EVORIX</span> © 2024 Smart
-        Energy & Commerce Admin Panel. Version 1.2.0-Stable
+        <span className="text-yellow-400">Powered by SYSTEMLABUZ</span> © 2024
+        Smart Energy & Commerce Admin Panel. Version 1.2.0-Stable
       </footer>
     </div>
   );

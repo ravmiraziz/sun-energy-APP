@@ -112,9 +112,6 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
         id: initialValues?.id,
         category_id: serviceData?.id,
       };
-
-      console.log(payload);
-
       if (isEdit) {
         await putData(`/app-service`, payload);
       } else {
@@ -123,7 +120,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
       onSuccess();
       onClose();
     } catch (error) {
-      console.log(error);
+      return;
     }
   };
 

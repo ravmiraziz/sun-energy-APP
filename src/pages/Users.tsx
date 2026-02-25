@@ -42,8 +42,6 @@ const Users: React.FC = () => {
     setLoading(true);
     try {
       const { data }: ResData = await get("/users", { page: p, limit, search });
-      console.log(data);
-
       setUsers(data.users || []);
       setTotalCount(data.count);
       setPage(p);

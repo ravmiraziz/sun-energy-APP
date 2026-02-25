@@ -49,7 +49,7 @@ const Sidebar: React.FC = () => {
         <div className="px-4">
           <div className="bg-card p-4 rounded-xl mt-4">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 text-center">
-              Powered by EVORIX
+              Powered by SYSTEMLABUZ
             </p>
           </div>
         </div>

@@ -131,8 +131,6 @@ const DashboardView: React.FC = () => {
   ];
 
   const fetchProducts = async (fromDate?: string, toDate?: string) => {
-    console.log(fromDate + "---" + toDate);
-
     setLoading(true);
     try {
       const { data }: getData = await get("/dashboard", {

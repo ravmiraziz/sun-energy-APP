@@ -161,9 +161,6 @@ const Orders: React.FC = () => {
       return;
     }
   };
-
-  console.log(orders);
-
   return (
     <div className="relative flex h-full overflow-auto">
       <div className="flex-1 flex flex-col overflow-y-auto px-8 py-8">

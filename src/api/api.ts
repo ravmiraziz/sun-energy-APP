@@ -1,12 +1,8 @@
-// src/api/api.ts
 import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 const API_URL = import.meta.env.VITE_SERVER_URL as string;
 
-/* ===============================
-AXIOS INSTANCE
-================================ */
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
 });
@@ -73,10 +69,9 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await axios.post(`${API_URL}/admin-refresh-token`, {
+        const res = await axios.post(`${API_URL}admin-refresh-token`, {
           refresh_token: refreshToken,
         });
-
         const newAccessToken = res.data.access_token;
 
         // 🔐 SAQLAYMIZ

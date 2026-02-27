@@ -137,7 +137,7 @@ const CategoryDrawer: React.FC<ProductDrawerProps> = ({
         <div className="p-6 border-b border_color">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xl font-bold text-white">
-              Category Management
+              Kategoryiyalarni boshqarish
             </h3>
             <button
               onClick={onClose}

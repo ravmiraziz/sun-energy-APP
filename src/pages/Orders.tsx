@@ -446,7 +446,7 @@ const Orders: React.FC = () => {
                     </div>
                     <div>
                       <h4 className="text-[10px] font-black uppercase text-slate-400 mt-6 tracking-[0.2em]">
-                        Habar
+                        Xabar
                       </h4>
                       <span className="text-sm">{showDetails.note}</span>
                     </div>
@@ -475,7 +475,7 @@ const Orders: React.FC = () => {
                   </p>
                   <p className="text-xs font-black uppercase">
                     {showDetails.payment_method === "cash"
-                      ? "Naqt to'lov"
+                      ? "Naqd to'lov"
                       : showDetails.payment_method === "uzum_nasiya"
                         ? "uzum nasiya"
                         : showDetails.payment_method}

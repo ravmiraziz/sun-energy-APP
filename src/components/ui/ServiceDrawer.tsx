@@ -224,7 +224,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
               onChange={setServiceData}
               endpoint="service-categories"
               labelKey="name_uz"
-              placeholder="Category tanlang"
+              placeholder="Kategoriyani tanlang"
             />
           </div>
 

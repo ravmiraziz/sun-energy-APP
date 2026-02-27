@@ -22,12 +22,12 @@ import { get } from "../api/api";
 import { formatPrice } from "../utils/formatter";
 
 const data = [
-  { date: "Du", amount: 2 },
-  { date: "Se", amount: 4 },
-  { date: "Cho", amount: 3 },
-  { date: "Pa", amount: 4 },
-  { date: "Ju", amount: 3 },
-  { date: "Sha", amount: 5 },
+  { date: "Du", amount: 1 },
+  { date: "Se", amount: 2 },
+  { date: "Cho", amount: 1 },
+  { date: "Pa", amount: 2 },
+  { date: "Ju", amount: 1 },
+  { date: "Sha", amount: 2 },
   { date: "Ya", amount: 7 },
 ];
 
@@ -80,7 +80,7 @@ const DashboardView: React.FC = () => {
       colorClass: "revenue-card-gradient border-2 border-yellow-500",
     },
     {
-      label: "Yangi foydalanuvchilar",
+      label: "Umumiy foydalanuvchilar",
       value: formatPrice(dashboard?.new_users_count || 0),
       isPositive: true,
       icon: <MdFlare className="text-[26px]" />,
@@ -257,6 +257,7 @@ const DashboardView: React.FC = () => {
                     />
                     <XAxis
                       dataKey="date"
+                      attributeName="Muddat"
                       stroke="#6b7280"
                       fontSize={12}
                       axisLine={false}
@@ -274,6 +275,7 @@ const DashboardView: React.FC = () => {
                     <Area
                       type="monotone"
                       dataKey="amount"
+                      name="Miqdor"
                       stroke="#09f6b3"
                       strokeWidth={3}
                       fillOpacity={1}

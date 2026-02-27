@@ -203,7 +203,6 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
     if (!values.price) newErrors.price = true;
     if (!values.ikpu_code) newErrors.ikpu_code = true;
     if (!values.package_code) newErrors.package_code = true;
-    if (!values.units) newErrors.units = true;
     if (values.images.length === 0) newErrors.images = true;
 
     setErrors(newErrors);

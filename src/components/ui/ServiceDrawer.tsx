@@ -94,7 +94,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
     if (!values.price) newErrors.price = true;
     if (!values.ikpu_code) newErrors.ikpu_code = true;
     if (!values.package_code) newErrors.package_code = true;
-    if (!values.units) newErrors.units = true;
+    
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

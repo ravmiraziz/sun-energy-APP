@@ -316,7 +316,7 @@ const Orders: React.FC = () => {
             </table>
           ) : (
             <div className="flex items-center py-6 justify-center h-full w-full">
-              Ma'lumtlar qo'shilmagan
+              Ma'lumotlar qo'shilmagan
             </div>
           )}
           <div className="w-full py-4 px-6 border-t border_color flex justify-between items-center card_btn">

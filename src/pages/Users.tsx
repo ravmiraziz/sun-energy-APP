@@ -88,7 +88,7 @@ const Users: React.FC = () => {
             <input
               onChange={(e) => setSearch(e.target.value)}
               className="w-full card_btn border-none rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder:text-slate-400"
-              placeholder="Ism buyicha qidiruv..."
+              placeholder="Ism bo'yicha..."
             />
             {search ? (
               <button
@@ -193,7 +193,7 @@ const Users: React.FC = () => {
           </table>
         ) : (
           <div className="flex items-center py-6 justify-center h-full w-full">
-            Ma'lumtlar qo'shilmagan
+            Ma'lumotlar qo'shilmagan
           </div>
         )}
         <div className="px-6 py-4 card_btn border-t border_color flex justify-end items-center">

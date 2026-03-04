@@ -122,7 +122,7 @@ const Services: React.FC = () => {
             <input
               onChange={(e) => setSearch(e.target.value)}
               className="w-full card_btn border-none rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder:text-slate-400"
-              placeholder="Servis nomi buyicha qidiruv..."
+              placeholder="Servis nomi bo'yicha qidiruv..."
             />
             {search ? (
               <button
@@ -153,7 +153,7 @@ const Services: React.FC = () => {
             <thead>
               <tr className="card_btn text-[10px] font-bold uppercase tracking-widest text_primary border-b border_color">
                 <th className="px-8 py-5">Servis</th>
-                <th className="px-8 py-5">Tafsif</th>
+                <th className="px-8 py-5">Tavsif</th>
                 <th className="px-8 py-5">Narxi</th>
                 <th className="px-8 py-5">Status</th>
                 <th className="px-8 py-5 text-right">Qo'shimcha</th>
@@ -182,10 +182,13 @@ const Services: React.FC = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-6">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
-                      {s.description_uz.slice(0, 300)}
-                    </span>
+                  <td className="px-8">
+                    <p className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
+                      {s.description_uz.slice(0, 150)}
+                    </p>
+                    <p className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
+                      {s.description_ru.slice(0, 150)}
+                    </p>
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex flex-col">

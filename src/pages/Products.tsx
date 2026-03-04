@@ -245,7 +245,7 @@ const Products: React.FC = () => {
             </table>
           ) : (
             <div className="flex items-center py-6 justify-center h-full w-full">
-              Ma'lumtlar qo'shilmagan
+              Ma'lumotlar qo'shilmagan
             </div>
           )}
         </div>

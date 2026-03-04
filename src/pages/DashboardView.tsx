@@ -80,7 +80,7 @@ const DashboardView: React.FC = () => {
       colorClass: "revenue-card-gradient border-2 border-yellow-500",
     },
     {
-      label: "Umumiy foydalanuvchilar",
+      label: "Yangi foydalanuvchilar",
       value: formatPrice(dashboard?.new_users_count || 0),
       isPositive: true,
       icon: <MdFlare className="text-[26px]" />,
@@ -402,7 +402,7 @@ const DashboardView: React.FC = () => {
           {dashboard?.top_products && (
             <div className="bg_card border border_color rounded-2xl overflow-hidden shadow-sm">
               <div className="p-6 border-b border_color flex items-center justify-between">
-                <h2 className="text-lg font-bold">Top Mahsulotlar</h2>
+                <h2 className="text-lg font-bold">Eng ko'p buyurtma berilgan mahsulot va xizmatlar</h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left">

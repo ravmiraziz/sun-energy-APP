@@ -152,11 +152,11 @@ const Services: React.FC = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="card_btn text-[10px] font-bold uppercase tracking-widest text_primary border-b border_color">
-                <th className="px-8 py-5">Service</th>
+                <th className="px-8 py-5">Servis</th>
                 <th className="px-8 py-5">Tafsif</th>
-                <th className="px-8 py-5">Price Model</th>
+                <th className="px-8 py-5">Narxi</th>
                 <th className="px-8 py-5">Status</th>
-                <th className="px-8 py-5 text-right">Actions</th>
+                <th className="px-8 py-5 text-right">Qo'shimcha</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800">

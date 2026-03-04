@@ -158,7 +158,7 @@ const CategoryDrawer: React.FC<ProductDrawerProps> = ({
                 value={values.name_uz}
                 onChange={handleChange}
                 className={`w-full bg_card border rounded-lg px-4 ${errors.name_uz ? "border-red-500" : "border_color"} py-2.5 text-sm outline-none transition-all placeholder:text-slate-600`}
-                placeholder="e.g. Solar Panels"
+                placeholder="e.g. nomi uz"
                 type="text"
               />
             </div>
@@ -171,7 +171,7 @@ const CategoryDrawer: React.FC<ProductDrawerProps> = ({
                 value={values.name_ru}
                 onChange={handleChange}
                 className={`w-full bg_card border rounded-lg px-4 ${errors.name_ru ? "border-red-500" : "border_color"} py-2.5 text-sm outline-none transition-all placeholder:text-slate-600`}
-                placeholder="e.g. residential-energy"
+                placeholder="e.g. nomi ru"
                 type="text"
               />
             </div>
@@ -179,7 +179,7 @@ const CategoryDrawer: React.FC<ProductDrawerProps> = ({
           {type === "service" && (
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text_primary">
-                Category Icon / Type
+                Kategoriya Belgi / Turi
               </label>
 
               <div className="flex items-center justify-between bg_card p-2 rounded-lg border border_color">

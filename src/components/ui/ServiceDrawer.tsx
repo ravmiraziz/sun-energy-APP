@@ -26,7 +26,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
   onSuccess,
 }) => {
   const isEdit = useMemo(() => !!initialValues?.id, [initialValues]);
-
+  const [loading, setLoading] = useState(false);
   /* FORM STATE */
   const [values, setValues] = useState<ServiceFormValues>({
     name_uz: "",
@@ -103,7 +103,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
   /* SUBMIT */
   const handleSubmit = async () => {
     if (!validate()) return;
-
+      setLoading(true);
     try {
       const payload = {
         ...values,
@@ -121,7 +121,7 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
       onClose();
     } catch (error) {
       return;
-    }
+    } finally { setLoading(false); }
   };
 
   return (
@@ -344,12 +344,14 @@ const ServiceDrawer: React.FC<ServiceDrawerProps> = ({
       {/* FOOTER */}
       <div className="p-4 border-t border-white/5 flex justify-end gap-3">
         <button
+        disabled={loading}
           onClick={onClose}
           className="h-12 px-6 rounded-xl border border-white/20 text-white"
         >
           Qaytish
         </button>
         <button
+          disabled={loading}
           onClick={handleSubmit}
           className="h-12 px-6 rounded-xl bg-primary text-[#10221d] font-bold"
         >

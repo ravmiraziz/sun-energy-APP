@@ -52,7 +52,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
   onSuccess,
 }) => {
   const isEdit = useMemo(() => !!initialValues?.id, [initialValues]);
-
+  const [loading, setLoading] = useState(false);
   /* FORM STATE */
   const [values, setValues] = useState<ProductFormValues>({
     name_uz: "",
@@ -218,7 +218,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
   /* SUBMIT */
   const handleSubmit = async () => {
     if (!validate()) return;
-
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -258,7 +258,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
       onClose();
     } catch (err) {
       console.error(err);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
@@ -419,10 +419,20 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-medium">
-              kVt <span className="text-red-500">*</span>
+              <select
+                name="units_of_measurement"
+                value={values.units_of_measurement}
+                onChange={handleChange}
+                className={`p-1 bg_card border-t border-b border-r ${
+                  errors.units_of_measurement
+                    ? "border-red-500"
+                    : "border_color"
+                } rounded-r-xl`}
+              >
+                <option value="kilowatts">kVt</option>
+                <option value="watts">VT</option>
+              </select> <span className="text-red-500">*</span>
             </label>
-            {/* input group with select appended */}
-            <div className="flex items-center">
               <input
                 name="watt"
                 type="text"
@@ -433,20 +443,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
                 } rounded-l-xl`}
                 placeholder="5000"
               />
-              <select
-                name="units_of_measurement"
-                value={values.units_of_measurement}
-                onChange={handleChange}
-                className={`h-14 bg_card px-4 border-t border-b border-r ${
-                  errors.units_of_measurement
-                    ? "border-red-500"
-                    : "border_color"
-                } rounded-r-xl`}
-              >
-                <option value="kilowatts">kVt</option>
-                <option value="watts">VT</option>
-              </select>
-            </div>
+              
           </div>
         </div>
 
@@ -612,16 +609,18 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
       {/* FOOTER */}
       <div className="p-4 border-t border-white/5 flex justify-end gap-3">
         <button
+        disabled={loading}
           onClick={onClose}
           className="h-12 px-6 rounded-xl border border-white/20 text-white"
         >
           Qaytish
         </button>
         <button
+        disabled={loading}
           onClick={handleSubmit}
           className="h-12 px-6 rounded-xl bg-primary text-[#10221d] font-bold"
         >
-          {isEdit ? "Yangilash" : "Mahsultni qo'shish"}
+          {loading ? "Yuklanmoqda..." : isEdit ? "Yangilash" : "Mahsultni qo'shish"}
         </button>
       </div>
     </BaseDrawer>

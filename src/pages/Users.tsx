@@ -170,9 +170,9 @@ const Users: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">+{user.phone}</td>
                   <td className="px-6 py-4">
-                    <span>
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </span>
+                    <p>
+                      {new Date(user.created_at).toLocaleDateString()} <span className="text-yellow-500">{new Date(user.created_at).toLocaleTimeString()}</span>
+                    </p>
                   </td>
                   <td className="px-6 py-4">
                     {user.lat && user.long ? (

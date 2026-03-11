@@ -97,9 +97,9 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
         is_active: initialValues.is_active,
         images: initialValues.images
           ? initialValues.images.map((img) => ({
-              id: String(img.id),
-              preview: img.image_url,
-            }))
+            id: String(img.id),
+            preview: img.image_url,
+          }))
           : [],
         ikpu_code: initialValues.ikpu_code || "",
         package_code: initialValues.package_code || "",
@@ -298,9 +298,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               name="name_uz"
               value={values.name_uz}
               onChange={handleChange}
-              className={`form-input w-full h-14 rounded-xl bg_card px-4 border ${
-                errors.name_uz ? "border-red-500" : "border_color"
-              }`}
+              className={`form-input w-full h-14 rounded-xl bg_card px-4 border ${errors.name_uz ? "border-red-500" : "border_color"
+                }`}
               placeholder="ThinkPower 5 kVt inverter"
             />
           </div>
@@ -312,9 +311,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               name="name_ru"
               value={values.name_ru}
               onChange={handleChange}
-              className={`form-input w-full h-14 rounded-xl bg_card px-4 border ${
-                errors.name_ru ? "border-red-500" : "border_color"
-              }`}
+              className={`form-input w-full h-14 rounded-xl bg_card px-4 border ${errors.name_ru ? "border-red-500" : "border_color"
+                }`}
               placeholder="Инвертор ThinkPower 5 кВт"
             />
           </div>
@@ -327,9 +325,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
             name="description_uz"
             value={values.description_uz}
             onChange={handleChange}
-            className={`form-input w-full h-25 py-4 rounded-xl bg_card px-4 border ${
-              errors.description_uz ? "border-red-500" : "border_color"
-            }`}
+            className={`form-input w-full h-25 py-4 rounded-xl bg_card px-4 border ${errors.description_uz ? "border-red-500" : "border_color"
+              }`}
             placeholder="Asosiy Texnik Ko‘rsatkichlar Nominal quvvat: 5000 Vt (5 kW) Maksimal chiqish quvvati: 5500 Vt AC chiqish kuchlanishi: 400 V (3 fazali) Chiqish chastotasi: 50/60 Hz Chiqish toki: 10 A Samaradorlik: Maksimal – 98.2%; Yevropa samaradorligi – 97.7% MPPT"
           />
         </div>
@@ -341,9 +338,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
             name="description_ru"
             value={values.description_ru}
             onChange={handleChange}
-            className={`form-input w-full h-25 py-4 rounded-xl bg_card px-4 border ${
-              errors.description_ru ? "border-red-500" : "border_color"
-            }`}
+            className={`form-input w-full h-25 py-4 rounded-xl bg_card px-4 border ${errors.description_ru ? "border-red-500" : "border_color"
+              }`}
             placeholder="Основные технические характеристики Номинальная мощность: 5000 Вт (5 кВт) Максимальная выходная мощность: 5500 Вт Выходное напряжение переменного тока: 400 В (3-фазное) Выходная частота: 50/60 Гц Выходной ток: 10 А"
           />
         </div>
@@ -359,9 +355,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
             inputMode="numeric"
             value={values.price}
             onChange={handleChange}
-            className={`h-14 rounded-xl bg_card px-4 border ${
-              errors.price ? "border-red-500" : "border_color"
-            }`}
+            className={`h-14 rounded-xl bg_card px-4 border ${errors.price ? "border-red-500" : "border_color"
+              }`}
             placeholder="0.00"
           />
         </div>
@@ -380,7 +375,34 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               placeholder="Kategoriyani tanlang"
             />
           </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-medium">
+              <select
+                name="units_of_measurement"
+                value={values.units_of_measurement}
+                onChange={handleChange}
+                className={`p-1 bg_card border-t border-b border-r ${errors.units_of_measurement
+                    ? "border-red-500"
+                    : "border_color"
+                  } rounded-r-xl`}
+              >
+                <option value="kilowatts">kVt</option>
+                <option value="watts">VT</option>
+              </select> <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="watt"
+              type="text"
+              value={values.watt}
+              onChange={handleChange}
+              className={`flex-1 h-14 bg_card px-4 border-t border-b border-l ${errors.watt ? "border-red-500" : "border_color"
+                } rounded-l-xl`}
+              placeholder="5000"
+            />
 
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="font-medium">
               {values.units_of_measurement === "watts" ? "Brand" : "Panel turi"}
@@ -391,14 +413,11 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               type="text"
               value={values.brand}
               onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${
-                errors.price ? "border-red-500" : "border_color"
-              }`}
+              className={`h-14 rounded-xl bg_card px-4 border ${errors.price ? "border-red-500" : "border_color"
+                }`}
               placeholder="___"
             />
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="font-medium">
               {values.units_of_measurement === "watts"
@@ -411,39 +430,10 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               type="text"
               value={values.model}
               onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${
-                errors.model ? "border-red-500" : "border_color"
-              }`}
+              className={`h-14 rounded-xl bg_card px-4 border ${errors.model ? "border-red-500" : "border_color"
+                }`}
               placeholder="____"
             />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              <select
-                name="units_of_measurement"
-                value={values.units_of_measurement}
-                onChange={handleChange}
-                className={`p-1 bg_card border-t border-b border-r ${
-                  errors.units_of_measurement
-                    ? "border-red-500"
-                    : "border_color"
-                } rounded-r-xl`}
-              >
-                <option value="kilowatts">kVt</option>
-                <option value="watts">VT</option>
-              </select> <span className="text-red-500">*</span>
-            </label>
-              <input
-                name="watt"
-                type="text"
-                value={values.watt}
-                onChange={handleChange}
-                className={`flex-1 h-14 bg_card px-4 border-t border-b border-l ${
-                  errors.watt ? "border-red-500" : "border_color"
-                } rounded-l-xl`}
-                placeholder="5000"
-              />
-              
           </div>
         </div>
 
@@ -458,9 +448,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               type="text"
               value={values.ikpu_code}
               onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${
-                errors.ikpu_code ? "border-red-500" : "border_color"
-              }`}
+              className={`h-14 rounded-xl bg_card px-4 border ${errors.ikpu_code ? "border-red-500" : "border_color"
+                }`}
               placeholder="00101001001000000"
             />
           </div>
@@ -474,9 +463,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               type="text"
               value={values.package_code}
               onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${
-                errors.package_code ? "border-red-500" : "border_color"
-              }`}
+              className={`h-14 rounded-xl bg_card px-4 border ${errors.package_code ? "border-red-500" : "border_color"
+                }`}
               placeholder="123456"
             />
           </div>
@@ -490,9 +478,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               type="number"
               value={values.units}
               onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${
-                errors.units ? "border-red-500" : "border_color"
-              }`}
+              className={`h-14 rounded-xl bg_card px-4 border ${errors.units ? "border-red-500" : "border_color"
+                }`}
               placeholder="1"
             />
           </div>
@@ -503,9 +490,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               type="number"
               value={values.vat_percent}
               onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${
-                errors.vat_percent ? "border-red-500" : "border_color"
-              }`}
+              className={`h-14 rounded-xl bg_card px-4 border ${errors.vat_percent ? "border-red-500" : "border_color"
+                }`}
               placeholder="12"
             />
           </div>
@@ -519,9 +505,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
 
           {(!initialValues || values?.images?.length <= 0) && (
             <label
-              className={`w-full h-32 bg_card border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer ${
-                errors.images ? "border-red-500" : "border_color"
-              }`}
+              className={`w-full h-32 bg_card border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer ${errors.images ? "border-red-500" : "border_color"
+                }`}
             >
               <input
                 type="file"
@@ -609,14 +594,14 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
       {/* FOOTER */}
       <div className="p-4 border-t border-white/5 flex justify-end gap-3">
         <button
-        disabled={loading}
+          disabled={loading}
           onClick={onClose}
           className="h-12 px-6 rounded-xl border border-white/20 text-white"
         >
           Qaytish
         </button>
         <button
-        disabled={loading}
+          disabled={loading}
           onClick={handleSubmit}
           className="h-12 px-6 rounded-xl bg-primary text-[#10221d] font-bold"
         >

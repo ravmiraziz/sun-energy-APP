@@ -519,7 +519,7 @@ const Settings: React.FC = () => {
             </table>
           ) : (
             <div className="flex items-center py-6 justify-center h-full w-full">
-              Ma'lumotlar qo'shilmagan
+              Ma'lumotlar topilmadi
             </div>
           )}
         </div>

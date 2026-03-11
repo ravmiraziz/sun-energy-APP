@@ -193,7 +193,7 @@ const Users: React.FC = () => {
           </table>
         ) : (
           <div className="flex items-center py-6 justify-center h-full w-full">
-            Ma'lumotlar qo'shilmagan
+            Ma'lumotlar topilmadi
           </div>
         )}
         <div className="px-6 py-4 card_btn border-t border_color flex justify-end items-center">

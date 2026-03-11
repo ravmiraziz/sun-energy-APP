@@ -20,6 +20,8 @@ export interface ProductFormValues {
   price: number;
   category_id: string;
   watt: string;
+  // new select value for unit of measurement (kVt or VT)
+  units_of_measurement: string;
   brand: string;
   model: string;
   images: ProductImage[];
@@ -60,6 +62,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
     price: 0,
     category_id: "",
     watt: "",
+    units_of_measurement: "kVt",
     brand: "",
     model: "",
     images: [],
@@ -88,6 +91,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
         price: Number(initialValues.price),
         category_id: String(initialValues.category_id),
         watt: String(initialValues.watt),
+        units_of_measurement: initialValues.units_of_measurement || "kVt",
         brand: initialValues.brand,
         model: initialValues.model,
         is_active: initialValues.is_active,
@@ -111,6 +115,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
         price: 0,
         category_id: "",
         watt: "",
+        units_of_measurement: "kVt",
         brand: "",
         model: "",
         images: [],
@@ -200,6 +205,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
     if (!category) newErrors.category_id = true;
     if (!values.model) newErrors.model = true;
     if (!values.watt) newErrors.watt = true;
+    if (!values.units_of_measurement) newErrors.units_of_measurement = true;
     if (!values.price) newErrors.price = true;
     if (!values.ikpu_code) newErrors.ikpu_code = true;
     if (!values.package_code) newErrors.package_code = true;
@@ -223,6 +229,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
       formData.append("price", String(values.price));
       formData.append("category_id", String(category?.id));
       formData.append("watt", values.watt);
+      formData.append("units_of_measurement", values.units_of_measurement);
       formData.append("brand", values.brand);
       formData.append("model", values.model);
       formData.append("ikpu_code", values.ikpu_code);
@@ -376,7 +383,8 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
 
           <div className="flex flex-col gap-2">
             <label className="font-medium">
-              Brend <span className="text-red-500">*</span>
+              {values.units_of_measurement === "watts" ? "Brand" : "Panel turi"}
+              <span className="text-red-500">*</span>
             </label>
             <input
               name="brand"
@@ -393,7 +401,10 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="font-medium">
-              Madeli <span className="text-red-500">*</span>
+              {values.units_of_measurement === "watts"
+                ? "Model"
+                : "Inverter turi"}
+              <span className="text-red-500">*</span>
             </label>
             <input
               name="model"
@@ -403,23 +414,39 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
               className={`h-14 rounded-xl bg_card px-4 border ${
                 errors.model ? "border-red-500" : "border_color"
               }`}
-              placeholder="004030-3"
+              placeholder="____"
             />
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-medium">
-              VAT <span className="text-red-500">*</span>
+              kVt <span className="text-red-500">*</span>
             </label>
-            <input
-              name="watt"
-              type="text"
-              value={values.watt}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${
-                errors.watt ? "border-red-500" : "border_color"
-              }`}
-              placeholder="5000"
-            />
+            {/* input group with select appended */}
+            <div className="flex items-center">
+              <input
+                name="watt"
+                type="text"
+                value={values.watt}
+                onChange={handleChange}
+                className={`flex-1 h-14 bg_card px-4 border-t border-b border-l ${
+                  errors.watt ? "border-red-500" : "border_color"
+                } rounded-l-xl`}
+                placeholder="5000"
+              />
+              <select
+                name="units_of_measurement"
+                value={values.units_of_measurement}
+                onChange={handleChange}
+                className={`h-14 bg_card px-4 border-t border-b border-r ${
+                  errors.units_of_measurement
+                    ? "border-red-500"
+                    : "border_color"
+                } rounded-r-xl`}
+              >
+                <option value="kilowatts">kVt</option>
+                <option value="watts">VT</option>
+              </select>
+            </div>
           </div>
         </div>
 

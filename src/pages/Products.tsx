@@ -27,6 +27,7 @@ export interface Product {
   name_uz: string;
   price: string;
   watt: number;
+  units_of_measurement?: string;
   ikpu_code: string;
   package_code: string;
   units: number;
@@ -154,10 +155,10 @@ const Products: React.FC = () => {
                 <tr className="uppercase text-[11px] font-bold tracking-widest border-b border_color">
                   <th className="px-6 py-4 w-16">Rasm</th>
                   <th className="px-6 py-4">Nomi</th>
-                  <th className="px-6 py-4">Brend</th>
+                  <th className="px-6 py-4">Panel turi</th>
                   <th className="px-6 py-4">Narx</th>
                   <th className="px-6 py-4">Qo'shilgan vaqti</th>
-                  <th className="px-6 py-4">Holati</th>
+                  <th className="px-6 py-4">Holat</th>
                   <th className="px-6 py-4 text-right">Qo'shimcha </th>
                 </tr>
               </thead>
@@ -185,8 +186,8 @@ const Products: React.FC = () => {
                         <span className="text-sm font-semibold text-white transition-colors text-nowrap">
                           {product.name_uz}
                         </span>
-                        <span className="text-xs text-slate-500 font-mono uppercase tracking-tighter">
-                          WATT: {product.watt}
+                        <span className="text-xs text-white/50 font-mono uppercase tracking-tighter">
+                          kVt: {product.watt}
                         </span>
                       </div>
                     </td>
@@ -245,7 +246,7 @@ const Products: React.FC = () => {
             </table>
           ) : (
             <div className="flex items-center py-6 justify-center h-full w-full">
-              Ma'lumotlar qo'shilmagan
+              Ma'lumotlar topilmadi
             </div>
           )}
         </div>

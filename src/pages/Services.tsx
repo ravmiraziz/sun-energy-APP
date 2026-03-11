@@ -155,7 +155,7 @@ const Services: React.FC = () => {
                 <th className="px-8 py-5">Servis</th>
                 <th className="px-8 py-5">Tavsif</th>
                 <th className="px-8 py-5">Narxi</th>
-                <th className="px-8 py-5">Status</th>
+                <th className="px-8 py-5">Holat</th>
                 <th className="px-8 py-5 text-right">Qo'shimcha</th>
               </tr>
             </thead>
@@ -233,7 +233,7 @@ const Services: React.FC = () => {
           </table>
         ) : (
           <div className="flex items-center py-6 justify-center h-full w-full">
-            Ma'lumotlar qo'shilmagan
+            Ma'lumotlar topilmadi
           </div>
         )}
         <div className="py-4 px-6 border-t border_color flex justify-end items-center card_btn">

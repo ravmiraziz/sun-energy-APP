@@ -98,12 +98,17 @@ const Orders: React.FC = () => {
       limit,
       phone_number: "",
       order_id: "",
+      service_id: "",
     };
 
     if (search.slice(0, 1) === "+") {
       params.phone_number = search.slice(1);
+    } else if(type === "service") {
+      params.service_id = search;
+      delete params.order_id;
     } else {
       params.order_id = search;
+      delete params.service_id;
     }
 
     try {
@@ -253,7 +258,7 @@ const Orders: React.FC = () => {
                     Vaqt
                   </th>
                   <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                    Xolat
+                    Holat
                   </th>
                 </tr>
               </thead>
@@ -316,7 +321,7 @@ const Orders: React.FC = () => {
             </table>
           ) : (
             <div className="flex items-center py-6 justify-center h-full w-full">
-              Ma'lumotlar qo'shilmagan
+              Ma'lumotlar topilmadi
             </div>
           )}
           <div className="w-full py-4 px-6 border-t border_color flex justify-between items-center card_btn">

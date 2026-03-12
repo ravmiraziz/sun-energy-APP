@@ -187,7 +187,7 @@ const Products: React.FC = () => {
                           {product.name_uz}
                         </span>
                         <span className="text-xs text-white/50 font-mono uppercase tracking-tighter">
-                          {product.units_of_measurement === "watts" ? "Vt" : "kVt"}: {product.watt}
+                          {product.units_of_measurement === "watts" ? "Watt" : "kVt"}: {product.watt}
                         </span>
                       </div>
                     </td>

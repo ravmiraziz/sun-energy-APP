@@ -387,7 +387,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
                   } rounded-r-xl`}
               >
                 <option value="kilowatts">kVt</option>
-                <option value="watts">VT</option>
+                <option value="watts">Watt</option>
               </select> <span className="text-red-500">*</span>
             </label>
             <input

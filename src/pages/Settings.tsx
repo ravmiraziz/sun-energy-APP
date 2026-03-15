@@ -15,7 +15,6 @@ import { IoLogOut } from "react-icons/io5";
 import CategoryDrawer from "../components/ui/CategoryDrawer";
 import { get, patch, putData } from "../api/api";
 import UserDrawer from "../components/ui/UserDrawer";
-import DeleteModal from "../components/modals/DeleteModal";
 import Announcement from "../components/ui/Announcement";
 
 interface AdminData {
@@ -473,8 +472,10 @@ const Settings: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-border-teal">
-                {admins.map((item, i) => (
-                  <tr
+                {admins.map((item, i) => 
+                
+                {
+                    return <tr
                     key={i}
                     className={
                       user?.id === item.id
@@ -505,16 +506,11 @@ const Settings: React.FC = () => {
                           >
                             <MdEdit className="text-[18px]" />
                           </button>
-                          <DeleteModal
-                            itemId={user?.id || ""}
-                            path="admin"
-                            confirm={() => fetchUser()}
-                          />
                         </div>
                       )}
                     </td>
-                  </tr>
-                ))}
+                  </tr>}
+                )}
               </tbody>
             </table>
           ) : (

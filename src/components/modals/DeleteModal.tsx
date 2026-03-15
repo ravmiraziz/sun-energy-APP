@@ -13,10 +13,12 @@ const DeleteModal = ({ itemId, path, confirm }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleDelete = async () => {
+    if (!itemId) return console.error("Item ID is required for deletion.");
     setLoading(true);
+    
     try {
       await remove(path, itemId);
-      close();
+      setOpen(false);
       confirm();
     } finally {
       setLoading(false);

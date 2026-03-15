@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import BaseDrawer from "../../components/ui/BaseDrawer";
 import { MdClose } from "react-icons/md";
 import { post, putData } from "../../api/api";
+import DeleteModal from "../modals/DeleteModal";
 
 interface UserValues {
   id?: string;
@@ -216,7 +217,13 @@ const UserDrawer: React.FC<userDrawerProps> = ({
       </div>
 
       {/* FOOTER */}
-      <div className="p-4 border-t border-white/5 flex justify-end gap-3">
+      <div className="p-4 border-t border-white/5 flex items-center justify-between gap-3">
+        <DeleteModal
+            itemId={initialValues?.id || ""}
+            path="admin"
+            confirm={() => {onSuccess(); onClose();}}
+          />
+      <div>
         <button
           onClick={onClose}
           className="h-12 px-6 rounded-xl border border-white/20 text-white"
@@ -229,6 +236,7 @@ const UserDrawer: React.FC<userDrawerProps> = ({
         >
           {isEdit ? "Admin Ma'lumotini Yangilash" : "Admin Qo'shish"}
         </button>
+      </div>
       </div>
     </BaseDrawer>
   );

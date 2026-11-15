@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { MdSearch, MdPersonSearch } from "react-icons/md";
+import { MdSearch, MdLocationOn } from "react-icons/md";
 import { get } from "../api/api";
 import Pagination from "../components/ui/Pagination";
 import { TbReload } from "react-icons/tb";
 import { Link } from "react-router-dom";
 import { FaMapLocationDot } from "react-icons/fa6";
+import { Users as UsersIcon } from "lucide-react";
+import { toast } from "sonner";
 
 interface User {
   id?: string;
@@ -36,15 +38,18 @@ const Users: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  const fetchedOnce = useRef(false); // 🔥 MAGIC
+  const fetchedOnce = useRef(false);
 
   const fetchUsers = async (p = page) => {
     setLoading(true);
     try {
       const { data }: ResData = await get("/users", { page: p, limit, search });
       setUsers(data.users || []);
-      setTotalCount(data.count);
+      setTotalCount(data.count || 0);
       setPage(p);
+    } catch (err) {
+      console.error("Users fetch error:", err);
+      toast.error("Foydalanuvchilarni yuklashda xatolik");
     } finally {
       setLoading(false);
     }
@@ -52,151 +57,172 @@ const Users: React.FC = () => {
 
   useEffect(() => {
     if (fetchedOnce.current) return;
-
     fetchedOnce.current = true;
     fetchUsers();
   }, []);
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchUsers(1);
+  };
+
   return (
-    <div className="p-8 max-w-400 mx-auto w-full space-y-8">
-      <div className="flex flex-wrap justify-between items-center gap-4">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 select-none">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black leading-tight tracking-tight">
-            Foydalanuvchilar ma'lumotlari
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+            Foydalanuvchilar Ro'yxati
+            <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Jami: {totalCount} nafar
+            </span>
           </h1>
-          <p className="text_primary text-sm mt-1">
-            Barcha foydalanuvchilar bo'yicha ko'rsatkichlar
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Mijozlar hisoblari, kontaktlar va xaritadagi manzillar
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg_card rounded-2xl p-6 border border_color shadow-sm">
-          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">
-            Barcha foydalanuvchilar
-          </p>
-          <div className="flex items-baseline gap-2">
-            <p className="text-3xl font-bold">{totalCount}</p>
-            <p className={`text_primary text-xs font-semibold`}>
-              {/* {stat.trend} */}
-            </p>
-          </div>
-        </div>
-        <div className="bg_card p-4 rounded-2xl border border_color flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 w-full relative">
-            <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[24px]" />
-            <input
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full card_btn border-none rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder:text-slate-400"
-              placeholder="Ism bo'yicha..."
-            />
-            {search ? (
-              <button
-                onClick={() => fetchUsers(1)}
-                className="absolute bg-primary right-2 top-1/2 -translate-y-1/2 text-[24px] rounded-md p-1"
-              >
-                <MdPersonSearch />
-              </button>
-            ) : (
-              <button
-                onClick={() => fetchUsers(1)}
-                className="absolute bg-primary right-2 top-1/2 -translate-y-1/2 text-[24px] rounded-md p-1"
-              >
-                <TbReload className={`${loading && "animate-spin"} text-2xl`} />
-              </button>
-            )}
-          </div>
-        </div>
+      {/* Filter and Search Bar */}
+      <div className="p-4 rounded-2xl bg-[#12211c] border border-white/5 flex flex-col sm:flex-row items-center gap-3 shadow-lg">
+        <form
+          onSubmit={handleSearchSubmit}
+          className="flex-1 w-full relative"
+        >
+          <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-[#152721] border border-white/5 rounded-xl pl-11 pr-24 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/40"
+            placeholder="Ism, familiya yoki telefon bo'yicha qidiruv..."
+          />
+          <button
+            type="submit"
+            className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500 hover:text-[#0b1411] transition-all"
+          >
+            Qidirish
+          </button>
+        </form>
+
+        <button
+          onClick={() => {
+            setSearch("");
+            fetchUsers(1);
+          }}
+          title="Ro'yxatni yangilash"
+          className="p-2.5 rounded-xl bg-[#152721] border border-white/5 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/30 transition-all"
+        >
+          <TbReload className={`text-xl ${loading ? "animate-spin" : ""}`} />
+        </button>
       </div>
 
-      <div className="bg_card rounded-2xl border border_color overflow-x-auto shadow-sm">
-        {loading ? (
-          <div className="flex items-center justify-center h-full py-6 w-full animate-pulse">
-            Yuklanmoqda...
-          </div>
-        ) : users?.length > 0 ? (
-          <table className="w-full text-left">
-            <thead>
-              <tr className="card_btn border-b border_color">
-                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                  Foydalanuvchi
-                </th>
-                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                  Manzil
-                </th>
-                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                  Telefon raqam
-                </th>
-                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                  Qo'shilgan vaqt
-                </th>
-                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                  Xarita
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user, i) => (
-                <tr key={i} className="hover:bg-primary/5 transition-all group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-full border-2 border_color transition-all overflow-hidden">
-                        {user.image_url ? (
-                          <img
-                            src={user.image_url}
-                            alt={user.first_name}
-                            className="object-cover w-full h-full"
-                          />
-                        ) : (
-                          <span className="flex items-center justify-center uppercase h-full card_btn">
-                            {user.first_name.slice(0, 1)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold group-hover:text-yellow-500 transition-colors text-nowrap">
-                          {user.first_name} {user.last_name}
-                        </span>
-                        <span className="text-xs card_text">{user.email}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border border_color text-nowrap`}
-                    >
-                      {user.address}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">+{user.phone}</td>
-                  <td className="px-6 py-4">
-                    <p>
-                      {new Date(user.created_at).toLocaleDateString()} <span className="text-yellow-500">{new Date(user.created_at).toLocaleTimeString()}</span>
-                    </p>
-                  </td>
-                  <td className="px-6 py-4">
-                    {user.lat && user.long ? (
-                      <Link
-                        className="group-hover:text-yellow-500"
-                        target="_blank"
-                        to={`https://yandex.uz/maps/?ll=${user.long},${user.lat}&z=16&pt=${user.long},${user.lat},pm2rdm`}
-                      >
-                        <FaMapLocationDot className="text-2xl" />
-                      </Link>
-                    ) : (
-                      <span>---</span>
-                    )}
-                  </td>
+      {/* Users Table */}
+      <div className="rounded-3xl bg-[#12211c] border border-white/5 overflow-hidden shadow-xl">
+        <div className="overflow-x-auto">
+          {loading ? (
+            <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+              <div className="size-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+              <span className="text-xs font-medium">Foydalanuvchilar yuklanmoqda...</span>
+            </div>
+          ) : users.length > 0 ? (
+            <table className="w-full text-left text-sm">
+              <thead className="bg-white/[0.02] border-b border-white/5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <tr>
+                  <th className="px-5 py-4">Foydalanuvchi</th>
+                  <th className="px-5 py-4">Telefon</th>
+                  <th className="px-5 py-4">Manzil</th>
+                  <th className="px-5 py-4">Ro'yxatdan o'tgan</th>
+                  <th className="px-5 py-4 text-center">Xarita</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="flex items-center py-6 justify-center h-full w-full">
-            Ma'lumotlar topilmadi
-          </div>
-        )}
-        <div className="px-6 py-4 card_btn border-t border_color flex justify-end items-center">
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {users.map((user, i) => (
+                  <tr
+                    key={user.id || i}
+                    className="hover:bg-white/[0.02] transition-colors group"
+                  >
+                    {/* User profile */}
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="size-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 overflow-hidden flex items-center justify-center text-emerald-400 font-bold text-sm">
+                          {user.image_url ? (
+                            <img
+                              src={user.image_url}
+                              alt={user.first_name}
+                              className="size-full object-cover"
+                            />
+                          ) : (
+                            <span>{user.first_name ? user.first_name.slice(0, 1).toUpperCase() : "U"}</span>
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-white group-hover:text-emerald-400 transition-colors">
+                            {user.first_name} {user.last_name}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            {user.email || "E-pochta ko'rsatilmagan"}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Phone */}
+                    <td className="px-5 py-4 whitespace-nowrap font-mono text-xs text-slate-300">
+                      +{user.phone}
+                    </td>
+
+                    {/* Address */}
+                    <td className="px-5 py-4 max-w-xs">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-white/[0.04] text-slate-300 border border-white/5 line-clamp-1">
+                        <MdLocationOn className="text-emerald-400 shrink-0" />
+                        {user.address || "Manzil kiritilmagan"}
+                      </span>
+                    </td>
+
+                    {/* Date */}
+                    <td className="px-5 py-4 whitespace-nowrap text-xs text-slate-400">
+                      {new Date(user.created_at).toLocaleDateString()}{" "}
+                      <span className="text-slate-500 font-mono">
+                        {new Date(user.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </td>
+
+                    {/* Map Pin */}
+                    <td className="px-5 py-4 text-center">
+                      {user.lat && user.long ? (
+                        <Link
+                          target="_blank"
+                          to={`https://yandex.uz/maps/?ll=${user.long},${user.lat}&z=16&pt=${user.long},${user.lat},pm2rdm`}
+                          title="Xaritada ko'rish"
+                          className="inline-flex items-center justify-center p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500 hover:text-[#0b1411] transition-all"
+                        >
+                          <FaMapLocationDot className="text-base" />
+                        </Link>
+                      ) : (
+                        <span className="text-slate-600 text-xs">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="py-20 flex flex-col items-center justify-center text-slate-400 text-sm">
+              <UsersIcon className="size-12 text-slate-600 mb-2" />
+              Foydalanuvchilar topilmadi
+            </div>
+          )}
+        </div>
+
+        {/* Footer Pagination */}
+        <div className="p-4 border-t border-white/5 bg-white/[0.01] flex items-center justify-between">
+          <span className="text-xs text-slate-400">
+            Jami: {totalCount} ta foydalanuvchidan {(page - 1) * limit + 1}-
+            {Math.min(page * limit, totalCount)} ko'rsatilmoqda
+          </span>
           <Pagination
             page={page}
             limit={limit}

@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { MdAutoAwesome } from "react-icons/md";
-import clsx from "clsx";
+import { useEffect, useState } from "react";
+import { MdClose } from "react-icons/md";
 import { get, post } from "../../api/api";
 import { formatPrice } from "../../utils/formatter";
+import { toast } from "sonner";
+import { Megaphone } from "lucide-react";
 
 type Mode = "create" | "update";
 type AnnouncementType = "service" | "product";
@@ -22,9 +23,10 @@ export interface AnnouncementData {
 }
 
 interface AnnouncementProps {
-  mode: Mode;
-  type: AnnouncementType;
+  mode?: Mode;
+  type?: AnnouncementType;
   initialData?: AnnouncementData;
+  close?: () => void;
 }
 
 interface ResData {
@@ -32,10 +34,11 @@ interface ResData {
 }
 
 export default function Announcement({
-  mode,
-  type,
+  type: initialType = "product",
   initialData,
+  close,
 }: AnnouncementProps) {
+  const [type, setType] = useState<AnnouncementType>(initialType);
   const [postData, setPostData] = useState<AnnouncementData>(
     initialData || {
       name_uz: "",
@@ -43,16 +46,14 @@ export default function Announcement({
       description_uz: "",
       description_ru: "",
       price: 0,
-      ikpu_code: "",
-      package_code: "",
+      ikpu_code: "00702001001000001",
+      package_code: "123456",
       units: 0,
-      vat_percent: 0,
+      vat_percent: 12,
     },
   );
 
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const endpoint =
     type === "service" ? "service-announcement" : "product-announcement";
 
@@ -66,167 +67,191 @@ export default function Announcement({
     }));
   };
 
-  const fetchedOnce = useRef(false); // 🔥 MAGIC
-
   const getData = async () => {
     setLoading(true);
     try {
       const { data }: ResData = await get(endpoint);
-      setPostData(data);
+      if (data) {
+        setPostData(data);
+      }
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (fetchedOnce.current) return;
-
-    fetchedOnce.current = true;
     getData();
-  }, []);
+  }, [type]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       setLoading(true);
       await post(endpoint, postData);
-      setOpen(false);
-    } catch (err) {
-      console.error(err);
-      alert("Xatolik ❌");
+      toast.success("E'lon muvaffaqiyatli saqlandi! 🎉");
+      if (close) close();
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || "E'lonni saqlashda xatolik";
+      toast.error(`Xatolik: ${msg}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="relative bg-primary rounded-3xl p-6 shadow-xl shadow-primary/10 overflow-hidden ">
-        <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
-
-        <div className="flex justify-between items-start mb-4 relative z-10">
-          <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-black/10 backdrop-blur-md">
-            <MdAutoAwesome className="text-[16px] text-black mr-1" />
-            <span className="text-[10px] font-bold tracking-wider text-black uppercase">
-              {mode === "create" ? "Yangi" : "Premium"}
-            </span>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm select-none">
+      <div className="relative w-full max-w-2xl bg-[#12211c] border border-white/10 rounded-3xl p-6 sm:p-8 flex flex-col shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-white/5">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+              <Megaphone className="size-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white">E'lon Banner Sozlamasi</h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Mijozlar ilovasida aks etuvchi maxsus aksiya yoki taklif
+              </p>
+            </div>
           </div>
-
-          <span
-            onClick={() => setOpen(!open)}
-            className="bg-black text-primary px-4 py-1.5 rounded-full text-xs font-bold cursor-pointer"
-          >
-            {type === "service" ? "Servis" : "Mahsulot"}
-          </span>
+          {close && (
+            <button
+              onClick={close}
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5"
+            >
+              <MdClose className="text-2xl" />
+            </button>
+          )}
         </div>
 
-        <h3 className="text-2xl font-extrabold text-black mb-1 leading-tight">
-          {postData.name_uz || "Nomi"}
-        </h3>
-
-        <p className="text-black/80 text-sm mb-6 max-w-[80%] font-medium leading-relaxed">
-          {postData.description_uz || "Tavsif"}
-        </p>
-
-        <div className="flex items-baseline space-x-2">
-          <span className="text-2xl font-bold text-black">
-            {postData.price ? formatPrice(postData.price) + " so'm" : "0 so'm"}
-          </span>
-        </div>
-      </div>
-      {open && (
-        <div className="bg_card rounded-2xl p-6 space-y-4">
-          <h2 className="text-lg font-bold">
-            {mode === "create" ? "Yangi e'lon" : "E'lonni tahrirlash"}
-          </h2>
-
-          <input
-            placeholder="Nomi (UZ)"
-            value={postData.name_uz}
-            onChange={(e) => handleChange("name_uz", e.target.value)}
-            className="w-full h-11 px-4 rounded-xl card_btn"
-          />
-
-          <input
-            placeholder="Nomi (RU)"
-            value={postData.name_ru}
-            onChange={(e) => handleChange("name_ru", e.target.value)}
-            className="w-full h-11 px-4 rounded-xl card_btn"
-          />
-
-          <textarea
-            placeholder="Tavsif (UZ)"
-            value={postData.description_uz}
-            onChange={(e) => handleChange("description_uz", e.target.value)}
-            className="w-full min-h-20 px-4 py-2 rounded-xl card_btn"
-          />
-
-          <textarea
-            placeholder="Tavsif (RU)"
-            value={postData.description_ru}
-            onChange={(e) => handleChange("description_ru", e.target.value)}
-            className="w-full min-h-20 px-4 py-2 rounded-xl card_btn"
-          />
-
-          <input
-            type="number"
-            placeholder="Narx"
-            value={postData.price || ""}
-            onChange={(e) => handleChange("price", Number(e.target.value))}
-            className="w-full h-11 px-4 rounded-xl card_btn"
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              placeholder="МХИК коди: '00702001001000001'"
-              value={postData.ikpu_code}
-              onChange={(e) => handleChange("ikpu_code", e.target.value)}
-              className="w-full h-11 px-4 rounded-xl card_btn"
-            />
-            <input
-              placeholder="Ўлчов бирлиги: '1837252'"
-              value={postData.package_code}
-              onChange={(e) => handleChange("package_code", e.target.value)}
-              className="w-full h-11 px-4 rounded-xl card_btn"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="number"
-              placeholder="Қадоқлар"
-              value={postData.units || ""}
-              onChange={(e) => handleChange("units", Number(e.target.value))}
-              className="w-full h-11 px-4 rounded-xl card_btn"
-            />
-            <input
-              type="number"
-              placeholder="QQS (%)"
-              value={postData.vat_percent || ""}
-              onChange={(e) =>
-                handleChange("vat_percent", Number(e.target.value))
-              }
-              className="w-full h-11 px-4 rounded-xl card_btn"
-            />
-          </div>
-
+        {/* Type toggle */}
+        <div className="flex gap-2 p-1 rounded-xl bg-[#152721] border border-white/5 w-fit">
           <button
-            disabled={loading}
-            onClick={handleSubmit}
-            className={clsx(
-              "w-full h-11 rounded-xl font-bold transition",
-              loading
-                ? "bg-gray-400"
-                : "bg-primary text-black hover:opacity-90",
-            )}
+            type="button"
+            onClick={() => setType("product")}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              type === "product"
+                ? "bg-emerald-500 text-[#0b1411]"
+                : "text-slate-400 hover:text-white"
+            }`}
           >
-            {loading
-              ? "Yuklanmoqda..."
-              : mode === "create"
-                ? "Saqlash"
-                : "Yangilash"}
+            Mahsulot E'loni
+          </button>
+          <button
+            type="button"
+            onClick={() => setType("service")}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              type === "service"
+                ? "bg-emerald-500 text-[#0b1411]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            Servis E'loni
           </button>
         </div>
-      )}
+
+        {/* Live Preview Card */}
+        <div className="p-5 rounded-2xl bg-gradient-to-tr from-amber-500/20 via-emerald-500/10 to-transparent border border-amber-500/30 relative overflow-hidden">
+          <div className="flex items-center justify-between mb-2">
+            <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-400 text-black">
+              Maxsus Taklif
+            </span>
+            <span className="text-xs font-bold text-emerald-400 capitalize">
+              {type}
+            </span>
+          </div>
+          <h3 className="text-lg font-black text-white">
+            {postData.name_uz || "E'lon sarlavhasi (UZ)"}
+          </h3>
+          <p className="text-xs text-slate-300 mt-1 line-clamp-2">
+            {postData.description_uz || "E'lon tavsifi..."}
+          </p>
+          <div className="mt-3">
+            <span className="text-base font-extrabold text-amber-400">
+              {postData.price ? formatPrice(postData.price) + " so'm" : "0 so'm"}
+            </span>
+          </div>
+        </div>
+
+        {/* Form Inputs */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Nomi (UZ)</label>
+              <input
+                value={postData.name_uz}
+                onChange={(e) => handleChange("name_uz", e.target.value)}
+                placeholder="Nomi UZ"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Nomi (RU)</label>
+              <input
+                value={postData.name_ru}
+                onChange={(e) => handleChange("name_ru", e.target.value)}
+                placeholder="Nomi RU"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Tavsif (UZ)</label>
+              <textarea
+                rows={2}
+                value={postData.description_uz}
+                onChange={(e) => handleChange("description_uz", e.target.value)}
+                placeholder="Tavsif UZ"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Tavsif (RU)</label>
+              <textarea
+                rows={2}
+                value={postData.description_ru}
+                onChange={(e) => handleChange("description_ru", e.target.value)}
+                placeholder="Tavsif RU"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">Narxi (so'm)</label>
+            <input
+              type="number"
+              value={postData.price || ""}
+              onChange={(e) => handleChange("price", Number(e.target.value))}
+              placeholder="0"
+              className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
+            {close && (
+              <button
+                type="button"
+                onClick={close}
+                className="px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-xs font-semibold text-slate-300"
+              >
+                Bekor qilish
+              </button>
+            )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#0b1411] font-bold text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95 disabled:opacity-50"
+            >
+              {loading ? "Saqlanmoqda..." : "E'lonni Saqlash"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

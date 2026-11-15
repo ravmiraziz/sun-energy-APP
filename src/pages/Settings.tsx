@@ -1,21 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  MdPalette,
-  MdAccountCircle,
-  MdPhotoCamera,
-  MdSecurity,
-  MdBuild,
   MdShoppingCart,
   MdPersonAdd,
   MdEdit,
+  MdCampaign,
 } from "react-icons/md";
-
 import { useAuth, type User } from "../context/AuthContext";
 import { IoLogOut } from "react-icons/io5";
 import CategoryDrawer from "../components/ui/CategoryDrawer";
-import { get, patch, putData } from "../api/api";
+import { get, putData } from "../api/api";
 import UserDrawer from "../components/ui/UserDrawer";
 import Announcement from "../components/ui/Announcement";
+import { Wrench, Shield, User as UserIcon } from "lucide-react";
+import { toast } from "sonner";
 
 interface AdminData {
   created_at: string;
@@ -26,14 +23,6 @@ interface AdminData {
   language: string;
   last_name: string;
   phone: string;
-}
-
-export interface AnnouncementData {
-  name_uz: string;
-  name_ru: string;
-  description_uz: string;
-  description_ru: string;
-  price: number;
 }
 
 export interface CategoryData {
@@ -74,38 +63,36 @@ interface SerRes {
   };
 }
 
-type UserFormKey = keyof UserForm;
-
 const Settings: React.FC = () => {
   const { user, logout, getUser } = useAuth();
   const [open, setOpen] = useState(false);
+  const [openAnnouncement, setOpenAnnouncement] = useState(false);
   const [selected, setSelected] = useState("product");
   const [openUser, setOpenUser] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminData | null>(null);
-  const [page, setPage] = useState<number>(1);
+  const page = 1;
   const limit = 10;
   const [totalCount, setTotalCount] = useState<number>(0);
   const [totalCountService, setTotalCountService] = useState<number>(0);
-  const [totalCountUser, setTotalCountUser] = useState<number>(0);
   const [categories, setCategories] = useState<CategoryData[]>([]);
-  const [services, setServises] = useState<CategoryData[]>([]);
+  const [services, setServices] = useState<CategoryData[]>([]);
   const [admins, setAdmins] = useState<AdminData[]>([]);
   const [loading, setLoading] = useState(false);
-  const fetchedOnce = useRef(false); // 🔥 MAGIC
-  const fetchedOnceUser = useRef(false);
-  const initialFromUser = (user: any): UserForm => ({
-    first_name: user?.first_name ?? "",
-    last_name: user?.last_name ?? "",
-    email: user?.email ?? "",
-    phone: user?.phone ?? "",
+  const [savingUser, setSavingUser] = useState(false);
+
+  const fetchedOnce = useRef(false);
+
+  const initialFromUser = (u: any): UserForm => ({
+    first_name: u?.first_name ?? "",
+    last_name: u?.last_name ?? "",
+    email: u?.email ?? "",
+    phone: u?.phone ?? "",
+    password: "",
+    password_confirm: "",
   });
+
   const [form, setForm] = useState<UserForm>(() => initialFromUser(user));
-
-  const [initialForm, setInitialForm] = useState<UserForm>(() =>
-    initialFromUser(user),
-  );
-
-  const [error, setError] = useState<string | null>(null);
+  const [initialForm, setInitialForm] = useState<UserForm>(() => initialFromUser(user));
 
   useEffect(() => {
     if (user) {
@@ -117,11 +104,7 @@ const Settings: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const isChanged = useMemo(() => {
@@ -130,27 +113,24 @@ const Settings: React.FC = () => {
       form.last_name !== initialForm.last_name ||
       form.email !== initialForm.email ||
       form.phone !== initialForm.phone ||
-      form.password
+      Boolean(form.password)
     );
   }, [form, initialForm]);
 
   const updateUser = async () => {
-    setError(null);
-
     if (form.password && form.password !== form.password_confirm) {
-      setError("Parollar mos emas");
+      toast.error("Parollar bir-biriga mos kelmadi!");
       return;
     }
 
     try {
-      setLoading(true);
-
+      setSavingUser(true);
       const payload: any = {
         id: user?.id,
         first_name: form.first_name,
         last_name: form.last_name,
         email: form.email,
-        language: user?.language,
+        language: user?.language || "uz",
         phone: form.phone,
       };
 
@@ -159,385 +139,354 @@ const Settings: React.FC = () => {
       }
 
       await putData(`admin`, payload);
-
-      getUser(user?.id || "");
-    } catch (err) {
-      setError("Ma'lumotlarni yangilashda xatolik yuz berdi");
+      toast.success("Profil ma'lumotlari muvaffaqiyatli yangilandi! 🎉");
+      if (user?.id) getUser(user.id);
+      setForm((p) => ({ ...p, password: "", password_confirm: "" }));
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.response?.data?.message || "Xatolik yuz berdi";
+      toast.error(`Xatolik: ${msg}`);
     } finally {
-      setLoading(false);
+      setSavingUser(false);
     }
   };
 
-  const fields: {
-    label: string;
-    name: UserFormKey;
-    type: string;
-  }[] = [
-    { label: "Ism", name: "first_name", type: "text" },
-    { label: "Familiya", name: "last_name", type: "text" },
-    { label: "E-pochta manzil", name: "email", type: "email" },
-    { label: "Telefon raqam", name: "phone", type: "text" },
-    { label: "Yangi Parol", name: "password", type: "password" },
-    {
-      label: "Parolni tasdiqlash",
-      name: "password_confirm",
-      type: "password",
-    },
-  ];
-
-  const cancelChanges = () => {
-    setForm(initialForm);
-    setError(null);
-  };
-
-  const fetchCategories = async (p = page) => {
-    setLoading(true);
+  const fetchCategories = async (p = 1) => {
     try {
-      const { data }: CatRes = await get("product-categories", { page, limit });
-
-      const { data: services }: SerRes = await get("service-categories", {
-        page,
-        limit,
-      });
+      const { data }: CatRes = await get("product-categories", { page: p, limit });
       setCategories(data.product_categories || []);
       setTotalCount(data.count || 0);
-      setServises(services.service_categories || []);
-      setTotalCountService(services?.count || 0);
-      setPage(p);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  useEffect(() => {}, [selected]);
+  const fetchServiceCategories = async (p = 1) => {
+    try {
+      const { data }: SerRes = await get("service-categories", { page: p, limit });
+      setServices(data.service_categories || []);
+      setTotalCountService(data.count || 0);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  const fetchUser = async (p = page) => {
+  const fetchAdmins = async () => {
     setLoading(true);
     try {
-      const { data }: ResData = await get("admins", { page: p, limit });
+      const { data }: ResData = await get("/admins", { page: 1, limit: 50 });
       setAdmins(data.admins || []);
-      setTotalCountUser(data.count || 0);
-      setPage(p);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fileRef = useRef<HTMLInputElement | null>(null);
-
-  const handleButtonClick = () => {
-    fileRef.current?.click();
-  };
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append("image", file);
-    try {
-      await patch(`admin/${user?.id}`, formData);
-      getUser(user?.id || "");
-    } catch (err) {
-      return;
     }
   };
 
   useEffect(() => {
     if (fetchedOnce.current) return;
-
     fetchedOnce.current = true;
     fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    if (fetchedOnceUser.current) return;
-
-    fetchedOnceUser.current = true;
-    fetchUser();
+    fetchServiceCategories();
+    fetchAdmins();
   }, []);
 
   return (
-    <div className="p-8 max-w-400 mx-auto w-full space-y-12">
-      <div className="flex flex-wrap justify-between items-end gap-6">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 select-none">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-4xl font-black leading-tight tracking-tight">
-            Admin Sozlamalari
-          </h2>
-          <p className="card_text text_primary text-base">
-            Profilingiz, ruxsatnomalaringiz va tizim sozlamalaringizni
-            boshqaring.
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+            Tizim Sozlamalari
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Profil, toifalar, e'lonlar va administratorlar boshqaruvi
           </p>
         </div>
-        <div className="flex gap-3">
-          <button
-            onClick={logout}
-            className="px-6 py-2.5 bg-red-500 rounded-xl flex items-center justify-center gap-2 font-bold text-sm hover:opacity-90 transition-all"
-          >
-            Chiqish <IoLogOut className="text-[20px]" />
-          </button>
-          <button
-            onClick={() => setOpenUser(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-background-dark rounded-xl font-bold text-sm tracking-tight hover:brightness-110 shadow-lg shadow-primary/20 transition-all transform hover:scale-[1.02]"
-          >
-            <MdPersonAdd className="text-[24px]" />
-            Admin qo'shish
-          </button>
+
+        <button
+          onClick={logout}
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-white font-bold text-sm transition-all"
+        >
+          <IoLogOut className="text-xl" />
+          Tizimdan chiqish
+        </button>
+      </div>
+
+      {/* Profile Form Card */}
+      <div className="p-6 rounded-3xl bg-[#12211c] border border-white/5 shadow-xl space-y-6">
+        <div className="flex items-center gap-3 pb-4 border-b border-white/5">
+          <div className="size-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <UserIcon className="size-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-white">Administrator Profili</h2>
+            <p className="text-xs text-slate-400">
+              Shaxsiy ma'lumotlar va hisob xavfsizligi sozlamalari
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">Ism</label>
+            <input
+              name="first_name"
+              value={form.first_name}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">Familiya</label>
+            <input
+              name="last_name"
+              value={form.last_name}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">E-pochta</label>
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">Telefon raqam</label>
+            <input
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">
+              Yangi Parol (ixtiyoriy)
+            </label>
+            <input
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              value={form.password || ""}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">
+              Parolni tasdiqlash
+            </label>
+            <input
+              name="password_confirm"
+              type="password"
+              placeholder="••••••••"
+              value={form.password_confirm || ""}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+            />
+          </div>
+        </div>
+
+        {isChanged && (
+          <div className="flex justify-end pt-2">
+            <button
+              disabled={savingUser}
+              onClick={updateUser}
+              className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#0b1411] font-bold text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95 disabled:opacity-50"
+            >
+              {savingUser ? "Saqlanmoqda..." : "Profilni Saqlash"}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Quick Category & Announcement Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Product Categories */}
+        <div
+          onClick={() => {
+            setSelected("product");
+            setOpen(true);
+          }}
+          className="p-6 rounded-3xl bg-[#12211c] border border-white/5 hover:border-emerald-500/40 hover:-translate-y-1 transition-all cursor-pointer shadow-xl flex flex-col justify-between group"
+        >
+          <div className="space-y-3">
+            <div className="size-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+              <MdShoppingCart className="text-2xl" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">
+                Mahsulot Kategoriyalari
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Katalog mahsulotlari guruhlarini ko'rish va boshqarish
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 flex items-center justify-between text-xs font-semibold text-emerald-400">
+            <span>Jami: {totalCount} ta toifa</span>
+            <span>Boshqarish →</span>
+          </div>
+        </div>
+
+        {/* Service Categories */}
+        <div
+          onClick={() => {
+            setSelected("service");
+            setOpen(true);
+          }}
+          className="p-6 rounded-3xl bg-[#12211c] border border-white/5 hover:border-emerald-500/40 hover:-translate-y-1 transition-all cursor-pointer shadow-xl flex flex-col justify-between group"
+        >
+          <div className="space-y-3">
+            <div className="size-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+              <Wrench className="size-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white group-hover:text-cyan-400 transition-colors">
+                Servis Kategoriyalari
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Xizmat ko'rsatish yo'nalishlari va guruhlari
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 flex items-center justify-between text-xs font-semibold text-cyan-400">
+            <span>Jami: {totalCountService} ta toifa</span>
+            <span>Boshqarish →</span>
+          </div>
+        </div>
+
+        {/* Announcement */}
+        <div
+          onClick={() => setOpenAnnouncement(true)}
+          className="p-6 rounded-3xl bg-[#12211c] border border-white/5 hover:border-amber-500/40 hover:-translate-y-1 transition-all cursor-pointer shadow-xl flex flex-col justify-between group"
+        >
+          <div className="space-y-3">
+            <div className="size-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+              <MdCampaign className="text-2xl" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors">
+                E'lonlar (Banner)
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Mobil ilova va mini app bosh sahifasidagi aksiyalar
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 flex items-center justify-between text-xs font-semibold text-amber-400">
+            <span>Aktiv e'lon</span>
+            <span>Tahrirlash →</span>
+          </div>
         </div>
       </div>
 
-      <section className="space-y-6">
-        <div className="flex items-center gap-2">
-          <MdPalette className="text-primary text-[24px]" />
-          <h3 className="text-xl font-bold">Servis & Mahsulotlar</h3>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            {
-              key: "service",
-              label: "Servis turlari",
-              desc: "Servis kategoriya turlari bo'limi",
-              icon: MdBuild,
-            },
-            {
-              key: "product",
-              label: "Mahsulot turlari",
-              desc: "Mahsulotlar kategoriyasi sozlamalari",
-              icon: MdShoppingCart,
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              onClick={() => {
-                setOpen(true);
-                setSelected(item.key);
-              }}
-              className="flex items-center justify-between p-6 rounded-2xl border border_color bg_card shadow-sm cursor-pointer hover:opacity-70"
-            >
-              <div className="flex flex-col gap-1">
-                <p className="font-bold">{item.label}</p>
-                <p className="text-xs card_text">{item.desc}</p>
-              </div>
-              <item.icon
-                className={`text-3xl ${i === 1 ? "text-orange-400" : "text-blue-400"}`}
-              />
+      {/* Admins Table Section */}
+      <div className="rounded-3xl bg-[#12211c] border border-white/5 overflow-hidden shadow-xl space-y-4 p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <Shield className="size-5" />
             </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Announcement mode="create" type="service" />
-          <Announcement mode="create" type="product" />
-
-          {/* <div className="relative bg-primary rounded-3xl p-6 shadow-xl shadow-primary/10 overflow-hidden h-full">
-            <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
-            <div className="flex justify-between items-start mb-4 relative z-10">
-              <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-black/10 backdrop-blur-md">
-                <MdAutoAwesome className="text-[16px] text-black mr-1 leading-none" />
-                <span className="text-[10px] font-bold tracking-wider text-black uppercase">
-                  Yangi
-                </span>
-              </div>
-              <button className="bg-black text-primary px-4 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-gray-900 transition-colors">
-                Ko'rish
-              </button>
-            </div>
-            <h3 className="text-2xl font-extrabold text-black mb-1 relative z-10 leading-tight">
-              PowerWall Pro 3
-            </h3>
-            <p className="text-black/80 text-sm mb-6 max-w-[80%] font-medium leading-relaxed relative z-10">
-              Sizning aqlli uyingiz uchun keyingi avlod energiya saqlash tizimi.
-            </p>
-            <div className="flex items-baseline space-x-2 relative z-10">
-              <span className="text-2xl font-bold text-black">129$</span>
-              <span className="text-sm font-medium text-black/40 line-through">
-                180$
-              </span>
-            </div>
-          </div> */}
-        </div>
-      </section>
-
-      <section className="space-y-6">
-        <div className="flex items-center gap-2">
-          <MdAccountCircle className="text-primary text-[24px]" />
-          <h3 className="text-xl font-bold">Admin Profile</h3>
-        </div>
-        <div className="bg_card border border_color rounded-2xl p-8 shadow-sm">
-          <div className="flex flex-col md:flex-row gap-10 items-start">
-            <div className="relative group mx-auto md:mx-0">
-              {user?.image_url ? (
-                <img
-                  src={user?.image_url}
-                  loading="lazy"
-                  alt="profile_image"
-                  className="size-32 rounded-full bg-center bg-cover border-4 border_color shadow-xl"
-                />
-              ) : (
-                <div className="size-32 rounded-full flex items-center justify-center text-5xl bg-center bg-cover border-4 border_color shadow-xl">
-                  {user?.first_name?.slice(0, 1)}
-                </div>
-              )}
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handleFileChange}
-              />
-
-              {/* BUTTON */}
-              <button
-                type="button"
-                onClick={handleButtonClick}
-                className="absolute bottom-0 right-0 size-10 bg-primary text-background-dark rounded-full flex items-center justify-center border-4 border-white dark:border-card-dark hover:scale-110 transition-transform"
-              >
-                <MdPhotoCamera className="text-md" />
-              </button>
-            </div>
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              {fields.map((field) => (
-                <div key={field.name} className="space-y-2">
-                  <label className="text-[10px] font-bold card_text uppercase tracking-widest">
-                    {field.label}
-                  </label>
-                  <input
-                    name={field.name}
-                    type={field.type}
-                    value={form[field.name] ?? ""}
-                    onChange={handleChange}
-                    placeholder="********"
-                    className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm"
-                  />
-                </div>
-              ))}
-
-              {/* ERROR */}
-              {error && (
-                <div className="md:col-span-2 text-red-500 text-sm">
-                  {error}
-                </div>
-              )}
-
-              {/* BUTTONS */}
-              {isChanged && (
-                <>
-                  <button
-                    onClick={cancelChanges}
-                    className="bg_card border border_color p-2 rounded-lg w-full"
-                  >
-                    Bekor qilish
-                  </button>
-                  <button
-                    onClick={updateUser}
-                    disabled={loading}
-                    className="bg-primary p-2 rounded-lg w-full disabled:opacity-50"
-                  >
-                    {loading ? "Saqlanmoqda..." : "O'zgartirish"}
-                  </button>
-                </>
-              )}
+            <div>
+              <h2 className="text-lg font-bold text-white">Administratorlar Ro'yxati</h2>
+              <p className="text-xs text-slate-400">
+                Tizimga kirish huquqiga ega bo'lgan xodimlar
+              </p>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section className="space-y-6 pb-20">
-        <div className="flex items-center gap-2">
-          <MdSecurity className="text-primary text-[24px]" />
-          <h3 className="text-xl font-bold">Adminlar ro'yxati</h3>
+          <button
+            onClick={() => {
+              setSelectedUser(null);
+              setOpenUser(true);
+            }}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#0b1411] font-bold text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95"
+          >
+            <MdPersonAdd className="text-lg" />
+            Admin Qo'shish
+          </button>
         </div>
-        <div className="bg_card border border_color rounded-2xl overflow-x-auto shadow-sm">
+
+        <div className="overflow-x-auto">
           {loading ? (
-            <div className="flex items-center justify-center h-full py-6 w-full animate-pulse">
+            <div className="py-12 flex justify-center text-slate-400 text-xs">
               Yuklanmoqda...
             </div>
-          ) : admins?.length > 0 ? (
-            <table className="w-full text-left">
-              <thead className="card_btn">
-                <tr className="border-b border_color">
-                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase tracking-widest">
-                    Ism
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                    E-pochta
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                    Telefon
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                    Qo'shilgan vaqti
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-bold text_primary uppercase text-center">
-                    Qo'shimcha
-                  </th>
+          ) : admins.length > 0 ? (
+            <table className="w-full text-left text-sm">
+              <thead className="bg-white/[0.02] border-b border-white/5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <tr>
+                  <th className="px-5 py-3">Ism-Familiya</th>
+                  <th className="px-5 py-3">E-pochta</th>
+                  <th className="px-5 py-3">Telefon</th>
+                  <th className="px-5 py-3">Qo'shilgan</th>
+                  <th className="px-5 py-3 text-right">Amallar</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-border-teal">
-                {admins.map((item, i) => 
-                
-                {
-                    return <tr
-                    key={i}
-                    className={
-                      user?.id === item.id
-                        ? "opacity-40 touch-none"
-                        : "hover:bg-primary/5 transition-colors"
-                    }
-                  >
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-bold">{item.first_name}</p>
-                      <p className="text-[10px] card_text">{item.last_name}</p>
-                    </td>
-                    <td className="px-6 py-4 text-center">{item.email}</td>
-                    <td className="px-6 py-4 text-center">+{item.phone}</td>
-                    <td className="px-6 py-4 text-center">
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      {user?.id === item.id ? (
-                        <span>Bu siz</span>
-                      ) : (
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => {
-                              setSelectedUser(item);
-                              setOpenUser(true);
-                            }}
-                            className="p-1.5 hover:text-primary transition-colors text-slate-400"
-                          >
-                            <MdEdit className="text-[18px]" />
-                          </button>
-                        </div>
+              <tbody className="divide-y divide-white/5">
+                {admins.map((adm) => (
+                  <tr key={adm.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="px-5 py-3 font-semibold text-white">
+                      {adm.first_name} {adm.last_name}
+                      {adm.id === user?.id && (
+                        <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                          Siz
+                        </span>
                       )}
                     </td>
-                  </tr>}
-                )}
+                    <td className="px-5 py-3 text-xs text-slate-300">{adm.email}</td>
+                    <td className="px-5 py-3 text-xs text-slate-300 font-mono">
+                      +{adm.phone}
+                    </td>
+                    <td className="px-5 py-3 text-xs text-slate-400">
+                      {new Date(adm.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      {adm.id !== user?.id && (
+                        <button
+                          onClick={() => {
+                            setSelectedUser(adm);
+                            setOpenUser(true);
+                          }}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all"
+                        >
+                          <MdEdit className="text-lg" />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           ) : (
-            <div className="flex items-center py-6 justify-center h-full w-full">
-              Ma'lumotlar topilmadi
+            <div className="py-8 text-center text-slate-500 text-xs">
+              Adminlar topilmadi
             </div>
           )}
         </div>
-      </section>
+      </div>
+
+      {/* Drawers and Modals */}
       <CategoryDrawer
         type={selected}
         open={open}
         page={page}
         limit={limit}
-        totalCount={
-          selected === "product"
-            ? totalCount
-            : selected === "service"
-              ? totalCountService
-              : totalCountUser
-        }
+        totalCount={selected === "product" ? totalCount : totalCountService}
         initialValues={selected === "service" ? services : categories}
-        onClose={() => {
-          setOpen(false);
+        onClose={() => setOpen(false)}
+        onSuccess={() => {
+          fetchCategories();
+          fetchServiceCategories();
         }}
-        onSuccess={(p) => fetchCategories(p)}
       />
+
       <UserDrawer
         open={openUser}
         initialValues={selectedUser}
@@ -545,8 +494,12 @@ const Settings: React.FC = () => {
           setOpenUser(false);
           setSelectedUser(null);
         }}
-        onSuccess={() => fetchUser(page)}
+        onSuccess={() => fetchAdmins()}
       />
+
+      {openAnnouncement && (
+        <Announcement close={() => setOpenAnnouncement(false)} />
+      )}
     </div>
   );
 };

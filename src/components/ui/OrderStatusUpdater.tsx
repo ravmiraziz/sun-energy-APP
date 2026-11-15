@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { OrderStatus } from "../../pages/Orders";
+import { CheckCircle2, Clock, Truck, XCircle } from "lucide-react";
 
 interface Props {
   item: {
@@ -15,10 +16,10 @@ const OrderStatusUpdater = ({ item, onUpdateStatus }: Props) => {
   );
 
   const statuses = [
-    { value: "new", label: "Yangi" },
-    { value: "delivered", label: "Yakunlangan" },
-    { value: "success", label: "Jarayonda" },
-    { value: "canceled", label: "Bekor qilingan" },
+    { value: "new", label: "Yangi", icon: Clock, color: "text-sky-400" },
+    { value: "success", label: "Jarayonda", icon: CheckCircle2, color: "text-amber-400" },
+    { value: "delivered", label: "Yakunlangan", icon: Truck, color: "text-emerald-400" },
+    { value: "canceled", label: "Bekor qilingan", icon: XCircle, color: "text-rose-400" },
   ] as const;
 
   const handleUpdate = () => {
@@ -30,44 +31,36 @@ const OrderStatusUpdater = ({ item, onUpdateStatus }: Props) => {
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {statuses.map((item) => {
-          const isActive = item.value === selectedStatus;
+      <div className="grid grid-cols-2 gap-2">
+        {statuses.map((st) => {
+          const isActive = st.value === selectedStatus;
+          const Icon = st.icon;
 
           return (
-            <label
-              key={item.value}
-              className={`relative border p-3 rounded-lg cursor-pointer transition-all text-center
-                ${
-                  isActive
-                    ? "border-yellow-500 text-yellow-500"
-                    : "card_btn border_color"
-                }
-              `}
+            <button
+              key={st.value}
+              type="button"
+              onClick={() => setSelectedStatus(st.value)}
+              className={`p-2.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                isActive
+                  ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-sm"
+                  : "bg-[#152721] border-white/5 text-slate-400 hover:text-white hover:bg-white/5"
+              }`}
             >
-              {/* Hidden radio */}
-              <input
-                type="radio"
-                name="orderStatus"
-                value={item.value}
-                checked={isActive}
-                onChange={() => setSelectedStatus(item.value)}
-                className="hidden"
-              />
-              <span className="font-bold">{item.label}</span>
-            </label>
+              <Icon className={`size-3.5 ${st.color}`} />
+              <span>{st.label}</span>
+            </button>
           );
         })}
       </div>
 
       <button
+        type="button"
         onClick={handleUpdate}
         disabled={selectedStatus === item.status}
-        className="w-full bg-primary font-black py-4 rounded-2xl transition-all
-          hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#0b1411] font-bold text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        "{statuses.find((s) => s.value === selectedStatus)?.label}" ga
-        o‘zgartirish
+        "{statuses.find((s) => s.value === selectedStatus)?.label}" ga o'zgartirish
       </button>
     </div>
   );

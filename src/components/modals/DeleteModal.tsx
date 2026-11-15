@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { remove } from "../../api/api";
 import { MdDelete, MdWarning } from "react-icons/md";
+import { toast } from "sonner";
 
 type Props = {
   itemId: string;
@@ -13,60 +14,71 @@ const DeleteModal = ({ itemId, path, confirm }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleDelete = async () => {
-    if (!itemId) return console.error("Item ID is required for deletion.");
+    if (!itemId) return;
     setLoading(true);
-    
+
     try {
       await remove(path, itemId);
       setOpen(false);
       confirm();
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        "O'chirishda xatolik yuz berdi";
+      toast.error(`Xatolik: ${msg}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
+    <>
       <button
+        type="button"
         onClick={() => setOpen(true)}
-        className="p-1.5 hover:text-red-500 transition-colors text-slate-400"
+        title="O'chirish"
+        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
       >
-        <MdDelete className="text-[18px]" />
+        <MdDelete className="text-lg" />
       </button>
+
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-[2px]">
-          <div className="relative w-full max-w-md bg_card rounded-[20px] p-8 modal-glow flex flex-col items-center text-center">
-            <div className="mb-6 size-16 rounded-full bg-red-500/50 flex items-center justify-center">
-              <MdWarning className="text-red-500 text-4xl" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm select-none">
+          <div className="relative w-full max-w-md bg-[#12211c] border border-white/10 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="mb-4 size-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400">
+              <MdWarning className="text-3xl" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">
+
+            <h3 className="text-xl font-bold text-white mb-2">
               O'chirishni tasdiqlaysizmi?
             </h3>
-            <p className="text-slate-400 text-base leading-relaxed mb-8">
-              Rostan ham ushbu ma'lumotni o'chirmoqchimisiz? Elsatma ushbu
-              ma'lumot to'liq o'chirib yuboriladi
+            <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6">
+              Ushbu ma'lumot tizimdan butunlay o'chiriladi. Ushbu amalni ortga qaytarib bo'lmaydi.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 w-full">
+
+            <div className="flex gap-3 w-full">
               <button
+                type="button"
                 disabled={loading}
                 onClick={() => setOpen(false)}
-                className="flex-1 px-6 py-3.5 rounded-xl card_btn font-semibold hover:bg-white/5 transition-all text-sm"
+                className="flex-1 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-xs font-semibold text-slate-300 transition-colors"
               >
                 Bekor qilish
               </button>
               <button
+                type="button"
                 disabled={loading}
                 onClick={handleDelete}
-                className={`flex-1 px-6 py-3.5 rounded-xl bg-red-600 ${loading && "opacity-30"} text-white font-bold transition-all text-sm shadow-lg shadow-red-900/20`}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-all shadow-lg shadow-rose-600/20 active:scale-95 disabled:opacity-50"
               >
-                {loading ? "...." : "O'chirib tashlash"}
+                {loading ? "O'chirilmoqda..." : "Ha, o'chirilsin"}
               </button>
             </div>
-            <div className="absolute inset-0 rounded-[20px] pointer-events-none border border-white/10 opacity-50"></div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

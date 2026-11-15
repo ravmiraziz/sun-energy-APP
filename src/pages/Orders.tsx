@@ -1,16 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  MdExpandMore,
   MdClose,
-  MdAccountBalanceWallet,
   MdSearch,
+  MdReceipt,
+  MdPhone,
+  MdLocationOn,
 } from "react-icons/md";
 import { get, putData } from "../api/api";
 import Pagination from "../components/ui/Pagination";
-import { TbDatabaseSearch, TbReload } from "react-icons/tb";
+import { TbReload } from "react-icons/tb";
 import { formatPrice } from "../utils/formatter";
 import { PiFilePdfFill } from "react-icons/pi";
 import OrderStatusUpdater from "../components/ui/OrderStatusUpdater";
+import { ShoppingBag, Wrench } from "lucide-react";
+import { toast } from "sonner";
 
 interface ProductInfo {
   id: string;
@@ -21,7 +24,7 @@ interface ProductInfo {
   price: string;
 }
 
-interface Product {
+interface ProductItem {
   amount: number;
   created_at: string;
   id: string;
@@ -53,7 +56,7 @@ export interface Order {
   created_at: string;
   file_url?: string;
   id: string;
-  items?: Product[];
+  items?: ProductItem[];
   service?: Service;
   note?: string;
   address?: string;
@@ -88,7 +91,7 @@ const Orders: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  const fetchedOnce = useRef(false); // 🔥 MAGIC
+  const fetchedOnce = useRef(false);
 
   const fetchOrders = async (p = page, type = activeTab) => {
     setLoading(true);
@@ -101,9 +104,9 @@ const Orders: React.FC = () => {
       service_id: "",
     };
 
-    if (search.slice(0, 1) === "+") {
+    if (search.startsWith("+")) {
       params.phone_number = search.slice(1);
-    } else if(type === "service") {
+    } else if (type === "service") {
       params.service_id = search;
       delete params.order_id;
     } else {
@@ -114,7 +117,6 @@ const Orders: React.FC = () => {
     try {
       if (type === "product") {
         const { data }: ResData = await get("product-orders", params);
-
         setOrders(data.product_orders || []);
         setTotalCount(data.count || 0);
       } else {
@@ -122,8 +124,10 @@ const Orders: React.FC = () => {
         setOrders(data.service_orders || []);
         setTotalCount(data.count || 0);
       }
-
       setPage(p);
+    } catch (err) {
+      console.error("Orders fetch error:", err);
+      toast.error("Buyurtmalarni yuklashda xatolik");
     } finally {
       setLoading(false);
     }
@@ -136,11 +140,13 @@ const Orders: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "receipt.pdf";
+      link.download = `buyurtma_kvitansiya_${Date.now()}.pdf`;
       link.click();
       window.URL.revokeObjectURL(url);
+      toast.success("Kvitansiya yuklab olindi");
     } catch (error) {
-      console.error("Error downloading file:", error);
+      console.error("Download error:", error);
+      toast.error("Faylni yuklab olishda xatolik");
     }
   };
 
@@ -152,7 +158,6 @@ const Orders: React.FC = () => {
 
   useEffect(() => {
     if (fetchedOnce.current) return;
-
     fetchedOnce.current = true;
     fetchOrders();
   }, []);
@@ -160,174 +165,269 @@ const Orders: React.FC = () => {
   const updateOrderStatus = async (data: { id: string; status: string }) => {
     try {
       await putData(`${activeTab}-order`, data);
+      toast.success("Buyurtma holati muvaffaqiyatli o'zgartirildi");
       fetchOrders();
-      setShowDetails(null);
+      if (showDetails && showDetails.id === data.id) {
+        setShowDetails((prev) => (prev ? { ...prev, status: data.status } : null));
+      }
     } catch (error) {
-      return;
+      toast.error("Buyurtma holatini yangilashda xatolik");
     }
   };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "new":
+        return (
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+            <span className="size-1.5 rounded-full bg-sky-400 animate-pulse" />
+            Yangi
+          </span>
+        );
+      case "success":
+        return (
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <span className="size-1.5 rounded-full bg-amber-400" />
+            Jarayonda
+          </span>
+        );
+      case "delivered":
+        return (
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="size-1.5 rounded-full bg-emerald-400" />
+            Yakunlangan
+          </span>
+        );
+      case "canceled":
+        return (
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+            <span className="size-1.5 rounded-full bg-rose-400" />
+            Bekor qilingan
+          </span>
+        );
+      default:
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300">
+            {status}
+          </span>
+        );
+    }
+  };
+
   return (
-    <div className="relative flex h-full overflow-auto">
-      <div className="flex-1 flex flex-col overflow-y-auto px-8 py-8">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+    <div className="relative flex h-full overflow-hidden select-none">
+      {/* Main List Area */}
+      <div className="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black leading-tight tracking-tight">
-              Buyurtmalar boshqaruvi
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+              Buyurtmalar Boshqaruvi
+              <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                Jami: {totalCount}
+              </span>
             </h1>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+              Mijozlar buyurtmalari, kvitansiyalar va holat monitoringi
+            </p>
           </div>
-          {/* <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border_color bg_card text-sm font-bold transition-all">
-              <MdFilterList className="text-[22px]" />
-              Filter
+
+          {/* Tab Selector */}
+          <div className="flex p-1 rounded-2xl bg-[#12211c] border border-white/5">
+            <button
+              onClick={() => onTabChange("product")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeTab === "product"
+                  ? "bg-emerald-500 text-[#0b1411] shadow-md shadow-emerald-500/20"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <ShoppingBag className="size-4" />
+              Mahsulotlar
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-sm font-bold shadow-lg shadow-primary/20 hover:brightness-110 transition-all transform hover:scale-[1.02]">
-              <MdFileDownload className="text-[22px]" />
-              Export CSV
+            <button
+              onClick={() => onTabChange("service")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeTab === "service"
+                  ? "bg-emerald-500 text-[#0b1411] shadow-md shadow-emerald-500/20"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Wrench className="size-4" />
+              Xizmatlar
             </button>
-          </div> */}
+          </div>
         </div>
 
-        <div className="flex not-lg:flex-wrap gap-3 mb-6 pb-2 scrollbar-hide">
-          {[
-            { key: "product", value: "Mahsulotlar buyurtmasi" },
-            { key: "service", value: "Servislar buyurtmasi" },
-          ].map((filter) => (
-            <button
-              key={filter.key}
-              onClick={() => onTabChange(filter.key as OrderType)}
-              className={`
-                flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl px-5 text-xs font-bold uppercase tracking-wider transition-all
-                ${
-                  activeTab === filter.key
-                    ? "bg-primary text-black"
-                    : "bg_card text-slate-400"
-                }
-              `}
-            >
-              {filter.value}
-              <MdExpandMore className="text-base" />
-            </button>
-          ))}
-          <div className="flex-1 w-full relative">
-            <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[24px]" />
+        {/* Filter and Search Bar */}
+        <div className="p-4 rounded-2xl bg-[#12211c] border border-white/5 flex flex-col sm:flex-row items-center gap-3 shadow-lg">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              fetchOrders(1);
+            }}
+            className="flex-1 w-full relative"
+          >
+            <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
             <input
+              value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full card_btn border-none rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder:text-slate-400 min-w-50"
-              placeholder="Buyurtma raqami 01... yoki telefon raqam +998... bo'yicha qidiruv"
+              className="w-full bg-[#152721] border border-white/5 rounded-xl pl-11 pr-24 py-2.5 text-sm text-white placeholder:text-slate-400 focus:border-emerald-500/40 focus:ring-1 focus:ring-emerald-500/40"
+              placeholder="Telefon (+998...) yoki buyurtma ID bo'yicha qidiruv..."
             />
-            {search ? (
-              <button
-                onClick={() => fetchOrders(1)}
-                className="absolute bg-primary right-2 top-1/2 -translate-y-1/2 text-[24px] rounded-md p-1"
-              >
-                <TbDatabaseSearch />
-              </button>
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500 hover:text-[#0b1411] transition-all"
+            >
+              Qidirish
+            </button>
+          </form>
+
+          <button
+            onClick={() => {
+              setSearch("");
+              fetchOrders(1);
+            }}
+            title="Ro'yxatni yangilash"
+            className="p-2.5 rounded-xl bg-[#152721] border border-white/5 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/30 transition-all"
+          >
+            <TbReload className={`text-xl ${loading ? "animate-spin" : ""}`} />
+          </button>
+        </div>
+
+        {/* Orders Table Container */}
+        <div className="rounded-3xl bg-[#12211c] border border-white/5 overflow-hidden shadow-xl">
+          <div className="overflow-x-auto">
+            {loading ? (
+              <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+                <div className="size-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+                <span className="text-xs font-medium">Buyurtmalar yuklanmoqda...</span>
+              </div>
+            ) : orders.length > 0 ? (
+              <table className="w-full text-left text-sm">
+                <thead className="bg-white/[0.02] border-b border-white/5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <tr>
+                    <th className="px-5 py-4">Mijoz</th>
+                    <th className="px-5 py-4">Tafsilot</th>
+                    <th className="px-5 py-4">To'lov Turi</th>
+                    <th className="px-5 py-4">Umumiy Narx</th>
+                    <th className="px-5 py-4">Sana</th>
+                    <th className="px-5 py-4 text-center">Holat</th>
+                    <th className="px-5 py-4 text-right">Amallar</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {orders.map((order) => (
+                    <tr
+                      key={order.id}
+                      onClick={() => setShowDetails(order)}
+                      className={`hover:bg-white/[0.03] transition-colors cursor-pointer group ${
+                        showDetails?.id === order.id ? "bg-white/[0.04]" : ""
+                      }`}
+                    >
+                      {/* Customer */}
+                      <td className="px-5 py-4">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-white group-hover:text-emerald-400 transition-colors">
+                            {order.user?.first_name || "Mijoz"}{" "}
+                            {order.user?.last_name || ""}
+                          </span>
+                          <span className="text-xs text-slate-400 font-mono">
+                            +{order.user?.phone || order.phone_number || "—"}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Items / Service Info */}
+                      <td className="px-5 py-4 max-w-xs">
+                        {order.items && order.items.length > 0 ? (
+                          <div className="flex flex-col">
+                            <span className="text-xs font-semibold text-slate-200 line-clamp-1">
+                              {order.items[0]?.product_info?.name_uz}
+                            </span>
+                            {order.items.length > 1 && (
+                              <span className="text-[10px] text-emerald-400 font-bold">
+                                +{order.items.length - 1} ta boshqa mahsulot
+                              </span>
+                            )}
+                          </div>
+                        ) : order.service ? (
+                          <span className="text-xs font-semibold text-slate-200">
+                            {order.service.name_uz}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </td>
+
+                      {/* Payment */}
+                      <td className="px-5 py-4">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-white/[0.04] text-slate-300 border border-white/5 capitalize">
+                          {order.payment_method === "cash"
+                            ? "Naqd"
+                            : order.payment_method === "uzum_nasiya"
+                            ? "Uzum Nasiya"
+                            : order.payment_method}
+                        </span>
+                      </td>
+
+                      {/* Total */}
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <span className="font-extrabold text-amber-400 text-sm">
+                          {formatPrice(order.total_price)} so'm
+                        </span>
+                      </td>
+
+                      {/* Date */}
+                      <td className="px-5 py-4 whitespace-nowrap text-xs text-slate-400">
+                        {new Date(order.created_at).toLocaleDateString()}{" "}
+                        <span className="text-slate-500 font-mono">
+                          {new Date(order.created_at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-5 py-4 text-center">
+                        {getStatusBadge(order.status)}
+                      </td>
+
+                      {/* PDF download */}
+                      <td className="px-5 py-4 text-right">
+                        {order.file_url && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              getDownload(order.file_url!);
+                            }}
+                            title="Kvitansiyani yuklab olish"
+                            className="p-2 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-all inline-flex items-center gap-1"
+                          >
+                            <PiFilePdfFill className="text-xl" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             ) : (
-              <button
-                onClick={() => fetchOrders(1)}
-                className="absolute bg-primary right-2 top-1/2 -translate-y-1/2 text-[24px] rounded-md p-1"
-              >
-                <TbReload className={`${loading && "animate-spin"} text-2xl`} />
-              </button>
+              <div className="py-20 flex flex-col items-center justify-center text-slate-400 text-sm">
+                <MdReceipt className="size-12 text-slate-600 mb-2" />
+                Buyurtmalar topilmadi
+              </div>
             )}
           </div>
-        </div>
 
-        <div className="bg_card border border_color rounded-2xl overflow-x-auto shadow-sm">
-          {loading ? (
-            <div className="flex items-center justify-center h-full py-6 w-full animate-pulse">
-              Yuklanmoqda...
-            </div>
-          ) : orders?.length > 0 ? (
-            <table className="w-full text-left">
-              <thead>
-                <tr className="card_btn border-b border_color">
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                    Buyurtma ID
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                    Buyurtmachi
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                    Telefon
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                    Narx
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                    Vaqt
-                  </th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text_primary">
-                    Holat
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="w-full">
-                {orders.map((order, i) => (
-                  <tr
-                    key={i}
-                    className={`cursor-pointer transition-all hover:bg-slate-800/30 ${showDetails?.id === order.id ? "bg_mode border-l-4 border-l-orange-400" : ""}`}
-                  >
-                    <td className="px-6 py-5 font-bold text-sm">
-                      <span className="select-none">#</span>
-                      {order.order_id ? order.order_id : order?.service_id}
-                    </td>
-                    <td
-                      onClick={() => setShowDetails(order)}
-                      className="px-6 py-5 text-sm text-slate-300 text-nowrap"
-                    >
-                      {order.user.first_name} {order.user.last_name}
-                    </td>
-                    <td
-                      onClick={() => setShowDetails(order)}
-                      className="px-6 py-5 text-sm card_text"
-                    >
-                      +{order.user.phone}
-                    </td>
-                    <td
-                      onClick={() => setShowDetails(order)}
-                      className="px-6 py-5 font-bold text-sm text-yellow-500 text-nowrap"
-                    >
-                      {formatPrice(order.total_price)} so'm
-                    </td>
-                    <td className="px-6 py-5 text_primary text-xs text-nowrap">
-                      {new Date(order.created_at).toLocaleDateString()}
-                      {" - "}
-                      {new Date(order.created_at).toLocaleTimeString()}
-                    </td>
-                    <td className="px-6 py-5">
-                      <span
-                        onClick={() => setShowDetails(order)}
-                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
-                          order.status === "new"
-                            ? "bg-orange-500/20 text-orange-500"
-                            : order.status === "delivered"
-                              ? "bg-blue-500/20 text-blue-500"
-                              : order.status === "success"
-                                ? "bg-green-500/30 text-green-500"
-                                : "bg-red-500/40 text-red-500"
-                        }`}
-                      >
-                        {order.status === "new" && "Yangi Buyurtma"}
-                        {order.status === "delivered" && "To'liq yakunlangan"}
-                        {order.status === "success" &&
-                          "To'lov qilingan. Xizmat ko'rsatilmagan!"}
-                        {order.status === "canceled" && "Bekor qilingan"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="flex items-center py-6 justify-center h-full w-full">
-              Ma'lumotlar topilmadi
-            </div>
-          )}
-          <div className="w-full py-4 px-6 border-t border_color flex justify-between items-center card_btn">
-            <p className="text-[10px] font-bold text_primary uppercase tracking-widest">
-              Jami: {totalCount} ta buyurtma
-            </p>
+          {/* Footer Pagination */}
+          <div className="p-4 border-t border-white/5 bg-white/[0.01] flex items-center justify-between">
+            <span className="text-xs text-slate-400">
+              Jami: {totalCount} ta buyurtmadan {(page - 1) * limit + 1}-
+              {Math.min(page * limit, totalCount)} ko'rsatilmoqda
+            </span>
             <Pagination
               page={page}
               limit={limit}
@@ -338,175 +438,113 @@ const Orders: React.FC = () => {
         </div>
       </div>
 
+      {/* Slide-over Order Details Sidebar */}
       {showDetails && (
-        <aside className="absolute right-0 top-0 md:w-100 w-full border-l border_color bg_card h-full flex flex-col z-10 overflow-y-auto">
-          <div className="p-4 border-b border_color flex items-center justify-between">
-            <h3 className="text-xl font-black">
-              {activeTab === "product" ? "Buyurtma" : "Servis"} ma'lumotlari
-            </h3>
+        <aside className="w-96 border-l border-white/5 bg-[#0e1a15] p-6 flex flex-col overflow-y-auto space-y-6 z-30 shadow-2xl">
+          <div className="flex items-center justify-between border-b border-white/5 pb-4">
+            <div>
+              <h3 className="font-extrabold text-base text-white">
+                Buyurtma Tafsilotlari
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5 font-mono">
+                ID: {showDetails.id.slice(0, 8)}...
+              </p>
+            </div>
             <button
               onClick={() => setShowDetails(null)}
-              className="text-slate-400 hover:text-primary transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5"
             >
-              <MdClose className="text-[24px]" />
+              <MdClose className="text-xl" />
             </button>
           </div>
 
-          <div className="p-8 space-y-10">
-            <div className="card_btn rounded-2xl p-6 shadow-inner">
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <p className="text-[10px] font-black card_text uppercase tracking-[0.2em] mb-1">
-                    Buyurtma <span className="select-none">#</span>
-                    {showDetails.order_id
-                      ? showDetails.order_id
-                      : showDetails.service_id}
-                  </p>
-                  <p className="text-xl font-black leading-tight">
-                    {showDetails.user.first_name} {showDetails.user.last_name}
-                  </p>
-                </div>
-                <span
-                  className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
-                    showDetails.status === "new"
-                      ? "bg-orange-500/20 text-orange-500"
-                      : showDetails.status === "delivered"
-                        ? "bg-blue-500/20 text-blue-500"
-                        : showDetails.status === "success"
-                          ? "bg-green-500/30 text-green-500"
-                          : "bg-red-500/40 text-red-500"
-                  }`}
-                >
-                  {showDetails.status}
-                </span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div
-                  onClick={() => {
-                    if (activeTab === "product")
-                      getDownload(String(showDetails.file_url));
-                  }}
-                  className={`size-10 p-2 rounded-full bg-primary flex items-center justify-center shadow-sm ${activeTab === "product" ? "cursor-pointer" : "cursor-no-drop"}`}
-                >
-                  <PiFilePdfFill className="text-2xl" />
-                </div>
-                <div>
-                  <p className="text-[10px] card_text font-bold uppercase tracking-widest">
-                    +{showDetails.user.phone}
-                  </p>
-                  <p className="text-sm font-black">
-                    {showDetails.user.address}
-                  </p>
-                </div>
-              </div>
+          {/* Customer info */}
+          <div className="p-4 rounded-2xl bg-[#152721] border border-white/5 space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Mijoz Ma'lumotlari
+            </span>
+            <p className="font-bold text-white text-sm">
+              {showDetails.user?.first_name || "Mijoz"}{" "}
+              {showDetails.user?.last_name || ""}
+            </p>
+            <div className="flex items-center gap-2 text-xs text-slate-300">
+              <MdPhone className="text-emerald-400" />
+              <span>+{showDetails.user?.phone || showDetails.phone_number || "—"}</span>
             </div>
-
-            <div>
-              <h4 className="text-[10px] font-black uppercase text-slate-400 mb-6 tracking-[0.2em]">
-                To'lovlarning taqsimlanishi
-              </h4>
-              <div className="space-y-4">
-                {showDetails.items ? (
-                  <table className="w-full">
-                    <thead>
-                      <tr>
-                        <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">
-                          Mahsulot
-                        </th>
-                        <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">
-                          Soni
-                        </th>
-                        <th className="border-2 border_color p-1 text-sm font-bold text_primary text-center">
-                          Narx
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {showDetails.items.map((item, i) => (
-                        <tr key={i}>
-                          <td className="border border_color p-1 text-md text-center">
-                            {item.product_info.name_uz}
-                          </td>
-                          <td className="border border_color p-1 text-md text-center">
-                            {item.amount}
-                          </td>
-                          <td className="border border_color p-1 text-md text-center">
-                            {formatPrice(item.total_price)} so'm
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div>
-                    <div className="flex justify-between text-sm font-medium">
-                      <div>
-                        <span className="card_text">
-                          {showDetails?.service?.name_uz}
-                        </span>
-                      </div>
-                      <span className="text-white">
-                        {formatPrice(showDetails?.service?.price || 0)} so'm
-                      </span>
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-black uppercase text-slate-400 mt-6 tracking-[0.2em]">
-                        Xabar
-                      </h4>
-                      <span className="text-sm">{showDetails.note}</span>
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-black uppercase text-slate-400 mt-6 tracking-[0.2em]">
-                        Manzil
-                      </h4>
-                      <span className="text-sm">{showDetails.address}</span>
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] font-black uppercase text-slate-400 mt-6 tracking-[0.2em]">
-                        Telefon Raqam
-                      </h4>
-                      <span className="text-sm">
-                        {showDetails.phone_number}
-                      </span>
-                    </div>
-                  </div>
-                )}
+            {(showDetails.user?.address || showDetails.address) && (
+              <div className="flex items-start gap-2 text-xs text-slate-300 pt-1">
+                <MdLocationOn className="text-emerald-400 shrink-0 mt-0.5" />
+                <span>{showDetails.user?.address || showDetails.address}</span>
               </div>
-              <div className="mt-6 p-4 card_btn rounded-xl flex items-center gap-4 border border_color/50 dark:border-border-teal/50">
-                <MdAccountBalanceWallet className="text-primary text-[24px]" />
-                <div>
-                  <p className="text-[10px] card_text font-bold uppercase">
-                    To'lov turi
-                  </p>
-                  <p className="text-xs font-black uppercase">
-                    {showDetails.payment_method === "cash"
-                      ? "Naqd to'lov"
-                      : showDetails.payment_method === "uzum_nasiya"
-                        ? "uzum nasiya"
-                        : showDetails.payment_method}
-                  </p>
-                </div>
-              </div>
-              <div className="pt-4 border-t border_color flex justify-between items-baseline">
-                <span className="font-bold text-sm">Jami to'lov:</span>
-                <b className="font-black text_primary text-2xl">
-                  <span className="text-yellow-500 font-bold">
-                    {formatPrice(showDetails.total_price)}
-                  </span>{" "}
-                  so'm
-                </b>
-              </div>
-            </div>
-
-            {showDetails && (
-              <OrderStatusUpdater
-                item={{
-                  id: showDetails.id,
-                  status: showDetails.status as OrderStatus,
-                }}
-                onUpdateStatus={updateOrderStatus}
-              />
             )}
+          </div>
+
+          {/* Items breakdown */}
+          <div className="space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Tarkibi
+            </span>
+            {showDetails.items ? (
+              <div className="space-y-2">
+                {showDetails.items.map((it, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-xl bg-[#152721] border border-white/5 flex items-center justify-between"
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold text-white">
+                        {it.product_info?.name_uz}
+                      </span>
+                      <span className="text-[11px] text-slate-400">
+                        {it.amount} dona × {formatPrice(it.total_price)} so'm
+                      </span>
+                    </div>
+                    <span className="font-bold text-xs text-amber-400">
+                      {formatPrice(it.total_price)} so'm
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : showDetails.service ? (
+              <div className="p-3 rounded-xl bg-[#152721] border border-white/5 space-y-1">
+                <span className="text-xs font-semibold text-white">
+                  {showDetails.service.name_uz}
+                </span>
+                <p className="text-xs text-amber-400 font-bold">
+                  {formatPrice(showDetails.service.price)} so'm
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Total & Payment Method */}
+          <div className="p-4 rounded-2xl bg-[#152721] border border-white/5 space-y-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">To'lov usuli:</span>
+              <span className="font-bold text-white uppercase">
+                {showDetails.payment_method}
+              </span>
+            </div>
+            <div className="flex items-center justify-between border-t border-white/5 pt-2">
+              <span className="text-xs font-bold text-slate-300">Jami to'lov:</span>
+              <span className="text-base font-black text-amber-400">
+                {formatPrice(showDetails.total_price)} so'm
+              </span>
+            </div>
+          </div>
+
+          {/* Status updater */}
+          <div className="space-y-2 pt-2 border-t border-white/5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Buyurtma Holatini O'zgartirish
+            </span>
+            <OrderStatusUpdater
+              item={{
+                id: showDetails.id,
+                status: showDetails.status as OrderStatus,
+              }}
+              onUpdateStatus={updateOrderStatus}
+            />
           </div>
         </aside>
       )}

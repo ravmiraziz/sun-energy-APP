@@ -6,72 +6,88 @@ import {
   MdReceipt,
   MdGroup,
   MdSettings,
+  MdMiscellaneousServices,
 } from "react-icons/md";
 
 const Sidebar: React.FC = () => {
   const navbars = [
     { link: "/admin", icon: MdDashboard, label: "Boshqaruv" },
-    { link: "/admin/users", icon: MdGroup, label: "Foydalanuvchilar" },
     { link: "/admin/orders", icon: MdReceipt, label: "Buyurtmalar" },
     { link: "/admin/products", icon: MdInventory, label: "Mahsulotlar" },
-    { link: "/admin/services", icon: MdDashboard, label: "Servislar" },
+    { link: "/admin/services", icon: MdMiscellaneousServices, label: "Xizmatlar" },
+    { link: "/admin/users", icon: MdGroup, label: "Foydalanuvchilar" },
     { link: "/admin/settings", icon: MdSettings, label: "Sozlamalar" },
   ];
+
   return (
     <>
-      <aside className="w-64 bg_card border-r border_color not-md:hidden flex flex-col z-50 transition-all duration-300">
-        <div className="px-10 flex items-center gap-3">
-          <Link to="/admin">
-            <img src="/logo.svg" alt="logo" className="object-contain" />
+      {/* Desktop Sidebar */}
+      <aside className="w-64 bg-[#0e1a15] border-r border-white/5 not-md:hidden flex flex-col z-50 h-screen sticky top-0 select-none">
+        {/* Logo */}
+        <div className="h-20 px-6 flex items-center border-b border-white/5">
+          <Link to="/admin" className="flex items-center">
+            <img src="/logo.svg" alt="Sun Energy" className="h-10 object-contain" />
           </Link>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2 mt-4">
-          {navbars.map((navbar) => {
-            return (
-              <NavLink
-                key={navbar.link}
-                to={navbar.link}
-                end
-                className={({ isActive }) =>
-                  `nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                    isActive ? "text-[#fbbf24]" : "card_text"
-                  }`
-                }
-              >
-                <navbar.icon className="text-[24px]" />
-                <span className="text-sm font-semibold">{navbar.label}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        <div className="px-4">
-          <div className="bg-card p-4 rounded-xl mt-4">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 text-center">
-              Powered by SYSTEMLABUZ
-            </p>
-          </div>
-        </div>
-      </aside>
-      <nav className="fixed overflow-x-auto px-3 bottom-0 w-full bg-[#064e3b]/90 backdrop-blur-xl border-t border-emerald-900/50 pt-4 pb-2 flex justify-between items-center gap-4 z-50 rounded-t-3xl shadow-2xl md:hidden">
-        {navbars.map((navbar) => {
-          return (
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          {navbars.map((navbar) => (
             <NavLink
               key={navbar.link}
               to={navbar.link}
               end
               className={({ isActive }) =>
-                `flex flex-col items-center gap-1 transition-all nav-link w-full rounded-xl duration-200 group ${
-                  isActive ? "text-[#fbbf24]" : "card_text"
+                `w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-colors text-sm ${
+                  isActive
+                    ? "bg-white/[0.06] text-emerald-400 font-semibold"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.02]"
                 }`
               }
             >
-              <navbar.icon />
-              <span className="text-sm font-semibold">{navbar.label}</span>
+              {({ isActive }) => (
+                <>
+                  <navbar.icon
+                    className={`text-xl ${
+                      isActive ? "text-emerald-400" : "text-slate-400"
+                    }`}
+                  />
+                  <span>{navbar.label}</span>
+                </>
+              )}
             </NavLink>
-          );
-        })}
+          ))}
+        </nav>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-white/5">
+          <p className="text-[11px] font-medium text-slate-500 text-center">
+            Powered by SYSTEMLABUZ
+          </p>
+        </div>
+      </aside>
+
+      {/* Mobile Bottom Dock Bar */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0b1411]/95 backdrop-blur-xl border-t border-white/10 px-2 py-2 flex justify-around items-center md:hidden shadow-2xl">
+        {navbars.map((navbar) => (
+          <NavLink
+            key={navbar.link}
+            to={navbar.link}
+            end
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-colors ${
+                isActive
+                  ? "text-emerald-400 font-semibold"
+                  : "text-slate-400 hover:text-slate-200"
+              }`
+            }
+          >
+            <navbar.icon className="text-xl" />
+            <span className="text-[10px] mt-0.5">
+              {navbar.label}
+            </span>
+          </NavLink>
+        ))}
       </nav>
     </>
   );

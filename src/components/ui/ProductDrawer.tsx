@@ -1,14 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import BaseDrawer from "../../components/ui/BaseDrawer";
-import { MdClose } from "react-icons/md";
+import { MdClose, MdCloudUpload, MdDelete } from "react-icons/md";
 import { PaginatedSelect } from "./PaginationSelect";
 import { post, putData, remove } from "../../api/api";
 import type { Product } from "../../pages/Products";
+import { toast } from "sonner";
+import { Layers } from "lucide-react";
 
 interface ProductImage {
-  file?: File; // yangi yuklangan rasm
-  id?: string; // backenddagi eski rasm
-  preview: string; // ko‘rsatish uchun URL
+  file?: File;
+  id?: string;
+  preview: string;
 }
 
 export interface ProductFormValues {
@@ -17,10 +19,9 @@ export interface ProductFormValues {
   name_ru: string;
   description_uz: string;
   description_ru: string;
-  price: number;
+  price: number | string;
   category_id: string;
   watt: string;
-  // new select value for unit of measurement (kVt or VT)
   units_of_measurement: string;
   brand: string;
   model: string;
@@ -28,8 +29,8 @@ export interface ProductFormValues {
   is_active: boolean;
   ikpu_code: string;
   package_code: string;
-  units: number;
-  vat_percent: number;
+  units: number | string;
+  vat_percent: number | string;
 }
 
 interface ProductDrawerProps {
@@ -38,8 +39,9 @@ interface ProductDrawerProps {
   initialValues?: Product | null;
   onSuccess: () => void;
 }
+
 interface Category {
-  id: number;
+  id: string | number;
   name_ru: string;
   name_uz: string;
   created_at?: string;
@@ -53,96 +55,104 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
 }) => {
   const isEdit = useMemo(() => !!initialValues?.id, [initialValues]);
   const [loading, setLoading] = useState(false);
+
   /* FORM STATE */
   const [values, setValues] = useState<ProductFormValues>({
     name_uz: "",
     name_ru: "",
     description_uz: "",
     description_ru: "",
-    price: 0,
+    price: "",
     category_id: "",
     watt: "",
-    units_of_measurement: "kVt",
+    units_of_measurement: "kilowatts",
     brand: "",
     model: "",
     images: [],
     is_active: true,
-    ikpu_code: "",
-    package_code: "",
+    ikpu_code: "00702001001000001",
+    package_code: "123456",
     units: 0,
-    vat_percent: 0,
+    vat_percent: 12,
   });
 
-  /* ERROR STATE */
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [category, setCategory] = useState<Category | null>(null);
 
-  /* RESET / EDIT */
+  /* RESET / EDIT INITIALIZATION */
   useEffect(() => {
     if (!open) return;
 
     if (initialValues) {
       setValues({
         id: initialValues.id,
-        name_uz: initialValues.name_uz,
-        name_ru: initialValues.name_ru,
-        description_uz: initialValues.description_uz,
-        description_ru: initialValues.description_ru,
-        price: Number(initialValues.price),
-        category_id: String(initialValues.category_id),
-        watt: String(initialValues.watt),
-        units_of_measurement: initialValues.units_of_measurement || "kVt",
-        brand: initialValues.brand,
-        model: initialValues.model,
-        is_active: initialValues.is_active,
+        name_uz: initialValues.name_uz || "",
+        name_ru: initialValues.name_ru || "",
+        description_uz: initialValues.description_uz || "",
+        description_ru: initialValues.description_ru || "",
+        price: initialValues.price || "",
+        category_id: String(initialValues.category_id || ""),
+        watt: String(initialValues.watt || ""),
+        units_of_measurement: initialValues.units_of_measurement || "kilowatts",
+        brand: initialValues.brand || "",
+        model: initialValues.model || "",
+        is_active: initialValues.is_active ?? true,
         images: initialValues.images
           ? initialValues.images.map((img) => ({
-            id: String(img.id),
-            preview: img.image_url,
-          }))
+              id: String(img.id),
+              preview: img.image_url,
+            }))
           : [],
-        ikpu_code: initialValues.ikpu_code || "",
-        package_code: initialValues.package_code || "",
-        units: initialValues.units || 0,
-        vat_percent: initialValues.vat_percent || 0,
+        ikpu_code: initialValues.ikpu_code || "00702001001000001",
+        package_code: initialValues.package_code || "123456",
+        units: initialValues.units ?? 0,
+        vat_percent: initialValues.vat_percent ?? 12,
       });
+
+      if (initialValues.category_id) {
+        setCategory({
+          id: initialValues.category_id,
+          name_uz: "Tanlangan Kategoriya",
+          name_ru: "Выбранная категория",
+        });
+      } else {
+        setCategory(null);
+      }
     } else {
       setValues({
         name_uz: "",
         name_ru: "",
         description_uz: "",
         description_ru: "",
-        price: 0,
+        price: "",
         category_id: "",
         watt: "",
-        units_of_measurement: "kVt",
+        units_of_measurement: "kilowatts",
         brand: "",
         model: "",
         images: [],
         is_active: true,
-        ikpu_code: "",
-        package_code: "",
+        ikpu_code: "00702001001000001",
+        package_code: "123456",
         units: 0,
-        vat_percent: 0,
+        vat_percent: 12,
       });
+      setCategory(null);
     }
 
     setErrors({});
   }, [open, initialValues]);
 
-  /* INPUT CHANGE */
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >,
   ) => {
     const { name, value } = e.target;
-
     setValues((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: false }));
   };
 
-  /* IMAGE UPLOAD */
   const handleImageUpload = (files: FileList | null) => {
     if (!files) return;
 
@@ -155,14 +165,14 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
       ...prev,
       images: [...prev.images, ...mapped],
     }));
+    setErrors((prev) => ({ ...prev, images: false }));
   };
 
-  /* REMOVE IMAGE */
   const removeImage = async (image: ProductImage, index: number) => {
     try {
-      // faqat backenddagi rasm bo‘lsa
       if (image.id) {
         await remove("product-image", String(image.id));
+        toast.info("Rasm o'chirildi");
         onSuccess();
       }
 
@@ -171,7 +181,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
         images: prev.images.filter((_, i) => i !== index),
       }));
     } catch (error) {
-      return;
+      toast.error("Rasmni o'chirishda xatolik yuz berdi");
     }
   };
 
@@ -188,7 +198,6 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
       const updated = [...prev.images];
       const [moved] = updated.splice(dragIndex, 1);
       updated.splice(dropIndex, 0, moved);
-
       return { ...prev, images: updated };
     });
 
@@ -196,51 +205,92 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
   };
 
   /* VALIDATION */
-  const validate = () => {
+  const validate = (): boolean => {
     const newErrors: Record<string, boolean> = {};
-    if (!values.name_uz.trim()) newErrors.name_uz = true;
-    if (!values.name_ru.trim()) newErrors.name_ru = true;
-    if (!values.description_uz.trim()) newErrors.description_uz = true;
-    if (!values.description_ru.trim()) newErrors.description_ru = true;
-    if (!category) newErrors.category_id = true;
-    if (!values.model) newErrors.model = true;
-    if (!values.watt) newErrors.watt = true;
-    if (!values.units_of_measurement) newErrors.units_of_measurement = true;
-    if (!values.price) newErrors.price = true;
-    if (!values.ikpu_code) newErrors.ikpu_code = true;
-    if (!values.package_code) newErrors.package_code = true;
-    if (values.images.length === 0) newErrors.images = true;
+    const missing: string[] = [];
+
+    if (!values.name_uz.trim()) {
+      newErrors.name_uz = true;
+      missing.push("Mahsulot nomi (UZ)");
+    }
+    if (!values.name_ru.trim()) {
+      newErrors.name_ru = true;
+      missing.push("Mahsulot nomi (RU)");
+    }
+    if (!values.description_uz.trim()) {
+      newErrors.description_uz = true;
+      missing.push("Tavsif (UZ)");
+    }
+    if (!values.description_ru.trim()) {
+      newErrors.description_ru = true;
+      missing.push("Tavsif (RU)");
+    }
+    if (!category?.id && !values.category_id) {
+      newErrors.category_id = true;
+      missing.push("Kategoriya");
+    }
+    if (!values.model.trim()) {
+      newErrors.model = true;
+      missing.push("Model");
+    }
+    if (!values.watt) {
+      newErrors.watt = true;
+      missing.push("Quvvat (Watt/kVt)");
+    }
+    if (!values.price || Number(values.price) <= 0) {
+      newErrors.price = true;
+      missing.push("Narx");
+    }
+    if (!values.ikpu_code.trim()) {
+      newErrors.ikpu_code = true;
+      missing.push("IKPU kodi");
+    }
+    if (!values.package_code.trim()) {
+      newErrors.package_code = true;
+      missing.push("O'lchov birligi (Package code)");
+    }
+    if (values.images.length === 0) {
+      newErrors.images = true;
+      missing.push("Kamida 1 ta rasm");
+    }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    if (missing.length > 0) {
+      toast.error(
+        `Iltimos, maydonlarni to'ldiring: ${missing.slice(0, 3).join(", ")}${
+          missing.length > 3 ? " va boshqalar" : ""
+        }`,
+      );
+      return false;
+    }
+
+    return true;
   };
 
   /* SUBMIT */
   const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true);
+
     try {
       const formData = new FormData();
-
       formData.append("name_uz", values.name_uz);
       formData.append("name_ru", values.name_ru);
       formData.append("description_uz", values.description_uz);
       formData.append("description_ru", values.description_ru);
       formData.append("price", String(values.price));
-      formData.append("category_id", String(category?.id));
-      formData.append("watt", values.watt);
+      formData.append("category_id", String(category?.id || values.category_id));
+      formData.append("watt", String(values.watt));
       formData.append("units_of_measurement", values.units_of_measurement);
-      formData.append("brand", values.brand);
+      formData.append("brand", values.brand || values.model);
       formData.append("model", values.model);
       formData.append("ikpu_code", values.ikpu_code);
       formData.append("package_code", values.package_code);
-      formData.append("units", String(values.units));
-      formData.append("vat_percent", String(values.vat_percent));
-
-      // 🔥 boolean
+      formData.append("units", String(values.units || 0));
+      formData.append("vat_percent", String(values.vat_percent || 0));
       formData.append("is_active", values.is_active ? "1" : "0");
 
-      // 🔥 images
       values.images.forEach((img) => {
         if (img.file) {
           formData.append("images", img.file);
@@ -250,15 +300,25 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
       if (isEdit) {
         formData.append("id", initialValues?.id || "");
         await putData(`/product`, formData);
+        toast.success("Mahsulot muvaffaqiyatli yangilandi! 🎉");
       } else {
         await post("/product", formData);
+        toast.success("Mahsulot muvaffaqiyatli qo'shildi! 🚀");
       }
 
       onSuccess();
       onClose();
-    } catch (err) {
-      console.error(err);
-    } finally { setLoading(false); }
+    } catch (err: any) {
+      console.error("Product submission failed:", err);
+      const serverMsg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        err?.response?.data?.Data ||
+        "Mahsulotni saqlashda xatolik yuz berdi";
+      toast.error(`Xatolik: ${serverMsg}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -266,347 +326,384 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({
       open={open}
       onClose={onClose}
       title={isEdit ? "Mahsulotni tahrirlash" : "Yangi mahsulot qo‘shish"}
-      width={700}
+      width={720}
     >
-      {/* HEADER */}
-      <div className="flex items-start justify-between border-b border_color">
-        <div>
-          <h2 className="text-2xl font-bold">
-            {isEdit ? "Mahsulotni yangilash" : "Yangi Mahsulot Qo'shish"}
-          </h2>
-          <p className="text-[#8fccba] text-sm mb-2">
-            Yangi energiya aktivini ro'yxatlash uchun tafsilotlarni to'ldiring.
-          </p>
-        </div>
-        <button
-          onClick={onClose}
-          className="p-2 hover:bg-white/10 rounded-full "
-        >
-          <MdClose className="text-2xl" />
-        </button>
-      </div>
-
-      {/* BODY */}
-      <div className="p-6 space-y-6 overflow-y-auto max-h-screen">
-        {/* NAME */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              Mahsulot nomi (UZ) <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="name_uz"
-              value={values.name_uz}
-              onChange={handleChange}
-              className={`form-input w-full h-14 rounded-xl bg_card px-4 border ${errors.name_uz ? "border-red-500" : "border_color"
-                }`}
-              placeholder="ThinkPower 5 kVt inverter"
-            />
+      <div className="flex flex-col h-full bg-[#0e1a15] text-slate-100 select-none">
+        {/* HEADER */}
+        <div className="p-6 border-b border-white/5 flex items-start justify-between bg-white/[0.02]">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <Layers className="size-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                {isEdit ? "Mahsulotni tahrirlash" : "Yangi Mahsulot Qo'shish"}
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Katalog parametrlarini to'ldiring va rasm yuklang
+              </p>
+            </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              Mahsulot nomi (RU) <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="name_ru"
-              value={values.name_ru}
-              onChange={handleChange}
-              className={`form-input w-full h-14 rounded-xl bg_card px-4 border ${errors.name_ru ? "border-red-500" : "border_color"
-                }`}
-              placeholder="Инвертор ThinkPower 5 кВт"
-            />
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="font-medium">
-            Mahsulotga tavsif (UZ) <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            name="description_uz"
-            value={values.description_uz}
-            onChange={handleChange}
-            className={`form-input w-full h-25 py-4 rounded-xl bg_card px-4 border ${errors.description_uz ? "border-red-500" : "border_color"
-              }`}
-            placeholder="Asosiy Texnik Ko‘rsatkichlar Nominal quvvat: 5000 Vt (5 kW) Maksimal chiqish quvvati: 5500 Vt AC chiqish kuchlanishi: 400 V (3 fazali) Chiqish chastotasi: 50/60 Hz Chiqish toki: 10 A Samaradorlik: Maksimal – 98.2%; Yevropa samaradorligi – 97.7% MPPT"
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="font-medium">
-            Mahsulotga tavsif (RU) <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            name="description_ru"
-            value={values.description_ru}
-            onChange={handleChange}
-            className={`form-input w-full h-25 py-4 rounded-xl bg_card px-4 border ${errors.description_ru ? "border-red-500" : "border_color"
-              }`}
-            placeholder="Основные технические характеристики Номинальная мощность: 5000 Вт (5 кВт) Максимальная выходная мощность: 5500 Вт Выходное напряжение переменного тока: 400 В (3-фазное) Выходная частота: 50/60 Гц Выходной ток: 10 А"
-          />
-        </div>
-
-        {/* CATEGORY + PRICE */}
-        <div className="flex flex-col gap-2">
-          <label className="font-medium">
-            Narx (UZS) <span className="text-red-500">*</span>
-          </label>
-          <input
-            name="price"
-            type="number"
-            inputMode="numeric"
-            value={values.price}
-            onChange={handleChange}
-            className={`h-14 rounded-xl bg_card px-4 border ${errors.price ? "border-red-500" : "border_color"
-              }`}
-            placeholder="0.00"
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div
-            className={`flex flex-col border gap-2 ${errors.category_id ? "border-red-500" : "border-transparent"}`}
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all"
           >
-            <label className="font-medium">
-              Kategoriya <span className="text-red-500">*</span>
-            </label>
-            <PaginatedSelect<Category>
-              value={category}
-              onChange={(e) => setCategory(e)}
-              endpoint="product-categories"
-              labelKey="name_uz"
-              placeholder="Kategoriyani tanlang"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              <select
-                name="units_of_measurement"
-                value={values.units_of_measurement}
+            <MdClose className="text-2xl" />
+          </button>
+        </div>
+
+        {/* BODY */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* NOM / NAME */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                Nomi (O'zbekcha) <span className="text-emerald-400">*</span>
+              </label>
+              <input
+                name="name_uz"
+                value={values.name_uz}
                 onChange={handleChange}
-                className={`p-1 bg_card border-t border-b border-r ${errors.units_of_measurement
-                    ? "border-red-500"
-                    : "border_color"
-                  } rounded-r-xl`}
-              >
-                <option value="kilowatts">kVt</option>
-                <option value="watts">Watt</option>
-              </select> <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="watt"
-              type="text"
-              value={values.watt}
-              onChange={handleChange}
-              className={`flex-1 h-14 bg_card px-4 border-t border-b border-l ${errors.watt ? "border-red-500" : "border_color"
-                } rounded-l-xl`}
-              placeholder="5000"
-            />
+                placeholder="Masalan: Quyosh paneli 550W Tier-1"
+                className={`w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border transition-all ${
+                  errors.name_uz
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : "border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                }`}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                Nomi (Ruscha) <span className="text-emerald-400">*</span>
+              </label>
+              <input
+                name="name_ru"
+                value={values.name_ru}
+                onChange={handleChange}
+                placeholder="Например: Солнечная панель 550W"
+                className={`w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border transition-all ${
+                  errors.name_ru
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : "border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                }`}
+              />
+            </div>
+          </div>
 
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              {values.units_of_measurement === "watts" ? "Brand" : "Panel turi"}
-              <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="brand"
-              type="text"
-              value={values.brand}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${errors.price ? "border-red-500" : "border_color"
+          {/* TAVSIF / DESCRIPTION */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                Tavsif (O'zbekcha) <span className="text-emerald-400">*</span>
+              </label>
+              <textarea
+                rows={3}
+                name="description_uz"
+                value={values.description_uz}
+                onChange={handleChange}
+                placeholder="Mahsulot parametrlari, kafolat va xususiyatlari..."
+                className={`w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border transition-all ${
+                  errors.description_uz
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : "border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 }`}
-              placeholder="___"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              {values.units_of_measurement === "watts"
-                ? "Model"
-                : "Inverter turi"}
-              <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="model"
-              type="text"
-              value={values.model}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${errors.model ? "border-red-500" : "border_color"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                Tavsif (Ruscha) <span className="text-emerald-400">*</span>
+              </label>
+              <textarea
+                rows={3}
+                name="description_ru"
+                value={values.description_ru}
+                onChange={handleChange}
+                placeholder="Параметры, гарантия и характеристики..."
+                className={`w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border transition-all ${
+                  errors.description_ru
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : "border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 }`}
-              placeholder="____"
-            />
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              МХИК коди: "00702001001000001"
-              <span className="text-red-500">*</span>
+          {/* KATEGORIYA VA QUVVAT */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                Kategoriya <span className="text-emerald-400">*</span>
+              </label>
+              <PaginatedSelect<Category>
+                value={category}
+                onChange={(cat) => {
+                  setCategory(cat);
+                  setValues((prev) => ({ ...prev, category_id: String(cat.id) }));
+                  setErrors((prev) => ({ ...prev, category_id: false }));
+                }}
+                endpoint="product-categories"
+                labelKey="name_uz"
+                placeholder="Kategoriyani tanlang..."
+                className={errors.category_id ? "ring-1 ring-rose-500 rounded-xl" : ""}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                  Quvvati <span className="text-emerald-400">*</span>
+                </label>
+                <div className="flex items-center gap-1 bg-[#152721] p-0.5 rounded-lg border border-white/5 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setValues((p) => ({ ...p, units_of_measurement: "kilowatts" }))
+                    }
+                    className={`px-2 py-0.5 rounded-md font-bold transition-all ${
+                      values.units_of_measurement === "kilowatts"
+                        ? "bg-emerald-500 text-[#0b1411]"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    kVt
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setValues((p) => ({ ...p, units_of_measurement: "watts" }))
+                    }
+                    className={`px-2 py-0.5 rounded-md font-bold transition-all ${
+                      values.units_of_measurement === "watts"
+                        ? "bg-emerald-500 text-[#0b1411]"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Watt
+                  </button>
+                </div>
+              </div>
+              <input
+                name="watt"
+                type="number"
+                value={values.watt}
+                onChange={handleChange}
+                placeholder={values.units_of_measurement === "kilowatts" ? "10" : "550"}
+                className={`w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border transition-all ${
+                  errors.watt
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : "border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                }`}
+              />
+            </div>
+          </div>
+
+          {/* BREND, MODEL VA NARX */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">
+                Brend / Ishlab chiqaruvchi
+              </label>
+              <input
+                name="brand"
+                value={values.brand}
+                onChange={handleChange}
+                placeholder="Jinko, Longi, Deye..."
+                className="w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                Model kodi <span className="text-emerald-400">*</span>
+              </label>
+              <input
+                name="model"
+                value={values.model}
+                onChange={handleChange}
+                placeholder="JKM550M-72HL4"
+                className={`w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border transition-all ${
+                  errors.model
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : "border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                }`}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                Narxi (so'm) <span className="text-emerald-400">*</span>
+              </label>
+              <input
+                name="price"
+                type="number"
+                value={values.price}
+                onChange={handleChange}
+                placeholder="1500000"
+                className={`w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border transition-all ${
+                  errors.price
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : "border-white/10 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                }`}
+              />
+            </div>
+          </div>
+
+          {/* SOLIQ VA E-TIJORAT KODLARI */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                МХИК (IKPU) Kodi <span className="text-emerald-400">*</span>
+              </label>
+              <input
+                name="ikpu_code"
+                value={values.ikpu_code}
+                onChange={handleChange}
+                placeholder="00702001001000001"
+                className={`w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border transition-all ${
+                  errors.ikpu_code
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : "border-white/10 focus:border-emerald-500"
+                }`}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                O'lchov kodi <span className="text-emerald-400">*</span>
+              </label>
+              <input
+                name="package_code"
+                value={values.package_code}
+                onChange={handleChange}
+                placeholder="123456"
+                className={`w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border transition-all ${
+                  errors.package_code
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : "border-white/10 focus:border-emerald-500"
+                }`}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">QQS (%)</label>
+              <input
+                name="vat_percent"
+                type="number"
+                value={values.vat_percent}
+                onChange={handleChange}
+                placeholder="12"
+                className="w-full px-4 py-3 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
+          {/* RASMLAR YUKLASH */}
+          <div className="space-y-3">
+            <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+              <span className="flex items-center gap-1">
+                Mahsulot rasmlari <span className="text-emerald-400">*</span>
+              </span>
+              <span className="text-[11px] text-slate-400 font-normal">
+                Birinchi rasm asosiy hisoblanadi (surib tartiblang)
+              </span>
             </label>
-            <input
-              name="ikpu_code"
-              type="text"
-              value={values.ikpu_code}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${errors.ikpu_code ? "border-red-500" : "border_color"
-                }`}
-              placeholder="00101001001000000"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">
-              Ўлчов бирлиги: "1837252"
-              <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="package_code"
-              type="text"
-              value={values.package_code}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${errors.package_code ? "border-red-500" : "border_color"
-                }`}
-              placeholder="123456"
-            />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">Қадоқлар</label>
-            <input
-              name="units"
-              type="number"
-              value={values.units}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${errors.units ? "border-red-500" : "border_color"
-                }`}
-              placeholder="1"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="font-medium">QQS (%)</label>
-            <input
-              name="vat_percent"
-              type="number"
-              value={values.vat_percent}
-              onChange={handleChange}
-              className={`h-14 rounded-xl bg_card px-4 border ${errors.vat_percent ? "border-red-500" : "border_color"
-                }`}
-              placeholder="12"
-            />
-          </div>
-        </div>
-
-        {/* IMAGE UPLOAD */}
-        <div className="flex flex-col gap-2">
-          <label className="font-medium">
-            Mahsulot rasmi <span className="text-red-500">*</span>
-          </label>
-
-          {(!initialValues || values?.images?.length <= 0) && (
             <label
-              className={`w-full h-32 bg_card border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer ${errors.images ? "border-red-500" : "border_color"
-                }`}
+              className={`w-full py-8 px-4 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all bg-[#152721]/50 hover:bg-[#152721] ${
+                errors.images ? "border-rose-500" : "border-emerald-500/30 hover:border-emerald-500"
+              }`}
             >
               <input
                 type="file"
                 multiple
                 hidden
-                name="images"
                 accept="image/*"
                 onChange={(e) => handleImageUpload(e.target.files)}
               />
-              <span className="text-[#8fccba] p-5 text-center">
-                Bo'lim ustiga bosing yoki faylni shu yurga surib olib keling
-              </span>
+              <MdCloudUpload className="text-4xl text-emerald-400 mb-2" />
+              <p className="text-sm font-semibold text-white">
+                Rasmlarni tanlang yoki bu yerga sudrab keltiring
+              </p>
+              <p className="text-xs text-slate-400 mt-1">PNG, JPG, WEBP (Maksimal 10MB)</p>
             </label>
-          )}
 
-          {/* PREVIEW */}
-          {values?.images?.length > 0 && (
-            <div className="flex gap-3 flex-wrap">
-              {values.images.map((img, i) => (
-                <div
-                  key={i}
-                  draggable
-                  onDragStart={() => handleDragStart(i)}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={() => handleDrop(i)}
-                  className={`relative w-24 h-24 rounded-xl overflow-hidden border cursor-move
-          ${i === 0 ? "border-primary ring-2 ring-primary" : "border_color"}`}
-                >
-                  <img
-                    src={img.preview}
-                    className="w-full h-full object-cover"
-                    alt="preview"
-                  />
-
-                  {/* MAIN badge */}
-                  {i === 0 && (
-                    <span className="absolute bottom-1 left-1 text-xs bg-primary text-black px-2 rounded">
-                      MAIN
-                    </span>
-                  )}
-
-                  {/* REMOVE */}
-                  <button
-                    type="button"
-                    onClick={() => removeImage(img, i)}
-                    className="absolute top-1 right-1 bg-black/60 rounded-full p-1"
+            {/* PREVIEWS */}
+            {values.images.length > 0 && (
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 pt-2">
+                {values.images.map((img, i) => (
+                  <div
+                    key={i}
+                    draggable
+                    onDragStart={() => handleDragStart(i)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => handleDrop(i)}
+                    className={`relative aspect-square rounded-xl overflow-hidden border cursor-move group transition-all ${
+                      i === 0
+                        ? "border-emerald-400 ring-2 ring-emerald-500/40"
+                        : "border-white/10 hover:border-white/30"
+                    }`}
                   >
-                    <MdClose />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                    <img
+                      src={img.preview}
+                      alt="preview"
+                      className="size-full object-cover"
+                    />
+                    {i === 0 && (
+                      <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-500 text-[#0b1411]">
+                        ASOSIY
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(img, i)}
+                      className="absolute top-1 right-1 p-1 rounded-md bg-black/70 text-rose-400 hover:text-rose-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <MdDelete className="text-base" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        {initialValues && (
-          <div className="col-span-2 flex items-center justify-between p-4 bg_card rounded-xl border border-transparent">
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-white">Faol holat</span>
-              <span className="text-xs text-slate-500 dark:text-[#8fccba]">
-                Ushbu bo'lim mahsulot qolmaganida o'chirilishi kerak
-              </span>
+          {/* FAOL HOLAT (ACTIVE) */}
+          <div className="p-4 rounded-xl bg-[#152721] border border-white/5 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-bold text-white">Faol Holat (Katalogda ko'rinadi)</p>
+              <p className="text-xs text-slate-400">
+                O'chirilsa, mahsulot mijozlarga sotuvda ko'rinmaydi
+              </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
+                type="checkbox"
                 name="is_active"
                 checked={values.is_active}
                 onChange={(e) =>
-                  setValues((prev) => ({
-                    ...prev,
-                    is_active: e.target.checked,
-                  }))
+                  setValues((prev) => ({ ...prev, is_active: e.target.checked }))
                 }
                 className="sr-only peer"
-                type="checkbox"
               />
-              <div
-                className={`w-11 h-6 ${values.is_active ? "bg-primary" : "card_btn"} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary`}
-              />
+              <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500" />
             </label>
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* FOOTER */}
-      <div className="p-4 border-t border-white/5 flex justify-end gap-3">
-        <button
-          disabled={loading}
-          onClick={onClose}
-          className="h-12 px-6 rounded-xl border border-white/20 text-white"
-        >
-          Qaytish
-        </button>
-        <button
-          disabled={loading}
-          onClick={handleSubmit}
-          className="h-12 px-6 rounded-xl bg-primary text-[#10221d] font-bold"
-        >
-          {loading ? "Yuklanmoqda..." : isEdit ? "Yangilash" : "Mahsultni qo'shish"}
-        </button>
+        {/* FOOTER */}
+        <div className="p-4 px-6 border-t border-white/5 bg-white/[0.02] flex items-center justify-end gap-3">
+          <button
+            type="button"
+            disabled={loading}
+            onClick={onClose}
+            className="px-5 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-sm font-semibold text-slate-300 transition-colors"
+          >
+            Bekor qilish
+          </button>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={handleSubmit}
+            className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#0b1411] font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-95 disabled:opacity-50"
+          >
+            {loading ? "Saqlanmoqda..." : isEdit ? "O'zgarishlarni saqlash" : "Mahsulotni qo'shish"}
+          </button>
+        </div>
       </div>
     </BaseDrawer>
   );

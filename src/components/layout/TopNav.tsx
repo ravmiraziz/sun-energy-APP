@@ -3,6 +3,7 @@ import { MdNotifications } from "react-icons/md";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import Notification from "../modals/Notification";
+import { User as UserIcon } from "lucide-react";
 
 const TopNav: React.FC = () => {
   const { user } = useAuth();
@@ -10,47 +11,61 @@ const TopNav: React.FC = () => {
 
   return (
     <>
-      <header className="h-16 border-b border_color flex items-center justify-between z-50 px-8 sticky gap-4 top-0 bg_card backdrop-blur-md transition-colors">
-        <div>
-          <Link to="/admin" className="md:hidden">
-            <img src="/logo.svg" alt="logo" className="object-contain h-18" />
+      <header className="h-16 border-b border-white/5 flex items-center justify-between z-40 px-6 sticky top-0 bg-[#0e1a15]/90 backdrop-blur-md transition-colors select-none">
+        {/* Mobile Logo */}
+        <div className="flex items-center md:hidden">
+          <Link to="/admin">
+            <img src="/logo.svg" alt="Sun Energy" className="h-8 object-contain" />
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setOpen(true)}
-              className="size-10 flex items-center justify-center rounded-xl card_btn text-slate-600 dark:text-slate-400 relative hover:text-primary transition-colors"
-            >
-              <MdNotifications className="text-[22px]" />
-            </button>
-          </div>
+        {/* Empty placeholder for desktop spacing */}
+        <div className="hidden md:block" />
 
-          <div className="h-8 w-px bg-slate-200 dark:bg-border-teal"></div>
+        {/* Actions & Profile */}
+        <div className="flex items-center gap-4 ml-auto">
+          {/* Notification Button */}
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            title="Bildirishnoma"
+            className="size-10 flex items-center justify-center rounded-xl bg-white/[0.04] border border-white/5 text-slate-300 hover:text-emerald-400 hover:bg-white/[0.08] transition-colors"
+          >
+            <MdNotifications className="text-xl" />
+          </button>
 
-          <Link to="/admin/settings">
-            <div className="flex items-center gap-3 cursor-pointer group">
-              <div className="hidden lg:block text-right">
-                <p className="text-sm font-bold leading-none group-hover:text-primary transition-colors">
-                  {user?.first_name} {user?.last_name}
-                </p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider mt-1">
-                  {user?.phone}
-                </p>
-              </div>
-              <div className="bg-center flex items-center justify-center bg-no-repeat aspect-square bg-cover overflow-hidden rounded-full size-10 border-2 border-primary/20 group-hover:border-primary transition-all">
+          <div className="h-6 w-px bg-white/10" />
+
+          {/* User Profile Info */}
+          <Link to="/admin/settings" className="group">
+            <div className="flex items-center gap-3 p-1 rounded-xl hover:bg-white/[0.03] transition-colors">
+              <div className="size-9 rounded-full bg-emerald-600/30 border border-emerald-500/20 overflow-hidden flex items-center justify-center text-emerald-300 font-bold text-sm">
                 {user?.image_url ? (
-                  <img loading="lazy" src={user?.image_url} alt="avatar" />
+                  <img
+                    loading="lazy"
+                    src={user?.image_url}
+                    alt="avatar"
+                    className="size-full object-cover"
+                  />
+                ) : user?.first_name ? (
+                  <span>{user.first_name.slice(0, 1).toUpperCase()}</span>
                 ) : (
-                  <span className="text-md">
-                    {user?.first_name?.slice(0, 1)}
-                  </span>
+                  <UserIcon className="size-4" />
                 )}
+              </div>
+
+              <div className="hidden sm:flex flex-col text-left">
+                <p className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors">
+                  {user?.first_name ? `${user.first_name} ${user.last_name || ""}` : "Administrator"}
+                </p>
+                <p className="text-[10px] text-slate-400 font-medium">
+                  {user?.phone ? `+${user.phone}` : "Bosh Administrator"}
+                </p>
               </div>
             </div>
           </Link>
         </div>
+
         {open && <Notification close={() => setOpen(false)} />}
       </header>
     </>

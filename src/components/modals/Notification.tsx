@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { MdCampaign, MdClear, MdClose, MdEdit } from "react-icons/md";
+import { MdClear, MdClose, MdEdit } from "react-icons/md";
 import { get, post, putData } from "../../api/api";
 import DeleteModal from "./DeleteModal";
-import Pagination from "../ui/Pagination";
-import { CiMobile3 } from "react-icons/ci";
+import { toast } from "sonner";
+import { Smartphone, Bell } from "lucide-react";
 
 interface Props {
   close: () => void;
@@ -40,7 +40,6 @@ const Notification = ({ close }: Props) => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [update, setUpdate] = useState<NotData | null>(null);
-  const [error, setError] = useState("");
   const [currentVersion, setCurrentVersion] = useState("");
   const [versionRequired, setVersionRequired] = useState(false);
 
@@ -64,35 +63,36 @@ const Notification = ({ close }: Props) => {
     try {
       const { data }: ResData = await get("notifications", { page: p, limit });
       setNotifications(data.notifications || []);
-      setTotalCount(data.count);
+      setTotalCount(data.count || 0);
       setPage(p);
     } catch (error) {
-      return;
+      console.error(error);
     }
   };
 
   const fetchVersion = async () => {
-    setLoading(true);
     try {
       const { data }: { data: { version_name: string; is_required: boolean } } =
         await get("version");
-      setCurrentVersion(data.version_name);
-      setVersionRequired(data.is_required);
+      if (data) {
+        setCurrentVersion(data.version_name || "");
+        setVersionRequired(Boolean(data.is_required));
+      }
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
+
   const updateVersion = async () => {
     try {
       await post("version", {
         version_name: currentVersion,
         is_required: versionRequired,
       });
+      toast.success("Ilova versiyasi yangilandi! 🎉");
       fetchVersion();
     } catch (error) {
-      console.log(error);
+      toast.error("Versiyani yangilashda xatolik");
     }
   };
 
@@ -113,221 +113,216 @@ const Notification = ({ close }: Props) => {
 
   const submit = async () => {
     if (!validate()) {
-      setError("Barcha maydonlar majburiy!");
+      toast.error("Barcha maydonlarni to'ldiring!");
       return;
     }
 
     setLoading(true);
-    setError("");
 
     try {
       if (update) {
         await putData("notification", { ...form, id: update?.id });
+        toast.success("Bildirishnoma yangilandi! 🎉");
       } else {
         await post("notification", form);
-        alert("Bildirishnoma yuborildi!");
+        toast.success("Bildirishnoma muvaffaqiyatli yuborildi! 🚀");
       }
       clear();
       fetchData();
-    } catch (e) {
-      setError("Xatolik yuz berdi, qayta urinib ko'ring");
+    } catch (e: any) {
+      toast.error("Bildirishnoma yuborishda xatolik yuz berdi");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 h-screen w-screen bg-black/60 backdrop-blur-sm z-100 flex items-center justify-center p-4">
-      <div className="bg_card w-full max-w-2xl rounded-xl shadow-2xl border border-slate-800 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm select-none">
+      <div className="relative w-full max-w-2xl bg-[#12211c] border border-white/10 rounded-3xl p-6 sm:p-8 flex flex-col shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
         {/* HEADER */}
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+        <div className="flex items-center justify-between pb-4 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
-              <MdCampaign className="text-2xl" />
+            <div className="size-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <Bell className="size-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold">Yangi bildirishnoma</h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Barcha foydalanuvchilar uchun bildirishnoma
+              <h2 className="text-xl font-bold text-white">Bildirishnomalar Markazi</h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Barcha foydalanuvchilar telefoniga push-xabar yuborish
               </p>
             </div>
           </div>
-          <button onClick={close} className="text-slate-400 hover:text-white">
+          <button
+            onClick={close}
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5"
+          >
             <MdClose className="text-2xl" />
           </button>
         </div>
-        <div className="flex flex-col items-center justify-between gap-4 m-6">
-          <div>
-            <label htmlFor="version">Ilova versiyasi</label>
-            <div className="flex items-center gap-2">
-              <input
-                id="version"
-                value={currentVersion}
-                onChange={(e) => setCurrentVersion(e.target.value)}
-                type="text"
-                className="border border_color rounded-lg py-1 px-2"
-              />
-              <button
-                onClick={updateVersion}
-                className="bg-primary rounded-lg p-1"
-              >
-                <CiMobile3 className="text-2xl" />
-              </button>
+
+        {/* VERSION SETTINGS */}
+        <div className="p-4 rounded-2xl bg-[#152721] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Smartphone className="size-5 text-emerald-400" />
+            <div>
+              <p className="text-xs font-bold text-white">Ilova versiyasi</p>
+              <p className="text-[11px] text-slate-400">Majburiy yangilanish sozlamasi</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <label htmlFor="version">
-              O'zgarishni o'rnatish majburiy qilish:
-            </label>
-            <div className="flex items-center gap-2">
+            <input
+              value={currentVersion}
+              onChange={(e) => setCurrentVersion(e.target.value)}
+              placeholder="1.0.0"
+              className="w-24 px-3 py-1.5 rounded-lg bg-[#0e1a15] border border-white/10 text-xs text-white"
+            />
+            <label className="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
               <input
-                id="version"
+                type="checkbox"
                 checked={versionRequired}
                 onChange={(e) => setVersionRequired(e.target.checked)}
-                type="checkbox"
-                className="border border_color rounded-lg p-2"
+                className="rounded accent-emerald-500"
               />
-            </div>
+              Majburiy
+            </label>
+            <button
+              onClick={updateVersion}
+              className="px-3 py-1.5 rounded-lg bg-emerald-500 text-[#0b1411] font-bold text-xs hover:bg-emerald-600 transition-colors"
+            >
+              Saqlash
+            </button>
           </div>
         </div>
-        {/* BODY */}
-        <div className="p-6 space-y-8 max-h-[70vh] overflow-y-auto">
-          {error && (
-            <div className="bg-red-500/10 text-red-400 text-sm p-3 rounded-lg">
-              {error}
-            </div>
-          )}
 
-          {/* UZ */}
-          <div className="flex flex-col gap-3 justify-center items-start">
-            <div className="flex items-center justify-between w-full">
-              <span className="card_btn text-[10px] font-bold px-2 py-0.5 rounded uppercase">
-                UZ
-              </span>
-              {update && (
-                <button onClick={clear} className="bg-primary px-1 rounded-lg">
-                  <MdClear />
-                </button>
-              )}
-            </div>
-
-            <input
-              name="title_uz"
-              value={form.title_uz}
-              onChange={onChange}
-              placeholder="Sarlavha (UZ)"
-              className="w-full card_btn rounded-xl px-4 py-3 text-sm"
-            />
-
-            <textarea
-              name="description_uz"
-              value={form.description_uz}
-              onChange={onChange}
-              placeholder="Tavsif (UZ)"
-              rows={3}
-              className="w-full card_btn rounded-xl px-4 py-3 text-sm resize-none"
-            />
-          </div>
-
-          {/* RU */}
-          <div className="flex flex-col gap-3 justify-center items-start">
-            <span className="card_btn text-[10px] font-bold px-2 py-0.5 rounded uppercase">
-              RU
+        {/* FORM */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              {update ? "Bildirishnomani Tahrirlash" : "Yangi Xabar Yozish"}
             </span>
-
-            <input
-              name="title_ru"
-              value={form.title_ru}
-              onChange={onChange}
-              placeholder="Заголовок (RU)"
-              className="w-full card_btn rounded-xl px-4 py-3 text-sm"
-            />
-
-            <textarea
-              name="description_ru"
-              value={form.description_ru}
-              onChange={onChange}
-              placeholder="Описание (RU)"
-              rows={3}
-              className="w-full card_btn rounded-xl px-4 py-3 text-sm resize-none"
-            />
+            {update && (
+              <button
+                onClick={clear}
+                className="text-xs text-emerald-400 hover:underline flex items-center gap-1"
+              >
+                <MdClear /> Bekor qilish
+              </button>
+            )}
           </div>
 
-          <div className="text-[10px] flex items-center justify-between p-2 font-bold text-slate-400 uppercase tracking-widest mb-1">
-            <p>Yuborilaganlar</p>{" "}
-            <p>
-              Jami:
-              <span className="text-yellow-500"> {totalCount} </span> ta
-            </p>
-          </div>
-          <div className="flex flex-col gap-2">
-            {notifications.length > 0 &&
-              notifications.map((item) => {
-                return (
-                  <div
-                    key={item?.id}
-                    className="flex items-center justify-between p-3 bg_card border border_color rounded-xl hover:border-slate-700 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-white">
-                          {item.title_uz}
-                        </span>
-                        <span className="text-[11px] text_primary">
-                          {item.description_uz}
-                        </span>
-                        <span className="text-[11px] card_text">
-                          {new Date(item.created_at).toLocaleDateString()}
-                          {" | "}
-                          {new Date(item.created_at).toLocaleTimeString()}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => {
-                          setUpdate(item);
-                        }}
-                        className="p-2 card_text hover:text-white hover:bg-slate-800 rounded-md transition-all"
-                      >
-                        <MdEdit />
-                      </button>
-                      <DeleteModal
-                        itemId={item?.id || ""}
-                        path={`notification`}
-                        confirm={() => fetchData()}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            <div className="px-6 py-4 card_btn border-t border_color flex justify-end items-center">
-              <Pagination
-                page={page}
-                limit={limit}
-                allCount={totalCount}
-                onChange={(p) => fetchData(p)}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold text-emerald-400 uppercase">
+                O'zbekcha
+              </span>
+              <input
+                name="title_uz"
+                value={form.title_uz}
+                onChange={onChange}
+                placeholder="Sarlavha (UZ)"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+              />
+              <textarea
+                rows={3}
+                name="description_uz"
+                value={form.description_uz}
+                onChange={onChange}
+                placeholder="Xabar matni (UZ)..."
+                className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500 resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold text-emerald-400 uppercase">
+                Ruscha
+              </span>
+              <input
+                name="title_ru"
+                value={form.title_ru}
+                onChange={onChange}
+                placeholder="Заголовок (RU)"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500"
+              />
+              <textarea
+                rows={3}
+                name="description_ru"
+                value={form.description_ru}
+                onChange={onChange}
+                placeholder="Текст уведомления (RU)..."
+                className="w-full px-4 py-2.5 rounded-xl bg-[#152721] text-sm text-white border border-white/10 focus:border-emerald-500 resize-none"
               />
             </div>
           </div>
+
+          <div className="flex justify-end">
+            <button
+              disabled={loading}
+              onClick={submit}
+              className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#0b1411] font-bold text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95 disabled:opacity-50"
+            >
+              {loading ? "Yuborilmoqda..." : update ? "O'zgartirish" : "Yuborish"}
+            </button>
+          </div>
         </div>
 
-        {/* FOOTER */}
-        <div className="p-6 border-t border-slate-800 flex justify-end gap-3">
-          <button
-            onClick={close}
-            className="px-6 py-2.5 rounded-xl text-sm text-slate-400 hover:card_btn"
-          >
-            Bekor qilish
-          </button>
+        {/* NOTIFICATIONS HISTORY */}
+        <div className="space-y-3 pt-4 border-t border-white/5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Yuborilgan Bildirishnomalar
+            </span>
+            <span className="text-xs text-amber-400 font-bold">
+              Jami: {totalCount} ta
+            </span>
+          </div>
 
-          <button
-            disabled={loading}
-            onClick={submit}
-            className="bg-primary px-8 py-2.5 rounded-xl font-bold text-sm disabled:opacity-50"
-          >
-            {loading ? "Yuborilmoqda..." : "Yuborish"}
-          </button>
+          <div className="space-y-2 max-h-52 overflow-y-auto">
+            {notifications.length > 0 ? (
+              notifications.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-3.5 rounded-xl bg-[#152721] border border-white/5 flex items-center justify-between group"
+                >
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-white">
+                      {item.title_uz}
+                    </span>
+                    <span className="text-[11px] text-slate-400 line-clamp-1">
+                      {item.description_uz}
+                    </span>
+                    <span className="text-[10px] text-slate-500 mt-1">
+                      {new Date(item.created_at).toLocaleDateString()}{" "}
+                      {new Date(item.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setUpdate(item)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400"
+                    >
+                      <MdEdit className="text-base" />
+                    </button>
+                    <DeleteModal
+                      itemId={item.id}
+                      path="notification"
+                      confirm={() => {
+                        toast.success("Bildirishnoma o'chirildi");
+                        fetchData();
+                      }}
+                    />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-slate-500 text-xs py-4">
+                Hozircha bildirishnomalar mavjud emas
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

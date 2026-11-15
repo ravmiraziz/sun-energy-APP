@@ -1,14 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   MdPayment,
-  MdFlare,
   MdShoppingCart,
-  MdRouter,
-  MdPower,
-  MdWarning,
   MdCheckCircle,
+  MdCancel,
+  MdPendingActions,
+  MdCalendarToday,
 } from "react-icons/md";
-
 import {
   AreaChart,
   Area,
@@ -18,20 +16,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { Users, TrendingUp, Sparkles } from "lucide-react";
 import { get } from "../api/api";
 import { formatPrice } from "../utils/formatter";
 
-const data = [
-  { date: "Du", amount: 1 },
-  { date: "Se", amount: 2 },
-  { date: "Cho", amount: 1 },
-  { date: "Pa", amount: 2 },
-  { date: "Ju", amount: 1 },
-  { date: "Sha", amount: 2 },
-  { date: "Ya", amount: 7 },
-];
-
-interface OrdersCaunt {
+interface OrdersCount {
   new: number;
   success: number;
   canceled: number;
@@ -41,7 +30,7 @@ interface OrdersCaunt {
 interface DashboardData {
   all_users_count: number;
   new_users_count: number;
-  orders_count: OrdersCaunt;
+  orders_count: OrdersCount;
   sales_history: {
     amount: number;
     date: string;
@@ -61,88 +50,35 @@ interface DashboardData {
   total_service_sales: string;
 }
 
-interface getData {
+interface GetData {
   data: DashboardData;
 }
 
 const DashboardView: React.FC = () => {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(false);
+  const fetchedOnce = useRef(false);
 
-  const fetchedOnce = useRef(false); // 🔥 MAGIC
+  const [fromDate, setFromDate] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1).toLocaleDateString("en-CA");
+  });
 
-  const kpis = [
-    {
-      label: "Umumiy daromad",
-      value: formatPrice(dashboard?.total_revenue || 0),
-      isPositive: true,
-      icon: <MdPayment className="text-[26px]" />,
-      colorClass: "revenue-card-gradient border-2 border-yellow-500",
-    },
-    {
-      label: "Yangi foydalanuvchilar",
-      value: formatPrice(dashboard?.new_users_count || 0),
-      isPositive: true,
-      icon: <MdFlare className="text-[26px]" />,
-    },
-    {
-      label: "Jami mahsulotlar sotuvi",
-      value: formatPrice(dashboard?.total_product_sales || 0),
-      isPositive: false,
-      icon: <MdShoppingCart className="text-[26px]" />,
-    },
-    {
-      label: "Jami servislar sotuvi",
-      value: formatPrice(dashboard?.total_service_sales || 0),
-      isPositive: true,
-      icon: <MdShoppingCart className="text-[26px]" />,
-    },
-  ];
+  const [toDate, setToDate] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth() + 1, 0).toLocaleDateString("en-CA");
+  });
 
-  const nodeStatuses = [
-    {
-      id: "1",
-      name: "Yangi buyurtmalar",
-      count: dashboard?.orders_count.new,
-      status: "new",
-      icon: <MdRouter className="text-[26px]" />,
-    },
-    {
-      id: "2",
-      name: "Yakunlangan buyurtmalar",
-      count: dashboard?.orders_count.delivered,
-      status: "delivered",
-      icon: <MdPower className="text-[26px]" />,
-    },
-    {
-      id: "3",
-      name: "Jarayondagi buyurtmalar",
-      count: dashboard?.orders_count.success,
-      status: "success",
-      icon: <MdCheckCircle className="text-[26px]" />,
-    },
-    {
-      id: "4",
-      name: "Bekor qilingan buyurtmalar",
-      count: dashboard?.orders_count.canceled,
-      status: "canceled",
-      icon: <MdWarning className="text-[26px]" />,
-    },
-  ];
-
-  const fetchProducts = async (fromDate?: string, toDate?: string) => {
+  const fetchDashboard = async (from = fromDate, to = toDate) => {
     setLoading(true);
     try {
-      const { data }: getData = await get("/dashboard", {
-        from_date:
-          fromDate ||
-          new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-            .toISOString()
-            .split("T")[0],
-        to_date: toDate || new Date().toISOString().split("T")[0],
+      const { data }: GetData = await get("/dashboard", {
+        from_date: from,
+        to_date: to,
       });
-
       setDashboard(data);
+    } catch (err) {
+      console.error("Dashboard fetch error:", err);
     } finally {
       setLoading(false);
     }
@@ -150,301 +86,287 @@ const DashboardView: React.FC = () => {
 
   useEffect(() => {
     if (fetchedOnce.current) return;
-    const newDate = new Date();
-    const year = newDate.getFullYear();
-    const month = newDate.getMonth();
-    const lastDay = new Date(year, month + 1, 0);
-
     fetchedOnce.current = true;
-    fetchProducts(
-      new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        1,
-      ).toLocaleDateString("en-CA"),
-      lastDay.toLocaleDateString("en-CA"),
-    );
+    fetchDashboard();
   }, []);
 
+  const handleFilterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchDashboard(fromDate, toDate);
+  };
+
+  const kpis = [
+    {
+      label: "Umumiy daromad",
+      value: `${formatPrice(dashboard?.total_revenue || 0)} so'm`,
+      subtitle: "Barcha tushumlar hisobi",
+      icon: <MdPayment className="size-6 text-amber-400" />,
+      accentBorder: "border-amber-500/20",
+      accentBg: "bg-amber-500/10",
+      glow: "shadow-[0_0_25px_rgba(245,158,11,0.08)]",
+    },
+    {
+      label: "Yangi foydalanuvchilar",
+      value: formatPrice(dashboard?.new_users_count || 0),
+      subtitle: `Jami: ${formatPrice(dashboard?.all_users_count || 0)} nafar`,
+      icon: <Users className="size-6 text-emerald-400" />,
+      accentBorder: "border-emerald-500/20",
+      accentBg: "bg-emerald-500/10",
+      glow: "shadow-[0_0_25px_rgba(16,185,129,0.08)]",
+    },
+    {
+      label: "Mahsulotlar sotuvi",
+      value: `${formatPrice(dashboard?.total_product_sales || 0)} so'm`,
+      subtitle: "Uskuna va butlovchi qismlar",
+      icon: <MdShoppingCart className="size-6 text-cyan-400" />,
+      accentBorder: "border-cyan-500/20",
+      accentBg: "bg-cyan-500/10",
+      glow: "shadow-[0_0_25px_rgba(6,182,212,0.08)]",
+    },
+    {
+      label: "Servis xizmatlari",
+      value: `${formatPrice(dashboard?.total_service_sales || 0)} so'm`,
+      subtitle: "O'rnatish va ta'mirlash",
+      icon: <TrendingUp className="size-6 text-indigo-400" />,
+      accentBorder: "border-indigo-500/20",
+      accentBg: "bg-indigo-500/10",
+      glow: "shadow-[0_0_25px_rgba(99,102,241,0.08)]",
+    },
+  ];
+
+  const nodeStatuses = [
+    {
+      id: "new",
+      name: "Yangi buyurtmalar",
+      count: dashboard?.orders_count?.new || 0,
+      icon: <MdPendingActions className="size-5 text-sky-400" />,
+      bg: "bg-sky-500/10 border-sky-500/20 text-sky-400",
+    },
+    {
+      id: "success",
+      name: "Jarayondagi",
+      count: dashboard?.orders_count?.success || 0,
+      icon: <Sparkles className="size-5 text-amber-400" />,
+      bg: "bg-amber-500/10 border-amber-500/20 text-amber-400",
+    },
+    {
+      id: "delivered",
+      name: "Yakunlangan",
+      count: dashboard?.orders_count?.delivered || 0,
+      icon: <MdCheckCircle className="size-5 text-emerald-400" />,
+      bg: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+    },
+    {
+      id: "canceled",
+      name: "Bekor qilingan",
+      count: dashboard?.orders_count?.canceled || 0,
+      icon: <MdCancel className="size-5 text-rose-400" />,
+      bg: "bg-rose-500/10 border-rose-500/20 text-rose-400",
+    },
+  ];
+
   return (
-    <div>
-      {loading ? (
-        <div className="flex items-center justify-center pt-50 h-full w-full animate-pulse">
-          Yuklanmoqda...
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 select-none">
+      {/* Header with Title and Date Range Filter */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Boshqaruv Paneli
+          </h1>
+          <p className="text-sm text-slate-400 mt-1">
+            Quyosh energiyasi va tijorat platformasi umumiy ko'rsatkichlari
+          </p>
         </div>
-      ) : (
-        <div className="md:p-8 p-4 space-y-8 max-w-400 mx-auto w-full">
-          {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {kpis.map((kpi, idx) => (
-              <div
-                key={idx}
-                className={`${kpi.colorClass || "border border_color"} bg_card rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:shadow-primary/5 transition-all duration-300 h-33 group`}
-              >
-                <div className="flex justify-between items-start">
-                  <p
-                    className={`${kpi.colorClass ? "text-white/80" : "text-slate-400"} text-sm font-semibold`}
-                  >
-                    {kpi.label}
-                  </p>
-                  <span
-                    className={
-                      kpi.colorClass ? "text-white/40" : "text-primary"
-                    }
-                  >
-                    {kpi.icon}
-                  </span>
-                </div>
-                <div>
-                  <p
-                    className={`${kpi.colorClass ? "text-white" : "text-white"} text-3xl font-bold tracking-tight`}
-                  >
-                    {kpi.value}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-            {/* Energy Chart Section */}
-            <div className="xl:col-span-2 bg_card border border_color rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-lg font-bold">To'liq Sotuv Jarayoni</h2>
-                  <p className="text-sm text-slate-400">
-                    Ma'lum vaqt oralig'idagi bo'lib o'tgan sotuvlar
-                  </p>
-                </div>
-                <div className="px-3 py-1.5 text-xs font-bold rounded-lg bg-primary text-background-dark shadow-lg shadow-primary/20">
-                  Mavjud
-                </div>
-              </div>
-              <div className="h-80 w-full">
-                <ResponsiveContainer
-                  width="100%"
-                  height="100%"
-                  className="outline-none"
-                >
-                  <AreaChart
-                    className="outline-none select-none"
-                    data={dashboard?.sales_history || data}
-                  >
-                    <defs>
-                      <linearGradient
-                        id="colorUsage"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="5%"
-                          stopColor="#09f6b3"
-                          stopOpacity={0.3}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="#09f6b3"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#1f2937"
-                      vertical={false}
-                    />
-                    <XAxis
-                      dataKey="date"
-                      attributeName="Muddat"
-                      stroke="#6b7280"
-                      fontSize={12}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis hide />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#111827",
-                        border: "1px solid #374151",
-                        borderRadius: "12px",
-                      }}
-                      itemStyle={{ color: "#09f6b3" }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="amount"
-                      name="Miqdor"
-                      stroke="#09f6b3"
-                      strokeWidth={3}
-                      fillOpacity={1}
-                      fill="url(#colorUsage)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+        {/* Date Filter Bar */}
+        <form
+          onSubmit={handleFilterSubmit}
+          className="flex flex-wrap items-center gap-2.5 p-1.5 rounded-2xl bg-[#12211c] border border-white/5"
+        >
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs text-slate-300">
+            <MdCalendarToday className="text-emerald-400 text-sm" />
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="bg-transparent text-white font-medium text-xs focus:outline-none"
+            />
+          </div>
+          <span className="text-slate-500 text-xs">—</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs text-slate-300">
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="bg-transparent text-white font-medium text-xs focus:outline-none"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#0b1411] font-bold text-xs transition-all shadow-md shadow-emerald-500/20 active:scale-95 disabled:opacity-50"
+          >
+            {loading ? "Yangilanmoqda..." : "Filtrlash"}
+          </button>
+        </form>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {kpis.map((kpi, idx) => (
+          <div
+            key={idx}
+            className={`p-5 rounded-2xl bg-[#12211c] border ${kpi.accentBorder} ${kpi.glow} relative overflow-hidden transition-all duration-300 hover:border-white/20 hover:-translate-y-0.5`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                {kpi.label}
+              </span>
+              <div className={`p-2.5 rounded-xl ${kpi.accentBg}`}>
+                {kpi.icon}
               </div>
             </div>
-
-            {/* Node Status Widget */}
-            <div className="bg_card border border_color rounded-2xl p-6 flex flex-col shadow-sm">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold">Buyurtmalar soni</h2>
-                <span className="flex items-center gap-1 text-[10px] font-bold text_primary uppercase">
-                  <span className="size-2 bg-primary rounded-full animate-pulse"></span>
-                  Barchasi
-                </span>
-              </div>
-              <div className="space-y-6 flex-1">
-                {nodeStatuses.map((node) => (
-                  <div key={node.id} className="flex items-center gap-4 group">
-                    <div
-                      className={`size-10 rounded-full flex items-center justify-center transition-colors ${
-                        node.status === "new"
-                          ? "text-orange-500"
-                          : node.status === "delivered"
-                            ? "text-blue-500"
-                            : node.status === "success"
-                              ? "text-green-500"
-                              : "text-red-500"
-                      }`}
-                    >
-                      <span className="text-xl">{node.icon}</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-bold group-hover:text-primary transition-colors">
-                        {node.name}
-                      </p>
-                    </div>
-                    <span
-                      className={`text-[14px] font-bold px-2 py-1 rounded transition-all ${
-                        node.status === "new"
-                          ? "text-orange-500"
-                          : node.status === "delivered"
-                            ? "text-blue-500"
-                            : node.status === "success"
-                              ? "text-green-500"
-                              : "text-red-500"
-                      }`}
-                    >
-                      {node.count}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  const fromDate = formData.get("from_date") as string;
-                  const toDate = formData.get("to_date") as string;
-                  fetchProducts(fromDate, toDate);
-                }}
-                className="mt-6 pt-6 border-t border_color space-y-4"
-              >
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">
-                      Dan
-                    </label>
-                    <input
-                      type="date"
-                      name="from_date"
-                      defaultValue={new Date(
-                        new Date().getFullYear(),
-                        new Date().getMonth(),
-                        1,
-                      ).toLocaleDateString("en-CA")}
-                      className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm"
-                      onChange={(e) => {
-                        const newDate = new Date(e.target.value);
-                        const year = newDate.getFullYear();
-                        const month = newDate.getMonth();
-                        const lastDay = new Date(year, month + 1, 0);
-                        const toDateInput = e.target.form?.elements.namedItem(
-                          "to_date",
-                        ) as HTMLInputElement;
-                        if (toDateInput) {
-                          toDateInput.value =
-                            lastDay.toLocaleDateString("en-CA");
-                        }
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">
-                      Gacha
-                    </label>
-                    <input
-                      type="date"
-                      defaultValue={new Date(
-                        new Date().getFullYear(),
-                        new Date().getMonth() + 1,
-                        0,
-                      ).toLocaleDateString("en-CA")}
-                      className="w-full bg_card border_color rounded-xl px-4 py-3 text-sm"
-                      name="to_date"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-3 text-xs font-bold bg-primary rounded-xl transition-all active:scale-[0.98]"
-                >
-                  Ko'rish
-                </button>
-              </form>
+            <div className="space-y-1">
+              <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                {kpi.value}
+              </p>
+              <p className="text-xs text-slate-400 font-medium">
+                {kpi.subtitle}
+              </p>
             </div>
           </div>
+        ))}
+      </div>
 
-          {/* Recent Transactions Table */}
-          {dashboard?.top_products && (
-            <div className="bg_card border border_color rounded-2xl overflow-hidden shadow-sm">
-              <div className="p-6 border-b border_color flex items-center justify-between">
-                <h2 className="text-lg font-bold">Eng ko'p buyurtma berilgan mahsulot va xizmatlar</h2>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead className="card_btn">
-                    <tr>
-                      <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Nomi
-                      </th>
-                      <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Soni
-                      </th>
-                      <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Narxi
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="">
-                    {dashboard?.top_products.map((tx, i) => (
-                      <tr
-                        key={i}
-                        className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group"
-                      >
-                        <td className="px-6 py-4 font-bold text-sm text-nowrap">
-                          {tx.name}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium group-hover:text-primary transition-colors">
-                              {tx.count}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-sm font-bold text-nowrap">
-                          {formatPrice(tx.total_sum)} so'm
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+      {/* Order Statuses Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {nodeStatuses.map((st) => (
+          <div
+            key={st.id}
+            className="p-4 rounded-2xl bg-[#12211c] border border-white/5 flex items-center justify-between hover:border-white/10 transition-colors"
+          >
+            <div className="space-y-1">
+              <span className="text-xs text-slate-400 font-medium">{st.name}</span>
+              <p className="text-2xl font-black text-white">{st.count}</p>
+            </div>
+            <div className={`p-2.5 rounded-xl border ${st.bg}`}>
+              {st.icon}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Sales Trend Chart */}
+      <div className="p-6 rounded-3xl bg-[#12211c] border border-white/5 shadow-xl space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <TrendingUp className="size-5 text-emerald-400" />
+              Sotuvlar Dinamikasi
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Tanlangan muddat bo'yicha tushumlar grafikasi
+            </p>
+          </div>
+        </div>
+
+        <div className="h-72 w-full">
+          {dashboard?.sales_history && dashboard.sales_history.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={dashboard.sales_history}>
+                <defs>
+                  <linearGradient id="emeraldGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                <XAxis
+                  dataKey="date"
+                  stroke="#64748b"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="#64748b"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(val) => `${Number(val) / 1000}k`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#0b1411",
+                    borderColor: "rgba(16, 185, 129, 0.3)",
+                    borderRadius: "12px",
+                    color: "#fff",
+                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)",
+                  }}
+                  formatter={(value: any) => [`${formatPrice(value)} so'm`, "Sotuv"]}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="#10b981"
+                  strokeWidth={2.5}
+                  fillOpacity={1}
+                  fill="url(#emeraldGrad)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-full flex items-center justify-center text-slate-500 text-sm">
+              Tanlangan davr uchun sotuvlar statistikasi topilmadi
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Top Products Table */}
+      {dashboard?.top_products && dashboard.top_products.length > 0 && (
+        <div className="rounded-3xl bg-[#12211c] border border-white/5 overflow-hidden shadow-xl">
+          <div className="p-6 border-b border-white/5 flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-white">
+                Eng ko'p sotilgan mahsulotlar
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Yetakchi mahsulotlar bo'yicha daromad
+              </p>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-white/[0.02] border-b border-white/5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <tr>
+                  <th className="px-6 py-4">Mahsulot Nomi</th>
+                  <th className="px-6 py-4 text-center">Sotilgan Soni</th>
+                  <th className="px-6 py-4 text-right">Umumiy Summa</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {dashboard.top_products.map((item, idx) => (
+                  <tr
+                    key={idx}
+                    className="hover:bg-white/[0.02] transition-colors"
+                  >
+                    <td className="px-6 py-4 font-semibold text-white">
+                      {item.name}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        {item.count} dona
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-amber-400">
+                      {formatPrice(item.total_sum)} so'm
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
